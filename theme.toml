@@ -1,0 +1,31 @@
+name = 'Hugo-focus'
+license = 'MIT'
+licenselink = 'https://github.com/caoyang2002/hugo-focus/LICENSE'
+description = 'Theme description'
+
+# The home page of the theme, where the source can be found
+homepage = 'https://github.com/caoyang2002/hugo-focus'
+
+# If you have a running demo of the theme
+demosite = 'https://caoyang2002.github.io/hugo-focus'
+
+# Taxonomy terms
+tags = ["Responsive", "Simple", "Clean", "Light", "White", "Blog"]
+features = ["Responsive", "One Column", "Blog"]
+
+# If the theme has multiple authors
+authors = [
+  {name = 'simons', homepage = 'Website of author'},
+  {name = 'cuff', homepage = 'Website of author'}
+]
+
+# If the theme has a single author
+[author]
+  name = 'caoyang2002'
+  homepage = 'caoyang2002.xyz'
+
+# If porting an existing theme
+[original]
+  author = 'caoyang2002'
+  homepage = 'caoyang2002'
+  repo = 'https://github.com/caoyang2002/hugo-focus'

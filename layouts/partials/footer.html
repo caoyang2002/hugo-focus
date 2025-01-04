@@ -1,0 +1,136 @@
+<footer class="flex items-center text-xs uppercase">
+    <div class="mr-auto opacity-60">
+        {{if site.Copyright}} {{site.Copyright}} {{else}} &copy; {{ now.Year }}
+        <a class="link" href="{{ `` | absURL }}">{{ site.Title }}</a>
+        {{end}}
+    </div>
+
+    <a
+        class="link mx-6 opacity-60"
+        href="https://gohugo.io/"
+        rel="noopener"
+        target="_blank"
+        >powered by hugo️️</a
+    >️
+    <a
+        class="link mx-6 opacity-60"
+        href="https://github.com/nanxiaobei/hugo-paper"
+        rel="noopener"
+        target="_blank"
+        >hugo-paper</a
+    >
+    <a
+        class="link opacity-60"
+        href="https://github.com/caoyang2002/hugo-focus"
+        rel="noopener"
+        target="_blank"
+        >hugo-focus</a
+    >
+</footer>
+
+<style>
+    footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        width: 100%;
+
+        padding: 0.5rem;
+        padding-bottom: calc(0.5rem + var(--safe-padding-bottom));
+        padding-left: max(0.5rem, var(--safe-padding-left));
+        padding-right: max(0.5rem, var(--safe-padding-right));
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(12px);
+        background: rgba(255, 255, 255, 0.85);
+        border-top: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    /* 深色模式 */
+    .dark footer {
+        background: rgba(0, 0, 0, 0.85);
+        border-top-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* 内容容器 */
+    .footer-content {
+        width: 100%;
+        max-width: var(--w);
+        margin: 0 auto;
+        padding: 0 1rem;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    /* 元素样式 */
+    .footer-element {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        opacity: 0.8;
+        border-radius: 0.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        transition: all 0.2s ease;
+    }
+
+    .footer-element:hover {
+        opacity: 1;
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .dark .footer-element {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .dark .footer-element:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+        footer {
+            padding-top: 0.5rem;
+            padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+        }
+
+        .footer-content {
+            padding: 0 0.5rem;
+            gap: 0.5rem;
+        }
+
+        .footer-element {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .footer-element {
+            font-size: 0.875rem;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .footer-content {
+            padding: 0 2rem;
+            gap: 2rem;
+        }
+
+        .footer-element {
+            padding: 0.75rem 2rem;
+        }
+    }
+</style>

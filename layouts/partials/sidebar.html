@@ -1,0 +1,226 @@
+  <aside class="sticky top-24 w-64">
+  {{ if .IsHome }}
+  <!-- 个人信息卡片 -->
+  <div class="not-prose rounded-lg bg-white dark:bg-neutral-800 p-6 shadow-sm">
+    {{ with $.Scratch.Get "avatar_url" }}
+    <div class="mb-4 flex justify-center">
+      <a href="{{ site.BaseURL }}" class="block relative group">
+        <img
+          src="{{ . }}"
+          class="h-24 w-24 rounded-full border-2 border-neutral-200 dark:border-neutral-700 transition-transform duration-200 group-hover:scale-105"
+          alt="avatar"
+        />
+        <div class="absolute inset-0 rounded-full bg-black opacity-0 transition-opacity duration-200 group-hover:opacity-10"></div>
+      </a>
+    </div>
+    {{ end }}
+
+    {{ with site.Params.name }}
+    <h2 class="mb-2 text-center text-lg font-bold bg-gradient-to-r from-neutral-800 to-neutral-600 dark:from-neutral-200 dark:to-neutral-400 bg-clip-text text-transparent">
+      {{ . }}
+    </h2>
+    {{ end }}
+
+    {{ with site.Params.bio }}
+    <p class="mb-6 text-center text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+      {{ . }}
+    </p>
+    {{ end }}
+
+    <!-- 社交链接优化 -->
+    {{ with $.Scratch.Get "social_list" }}
+    <!-- <div class="flex justify-center space-x-4">
+      {{ range . }}
+      <a
+        href="{{ index site.Params . }}"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="group relative"
+      >
+        <img
+          src="/{{ . }}.svg"
+          alt="{{ . }}"
+          class="h-5 w-5 dark:invert transition-transform duration-200 group-hover:scale-110"
+        >
+        <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 text-xs text-white bg-neutral-800 rounded opacity-0 transition-opacity duration-200 pointer-events-none group-hover:opacity-100">
+          {{ . }}
+        </span>
+      </a>
+      {{ end }}
+    </div> -->
+    {{ end }}
+  </div>
+
+  {{ else }}
+  <!-- 文章目录优化 -->
+  {{ if and (ne .Params.toc false) (ne .TableOfContents "<nav id=\"TableOfContents\"></nav>") }}
+  <div class="not-prose sticky top-24 rounded-lg bg-white dark:bg-neutral-800 p-6 shadow-sm">
+    <h3 class="mb-4 text-lg font-semibold bg-gradient-to-r from-neutral-800 to-neutral-600 dark:from-neutral-200 dark:to-neutral-400 bg-clip-text text-transparent">
+      目录
+    </h3>
+    <nav id="TableOfContents" class="toc">
+      {{ .TableOfContents }}
+    </nav>
+  </div>
+  {{ end }}
+  {{ end }}
+</aside>
+
+<style>
+/* 固定目录样式 */
+aside {
+  position: fixed;  /* 改为固定定位 */
+  top: 96px;       /* 距离顶部位置，根据实际头部高度调整 */
+  right: 0rem;
+  width: 14rem;
+  height: calc(100vh - 96px); /* 减去顶部间距的视口高度 */
+  overflow-y: auto;
+  z-index: 40;     /* 确保在适当的层级 */
+}
+
+/* 目录容器本身的样式 */
+.toc-container {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+}
+
+/* 暗色模式 */
+@media (prefers-color-scheme: dark) {
+  .toc-container {
+    background: rgb(38 38 38);
+  }
+}
+
+/* 目录内容区域 */
+.toc {
+  max-height: calc(100vh - 180px); /* 减去头部、padding等空间 */
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+/* 美化滚动条 */
+.toc::-webkit-scrollbar {
+  width: 4px;
+}
+
+.toc::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.toc::-webkit-scrollbar-thumb {
+  background-color: #d1d1d1;
+  border-radius: 4px;
+}
+
+/* 目录链接样式 */
+.toc ul {
+  list-style: none;
+  padding-left: 1rem;
+}
+
+.toc li {
+  margin: 0.5rem 0;
+}
+
+.toc a {
+  display: block;
+  padding: 0.25rem 0.5rem;
+  color: #4b5563;
+  text-decoration: none;
+  border-radius: 0.25rem;
+  transition: all 0.2s;
+}
+
+.toc a:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.toc a.active {
+  background-color: #f3f4f6;
+  color: #111827;
+  font-weight: 500;
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+  aside {
+    display: none; /* 在小屏幕上隐藏 */
+  }
+}
+
+/* 暗色模式适配 */
+@media (prefers-color-scheme: dark) {
+  .toc a {
+    color: #9ca3af;
+  }
+
+  .toc a:hover,
+  .toc a.active {
+    background-color: #262626;
+    color: #e5e7eb;
+  }
+
+  .toc::-webkit-scrollbar-thumb {
+    background-color: #404040;
+  }
+}
+h1, h2, h3, h4, h5, h6 {
+  scroll-margin-top: 100px; /* 根据实际情况调整 */
+}
+</style>
+
+<script>
+// 目录滚动监听
+document.addEventListener('DOMContentLoaded', () => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const id = entry.target.getAttribute('id');
+      const tocLink = document.querySelector(`.toc a[href="#${id}"]`);
+
+      if (entry.intersectionRatio > 0) {
+        document.querySelectorAll('.toc a.active').forEach(node => {
+          node.classList.remove('active');
+        });
+        tocLink?.classList.add('active');
+      }
+    });
+  }, {
+    rootMargin: '-20% 0px -80% 0px'
+  });
+
+  // 观察所有标题元素
+  document.querySelectorAll('h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]').forEach(heading => {
+    observer.observe(heading);
+  });
+});
+
+  // 移动端目录切换
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  document.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, false);
+
+  document.addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+  }, false);
+
+  function handleSwipe() {
+    const aside = document.querySelector('aside');
+    const swipeLength = touchEndX - touchStartX;
+
+    if (Math.abs(swipeLength) > 50) {
+      if (swipeLength < 0) {
+        aside?.classList.add('show');
+      } else {
+        aside?.classList.remove('show');
+      }
+    }
+  }
+});
+</script>
