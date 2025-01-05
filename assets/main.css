@@ -457,7 +457,7 @@ video {
 }
 
 :root {
-    --w: calc(680px + 32px * 2);
+    --w: 100vw;
     --safe-padding-bottom: env(safe-area-inset-bottom, 0px);
     --safe-padding-left: env(safe-area-inset-left, 0rem);
     --safe-padding-right: env(safe-area-inset-right, 0rem);
@@ -2243,4 +2243,11 @@ article .highlight {
 
 .\[\&_svg\]\:block svg {
     display: block;
+}
+
+.pagination-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3.5rem;
+    gap: 1rem; /* 添加这一行 */
 }

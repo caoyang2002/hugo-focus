@@ -39,28 +39,13 @@
     lang="{{ or site.LanguageCode site.Language.Lang }}"
     dir="{{ if site.Params.direction }}{{ site.Params.direction }}{{ else }}ltr{{ end }}"
 >
+    <!-- 元数据 -->
     {{ partial "head.html" . }}
-    <style>
-        header {
-            position: fixed;
-            top: 0;
-            left: 0; /* 改为从左边开始 */
-            right: 0; /* 添加右边界 */
-            z-index: 50;
-            width: 100vw; /* 使用视窗宽度 */
-            text-align: center;
 
-            /* 玻璃态模糊效果 */
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            background: rgba(255, 255, 255, 0.5);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        }
-    </style>
     <body class="text-black duration-200 ease-out dark:text-white">
         {{ partial "header.html" . }}
 
-        <div class="relative flex justify-start max-w-[--w] px-8">
+        <div class="relative flex justify-start max-w-[90vw] px-8">
             <main
                 class="prose prose-neutral flex-1 min-h-[calc(100vh-9rem)] pt-14 pb-16 dark:prose-invert text-left"
             >

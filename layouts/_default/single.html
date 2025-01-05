@@ -65,7 +65,7 @@
     <!-- Disqus -->
     {{ if and site.Config.Services.Disqus.Shortname (not (eq .Params.comments
     false)) }}
-    <div class="mt-24" id="disqus_thread"></div>
+    <div class="mt-24 w-100rem" id="disqus_thread"></div>
     <script>
         const disqusShortname = "{{ site.Config.Services.Disqus.Shortname }}";
         const script = document.createElement("script");
