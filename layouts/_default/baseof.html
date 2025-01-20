@@ -53,10 +53,13 @@
             >
                 {{ block "main" . }}{{ end }}
             </main>
-
+            {{ if .IsHome }}
             <div class="hidden lg:block ml-8">
-                {{ partial "sidebar.html" . }}
+                {{ partial "indexbar.html" . }}
             </div>
+            {{else}}
+            <div class="ml-2">{{ partial "tocbar.html" . }}</div>
+            {{end}}
         </div>
         {{ partial "footer.html" . }}
     </body>
