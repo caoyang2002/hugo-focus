@@ -22,7 +22,7 @@
 
 <!-- avatar_url -->
 {{ if site.Params.avatar }}<!---->
-{{ printf "Avatar setting: %s" site.Params.avatar }}<!---->
+<!-- {{ printf "Avatar setting: %s" site.Params.avatar }} -->
 {{if or (hasPrefix site.Params.avatar "http") (hasPrefix site.Params.avatar
 "https") (hasPrefix site.Params.avatar "/")}}<!---->
 {{ $.Scratch.Set "avatar_url" site.Params.avatar }}<!---->
