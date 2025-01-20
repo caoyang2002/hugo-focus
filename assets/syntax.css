@@ -1,0 +1,13 @@
+/* 行内代码 */
+code {
+    padding: 0.2em 0.4em;
+    background: rgba(175, 184, 193, 0.2);
+    border-radius: 3px;
+    font-family: monospace;
+}
+
+/* 代码块中的代码 */
+pre code {
+    padding: 0;
+    background: none;
+}

@@ -1,6 +1,4 @@
   <aside class="sticky w-64">
-      <!-- 侧边栏 -->
-  {{ if .IsHome }}
   <!-- 个人信息卡片 -->
   <div class="not-prose rounded-lg bg-white dark:bg-neutral-800 p-6 shadow-sm">
     {{ with $.Scratch.Get "avatar_url" }}
@@ -27,55 +25,92 @@
       {{ . }}
     </p>
     {{ end }}
+
+    <!-- 社交列表 -->
+    {{ with $.Scratch.Get "social_list" }}
+    <nav
+        class="space-x-4 flex justify-center dark:invert  lg:mt-0 lg:items-center"
+    >
+        {{ range . }}<!---->
+        <a
+            class="h-7 w-7 text-[0] [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+            style="--url: url(./{{ . }}.svg)"
+            href="{{ if eq . `rss` }}{{ `index.xml` | absURL }}{{ else if eq . `mastodon` }}{{ index site.Params . }}{{ else }}{{ if eq . `threads` }}https://threads.net/{{ else if eq . `bluesky` }}https://bsky.app/profile/{{ else }}https://{{ . }}.com/{{ end }}{{ if eq . `linkedin` }}in/{{ end }}{{ index site.Params . }}{{ end }}"
+            target="_blank"
+            rel="{{ if eq . `rss` }}alternate{{ else }}me{{ end }}"
+        >
+            {{ . }}
+        </a>
+        {{ end }}<!---->
+    </nav>
+    </div>
+    {{ end }}
+
     <!-- 博客统计 -->
     <div class="mb-6 text-center text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-        <p>  文章总数：{{ len (where .Site.RegularPages "Section" "posts") }}</p>
-        <p>总字数：{{ $wordCount := 0 }}{{ range .Site.RegularPages }}{{ $wordCount = add $wordCount .WordCount }}{{ end }}{{ $wordCount }}</p>
-        <p>分类数：{{ len .Site.Taxonomies.categories }}</p>
-        <p> 标签数：{{ len .Site.Taxonomies.tags }}</p>
+        <div class="blog-analyze">
+            <h3>统计</h3>
+            <div class="">
+                <p>  文章总数：{{ len (where .Site.RegularPages "Section" "posts") }}</p>
+                <p>总字数：{{ $wordCount := 0 }}{{ range .Site.RegularPages }}{{ $wordCount = add $wordCount .WordCount }}{{ end }}{{ $wordCount }}</p>
+                <p>分类数：{{ len .Site.Taxonomies.categories }}</p>
+                <p> 标签数：{{ len .Site.Taxonomies.tags }}</p>
+
+                <!-- 动态内容 -->
+                <div class="dynamic-content"
+                     data-api="{{ .Site.Params.apiEndpoint }}"
+                     data-refresh="60">
+                    {{ range first 5 .Site.RegularPages }}
+                        <article class="dynamic-item">
+                            <h3>{{ .Title }}</h3>
+                            <time>{{ .Date.Format "2006-01-02" }}</time>
+                        </article>
+                    {{ end }}
+                </div>
+
+
+<!-- 归档 -->
+                {{ range .Site.RegularPages.GroupByDate "2006" }}
+                <div class="archive-year">
+                    <h2>{{ .Key }}</h2>
+                    {{ range .Pages.GroupByDate "January" }}
+                        <div class="archive-month">
+                            <h3>{{ .Key }}</h3>
+                            {{ range .Pages }}
+                                <article>
+                                    <time>{{ .Date.Format "02" }}</time>
+                                    <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+                                    <span class="reading-time">{{ .ReadingTime }} min read</span>
+                                </article>
+                            {{ end }}
+                        </div>
+                    {{ end }}
+                </div>
+                {{ end }}
+            </div>
+        </div>
+
+        <div class="popular-posts">
+               <h3>热门文章</h3>
+               {{ range first 5 (where .Site.RegularPages.ByDate.Reverse "Section" "posts") }}
+                   <p><a href="{{ .RelPermalink }}">{{ .Title }}</a></p>
+               {{ end }}
+           </div>
+
+           <div class="tag-cloud">
+               <h3>标签云</h3>
+               {{ range $name, $taxonomy := .Site.Taxonomies.tags }}
+               {{ $count := .Count }}
+               <a href="{{ "/tags/" | relLangURL }}{{ $name | urlize }}"
+                  style="font-size: {{ add 0.8 (mul 0.1 (len $taxonomy)) }}rem">
+                   {{ $name }} ({{ $count }})
+               </a>
+               {{ end }}
+           </div>
     </div>
-
-
-
-    <!-- 社交链接优化 -->
-    {{ with $.Scratch.Get "social_list" }}
-    <!-- <div class="flex justify-center space-x-4">
-      {{ range . }}
-      <a
-        href="{{ index site.Params . }}"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="group relative"
-      >
-        <img
-          src="/{{ . }}.svg"
-          alt="{{ . }}"
-          class="h-5 w-5 dark:invert transition-transform duration-200 group-hover:scale-110"
-        >
-        <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 text-xs text-white bg-neutral-800 rounded opacity-0 transition-opacity duration-200 pointer-events-none group-hover:opacity-100">
-          {{ . }}
-        </span>
-      </a>
-      {{ end }}
-    </div> -->
-    {{ end }}
   </div>
 
-  {{ else }}
-  <!-- 文章目录优化 -->
-  <div class="toc-container fixed">
-    {{ if and (ne .Params.toc false) (ne .TableOfContents "<nav id=\"TableOfContents\"></nav>") }}
-    <div class="not-prose toc-wrapper">
-      <h3 class="toc-title">
-        目录
-      </h3>
-      <nav id="TableOfContents" class="toc">
-        {{ .TableOfContents }}
-      </nav>
-    </div>
-    {{ end }}
-  </div>
-  {{ end }}
+
 </aside>
 
 <style>
@@ -184,6 +219,17 @@ aside {
 h1, h2, h3, h4, h5, h6 {
   scroll-margin-top: 100px; /* 根据实际情况调整 */
 }
+
+/* 标签云 */
+/* 标签云动画 */
+.tag-cloud a {
+    transition: all 0.3s;
+}
+.tag-cloud a:hover {
+    transform: scale(1.1);
+}
+
+
 
 </style>
 

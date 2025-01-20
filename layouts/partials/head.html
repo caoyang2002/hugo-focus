@@ -29,6 +29,8 @@
     {{ end }}
 
     <!-- css & js -->
+    {{ $syntax := resources.Get "css/syntax.css" }}
+    <!--  -->
     {{ $main := resources.Get "main.css" }}
     <!---->
     {{ $custom := resources.Get "custom.css" }}

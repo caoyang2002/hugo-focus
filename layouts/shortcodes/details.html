@@ -1,0 +1,5 @@
+{{/* layouts/shortcodes/details.html */}}
+<details {{ if eq (.Get 0) "open" }}open{{ end }}>
+  <summary>{{ .Get 1 }}</summary>
+  {{ .Inner | markdownify }}
+</details>
