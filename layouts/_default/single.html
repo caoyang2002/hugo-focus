@@ -8,23 +8,38 @@
 
         {{ if ne .Type "page" }}
         <div class="text-xs antialiased opacity-60">
+            <!-- 日期 -->
             {{ if .Date }}
             <time>{{ .Date | time.Format ":date_medium" }}</time>
             {{ end }}<!---->
-            {{ $single_author := or .Params.Author site.Author.name }}
-            <!---->
-            {{ if $single_author }}
+            <!-- 作者 -->
+            {{ $single_author := or .Params.Author site.Author.name }} {{ if
+            $single_author }}
             <span class="mx-1">&middot;</span>
             <span>{{ $single_author }}</span>
-            {{ end }}
+            {{ end }}<!---->
+            <!-- 标签 -->
         </div>
-        {{ end }}
+        {{ if .Params.tags }}
+
+        <span class="text-md antialiased opacity-60">
+            {{ range .Params.tags }} {{ $href := print (absURL "tags/") (urlize
+            .) }}
+            <a
+                href="{{ $href }}"
+                class="mb-2 ltr:mr-1.5 rtl:ml-1.5 px-3 py-1 rounded-lg no-underline bg-black/[3%] hover:bg-black/[6%] dark:bg-white/[8%] dark:hover:bg-white/[12%]"
+            >
+                {{ . }}
+            </a>
+            {{ end }}
+        </span>
+        {{ end }} {{ end }}
     </div>
 
     <section>{{ .Content }}</section>
 
     <!-- Post Tags -->
-    {{ if .Params.tags }}
+    <!-- {{ if .Params.tags }}
     <footer class="mt-12 flex flex-wrap">
         {{ range .Params.tags }} {{ $href := print (absURL "tags/") (urlize .)
         }}
@@ -35,7 +50,7 @@
         >
         {{ end }}
     </footer>
-    {{ end }}
+    {{ end }} -->
 
     <!-- Post Nav -->
     {{ if not site.Params.disablePostNavigation }}<!---->
