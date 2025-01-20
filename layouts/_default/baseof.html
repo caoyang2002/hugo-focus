@@ -51,16 +51,19 @@
             <main
                 class="prose prose-neutral flex-1 min-h-[calc(100vh-9rem)] pt-14 pb-16 dark:prose-invert text-left"
             >
-                {{ block "main" . }}{{ end }}
+                {{ block "main" . }} {{ end }}
             </main>
+
             {{ if .IsHome }}
             <div class="hidden lg:block ml-8">
                 {{ partial "indexbar.html" . }}
             </div>
             {{else}}
             <div class="ml-2">{{ partial "tocbar.html" . }}</div>
+
             {{end}}
         </div>
+
         {{ partial "footer.html" . }}
     </body>
 </html>

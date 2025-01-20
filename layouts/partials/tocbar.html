@@ -1,3 +1,5 @@
+{{ $bg_color := $.Scratch.Get "bg_color" }}
+
 
 <!-- 移动端展开按钮 -->
 <button class="mobile-toc-toggle">
@@ -6,10 +8,12 @@
 
 <!-- 目录容器 -->
 <aside class="toc-aside">
+
   {{ if and (ne .Params.toc false) (ne .TableOfContents "<nav id=\"TableOfContents\"></nav>") }}
   <div class="toc-container">
     <div class="toc-header">
       <h3 class="toc-title">目录</h3>
+
       <button class="toc-close">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
           <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -101,7 +105,7 @@
   padding: 0.5rem;
   background: none;
   border: none;
-  color: #4b5563;
+  color: --bg;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -143,7 +147,7 @@
   color: #111827;
 }
 
-.toc a.active {
+.toc a:active {
   background-color: #f3f4f6;
   color: #111827;
   font-weight: 500;
@@ -183,7 +187,7 @@
 }
 
 /* 暗色模式适配 */
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   .toc-container,
   .toc-header {
     background: #262626;
@@ -225,7 +229,7 @@
   .toc::-webkit-scrollbar-thumb {
     background-color: #4b5563;
   }
-}
+} */
 
 /* 标题滚动偏移量 */
 h1, h2, h3, h4, h5, h6 {
@@ -238,6 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const tocAside = document.querySelector('.toc-aside');
   const mobileToggle = document.querySelector('.mobile-toc-toggle');
   const closeButton = document.querySelector('.toc-close');
+
 
   // 展开目录
   mobileToggle?.addEventListener('click', () => {
@@ -280,5 +285,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]').forEach(heading => {
     observer.observe(heading);
   });
+
 });
 </script>
