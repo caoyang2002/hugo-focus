@@ -1,1 +1,4 @@
 /* Place custom css here. */
+.bg-blue-500 {
+    background-color: blue;
+}

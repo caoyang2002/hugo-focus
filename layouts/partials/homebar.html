@@ -1,116 +1,131 @@
-  <aside class="sticky w-64">
-  <!-- 个人信息卡片 -->
-  <div class="not-prose rounded-lg bg-white dark:bg-neutral-800 p-6 shadow-sm">
-    {{ with $.Scratch.Get "avatar_url" }}
-    <div class="mb-4 flex justify-center">
-      <a href="{{ site.BaseURL }}" class="block relative group">
-        <img
-          src="{{ . }}"
-          class="h-24 w-24 rounded-full border-2 border-neutral-200 dark:border-neutral-700 transition-transform duration-200 group-hover:scale-105"
-          alt="avatar"
-        />
-        <div class="absolute inset-0 rounded-full bg-black opacity-0 transition-opacity duration-200 group-hover:opacity-10"></div>
-      </a>
-    </div>
-    {{ end }}
+<aside class="sticky w-64">
 
-    {{ with site.Params.name }}
-    <h2 class="mb-2 text-center text-lg font-bold bg-gradient-to-r from-neutral-800 to-neutral-600 dark:from-neutral-200 dark:to-neutral-400 bg-clip-text text-transparent">
-      {{ . }}
-    </h2>
-    {{ end }}
-
-    {{ with site.Params.bio }}
-    <p class="mb-6 text-center text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-      {{ . }}
-    </p>
-    {{ end }}
-
-    <!-- 社交列表 -->
-    {{ with $.Scratch.Get "social_list" }}
-    <nav
-        class="space-x-4 flex justify-center dark:invert  lg:mt-0 lg:items-center"
-    >
-        {{ range . }}<!---->
-        <a
-            class="h-7 w-7 text-[0] [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
-            style="--url: url(./{{ . }}.svg)"
-            href="{{ if eq . `rss` }}{{ `index.xml` | absURL }}{{ else if eq . `mastodon` }}{{ index site.Params . }}{{ else }}{{ if eq . `threads` }}https://threads.net/{{ else if eq . `bluesky` }}https://bsky.app/profile/{{ else }}https://{{ . }}.com/{{ end }}{{ if eq . `linkedin` }}in/{{ end }}{{ index site.Params . }}{{ end }}"
-            target="_blank"
-            rel="{{ if eq . `rss` }}alternate{{ else }}me{{ end }}"
-        >
-            {{ . }}
-        </a>
-        {{ end }}<!---->
-    </nav>
-    </div>
-    {{ end }}
-
-    <!-- 博客统计 -->
-    <div class="mb-6 text-center text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-        <div class="blog-analyze">
-            <h3>统计</h3>
-            <div class="">
-                <p>  文章总数：{{ len (where .Site.RegularPages "Section" "posts") }}</p>
-                <p>总字数：{{ $wordCount := 0 }}{{ range .Site.RegularPages }}{{ $wordCount = add $wordCount .WordCount }}{{ end }}{{ $wordCount }}</p>
-                <p>分类数：{{ len .Site.Taxonomies.categories }}</p>
-                <p> 标签数：{{ len .Site.Taxonomies.tags }}</p>
-
-                <!-- 动态内容 -->
-                <div class="dynamic-content"
-                     data-api="{{ .Site.Params.apiEndpoint }}"
-                     data-refresh="60">
-                    {{ range first 5 .Site.RegularPages }}
-                        <article class="dynamic-item">
-                            <h3>{{ .Title }}</h3>
-                            <time>{{ .Date.Format "2006-01-02" }}</time>
-                        </article>
-                    {{ end }}
+      <!-- 个人信息容器 -->
+    <div class="not-prose rounded-lg bg-white dark:bg-neutral-800 p-3 shadow-sm">
+        <!-- 个人信息卡片 -->
+        <div>
+            {{ with $.Scratch.Get "avatar_url" }}
+                <div class="mb-4 flex justify-center">
+                    <a href="{{ site.BaseURL }}" class="block relative group">
+                        <img
+                        src="{{ . }}"
+                        class="h-24 w-24 rounded-full border-2 border-neutral-200 dark:border-neutral-700 transition-transform duration-200 group-hover:scale-105"
+                        alt="avatar"
+                        />
+                        <div class="absolute inset-0 rounded-full bg-black opacity-0 transition-opacity duration-200 group-hover:opacity-10"></div>
+                    </a>
                 </div>
+            {{ end }}
 
+            {{ with site.Params.name }}
+                <h2 class="mb-2 text-center text-lg font-bold bg-gradient-to-r from-neutral-800 to-neutral-600 dark:from-neutral-200 dark:to-neutral-400 bg-clip-text text-transparent">
+                {{ . }}
+                </h2>
+            {{ end }}
 
-<!-- 归档 -->
-                {{ range .Site.RegularPages.GroupByDate "2006" }}
-                <div class="archive-year">
-                    <h2>{{ .Key }}</h2>
-                    {{ range .Pages.GroupByDate "January" }}
-                        <div class="archive-month">
-                            <h3>{{ .Key }}</h3>
-                            {{ range .Pages }}
-                                <article>
-                                    <time>{{ .Date.Format "02" }}</time>
-                                    <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-                                    <span class="reading-time">{{ .ReadingTime }} min read</span>
-                                </article>
-                            {{ end }}
-                        </div>
-                    {{ end }}
+            {{ with site.Params.bio }}
+                <p class="mb-6 text-center text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                {{ . }}
+                </p>
+            {{ end }}
+
+            <!-- 社交列表 -->
+            {{ with $.Scratch.Get "social_list" }}
+                <div
+                    class="space-x-4 flex justify-center dark:invert  lg:mt-0 lg:items-center"
+                >
+                    {{ range . }}<!---->
+                        <a
+                            class="h-7 w-7 text-[0] [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+                            style="--url: url(./{{ . }}.svg)"
+                            href="{{ if eq . `rss` }}{{ `index.xml` | absURL }}{{ else if eq . `mastodon` }}{{ index site.Params . }}{{ else }}{{ if eq . `threads` }}https://threads.net/{{ else if eq . `bluesky` }}https://bsky.app/profile/{{ else }}https://{{ . }}.com/{{ end }}{{ if eq . `linkedin` }}in/{{ end }}{{ index site.Params . }}{{ end }}"
+                            target="_blank"
+                            rel="{{ if eq . `rss` }}alternate{{ else }}me{{ end }}"
+                        >
+                            {{ . }}
+                        </a>
+                    {{ end }}<!---->
                 </div>
-                {{ end }}
+            {{ end }}
+        </div>
+
+        <!-- 博客统计 -->
+        <div class="py-1 text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+            <div class="blog-analyze">
+                <h3>统计</h3>
+                <div class="">
+                    <p>  文章总数：{{ len (where .Site.RegularPages "Section" "posts") }}</p>
+                    <p>总字数：{{ $wordCount := 0 }}{{ range .Site.RegularPages }}{{ $wordCount = add $wordCount .WordCount }}{{ end }}{{ $wordCount }}</p>
+                    <p>分类数：{{ len .Site.Taxonomies.categories }}</p>
+                    <p> 标签数：{{ len .Site.Taxonomies.tags }}</p>
+                </div>
             </div>
         </div>
 
-        <div class="popular-posts">
-               <h3>热门文章</h3>
-               {{ range first 5 (where .Site.RegularPages.ByDate.Reverse "Section" "posts") }}
-                   <p><a href="{{ .RelPermalink }}">{{ .Title }}</a></p>
-               {{ end }}
-           </div>
+        <!-- 热门文章 -->
+        <div class="py-1">
+            <h3>热门文章</h3>
+            {{ range first 5 (where .Site.RegularPages.ByDate.Reverse "Section" "posts") }}
+                <p><a href="{{ .RelPermalink }}">{{ .Title }}</a></p>
+            {{ end }}
+        </div>
 
-           <div class="tag-cloud">
-               <h3>标签云</h3>
-               {{ range $name, $taxonomy := .Site.Taxonomies.tags }}
-               {{ $count := .Count }}
-               <a href="{{ "/tags/" | relLangURL }}{{ $name | urlize }}"
-                  style="font-size: {{ add 0.8 (mul 0.1 (len $taxonomy)) }}rem">
-                   {{ $name }} ({{ $count }})
-               </a>
-               {{ end }}
-           </div>
+        <!-- 标签云 -->
+        <div class="py-1">
+            <h3>标签云</h3>
+            {{ range $name, $taxonomy := .Site.Taxonomies.tags }}
+            {{ $count := .Count }}
+            <a href="{{ "/tags/" | relLangURL }}{{ $name | urlize }}"
+            style="font-size: {{ add 0.8 (mul 0.1 (len $taxonomy)) }}rem">
+                {{ $name }} ({{ $count }})
+            </a>
+            {{ end }}
+        </div>
+
+        <!-- 最新内容 -->
+        <!-- <div class="dynamic-content"
+                data-api="{{ .Site.Params.apiEndpoint }}"
+                data-refresh="60">
+            {{ range first 5 .Site.RegularPages }}
+                <article class="dynamic-item">
+                    <h3>{{ .Title }}</h3>
+                    <time>{{ .Date.Format "2006-01-02" }}</time>
+                </article>
+            {{ end }}
+        </div> -->
+
+        <!-- 归档 -->
+        <div class="py-1">
+            <h3>归档</h3>
+            {{ range .Site.RegularPages.GroupByDate "2006" }}
+                <!-- 年份折叠 -->
+                <details class="archive-year mb-3">
+                    <summary class="cursor-pointer hover:text-primary-500 font-medium">
+                        {{ .Key }} ({{ len .Pages }} 篇)
+                    </summary>
+
+                    {{ range .Pages.GroupByDate "January" }}
+                        <!-- 月份折叠 -->
+                        <details class="archive-month ml-4 mb-2">
+                            <summary class="cursor-pointer hover:text-primary-500">
+                                {{ .Key }} ({{ len .Pages }} 篇)
+                            </summary>
+
+                            <div class="ml-4">
+                                {{ range .Pages }}
+                                    <article style="font-size: 12px;" class="flex items-center gap-2 py-1">
+                                        <time class="text-sm text-neutral-500">{{ .Date.Format "02" }}</time>
+                                        <a href="{{ .RelPermalink }}" class="hover:text-primary-500 ">{{ .Title }}</a>
+                                        <span class="text-sm text-neutral-500">{{ .ReadingTime }} 分钟阅读</span>
+                                    </article>
+                                {{ end }}
+                            </div>
+                        </details>
+                    {{ end }}
+                </details>
+            {{ end }}
+        </div>
     </div>
-  </div>
-
-
 </aside>
 
 <style>
@@ -126,110 +141,38 @@ aside {
    z-index: 10;
 }
 
-/* 目录容器本身的样式 */
-.toc-container {
-  background: white;
-  border-radius: 0.5rem;
-  padding: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+/* 自定义折叠箭头样式 */
+details > summary {
+    list-style: none;
+    padding: 0.5rem 0;
 }
 
-/* 暗色模式 */
-@media (prefers-color-scheme: dark) {
-  .toc-container {
-    background: rgb(38 38 38);
-  }
+details > summary::before {
+    content: "▶";
+    display: inline-block;
+    margin-right: 0.5rem;
+    transition: transform 0.2s;
 }
 
-/* 目录内容区域 */
-.toc {
-  max-height: calc(100vh - 180px); /* 减去头部、padding等空间 */
-  overflow-y: auto;
-  scrollbar-gutter: stable;
+details[open] > summary::before {
+    transform: rotate(90deg);
 }
 
-/* 美化滚动条 */
-.toc::-webkit-scrollbar {
-  width: 4px;
+/* 动画效果 */
+details[open] > div {
+    animation: slideDown 0.3s ease-out;
 }
 
-.toc::-webkit-scrollbar-track {
-  background: transparent;
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
-
-.toc::-webkit-scrollbar-thumb {
-  background-color: #d1d1d1;
-  border-radius: 4px;
-}
-
-/* 目录链接样式 */
-.toc ul {
-  list-style: none;
-  padding-left: 1rem;
-}
-
-.toc li {
-  margin: 0.5rem 0;
-}
-
-.toc a {
-  display: block;
-  padding: 0.25rem 0.5rem;
-  color: #4b5563;
-  text-decoration: none;
-  border-radius: 0.25rem;
-  transition: all 0.2s;
-}
-
-.toc a:hover {
-  background-color: #f3f4f6;
-  color: #111827;
-}
-
-.toc a.active {
-  background-color: #f3f4f6;
-  color: #111827;
-  font-weight: 500;
-}
-
-/* 响应式布局 */
-@media (max-width: 768px) {
-  aside {
-    display: none; /* 在小屏幕上隐藏 */
-  }
-}
-
-/* 暗色模式适配 */
-@media (prefers-color-scheme: dark) {
-  .toc a {
-    color: #9ca3af;
-  }
-
-  .toc a:hover,
-  .toc a.active {
-    background-color: #262626;
-    color: #e5e7eb;
-  }
-
-  .toc::-webkit-scrollbar-thumb {
-    background-color: #404040;
-  }
-}
-
-h1, h2, h3, h4, h5, h6 {
-  scroll-margin-top: 100px; /* 根据实际情况调整 */
-}
-
-/* 标签云 */
-/* 标签云动画 */
-.tag-cloud a {
-    transition: all 0.3s;
-}
-.tag-cloud a:hover {
-    transform: scale(1.1);
-}
-
-
 
 </style>
 
