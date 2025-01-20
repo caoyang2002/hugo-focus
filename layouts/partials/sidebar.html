@@ -1,4 +1,5 @@
-  <aside class="sticky top-24 w-64">
+  <aside class="sticky w-64">
+      <!-- 侧边栏 -->
   {{ if .IsHome }}
   <!-- 个人信息卡片 -->
   <div class="not-prose rounded-lg bg-white dark:bg-neutral-800 p-6 shadow-sm">
@@ -70,12 +71,13 @@
 /* 固定目录样式 */
 aside {
   position: fixed;  /* 改为固定定位 */
-  top: 96px;       /* 距离顶部位置，根据实际头部高度调整 */
-  right: 0rem;
-  width: 14rem;
-  height: calc(100vh - 96px); /* 减去顶部间距的视口高度 */
-  overflow-y: auto;
-  z-index: 40;     /* 确保在适当的层级 */
+  top: 8rem;          /* 距离顶部 8rem */
+   bottom: 8rem;       /* 距离底部 2rem */
+   right: 0rem;
+   width: 14rem;
+   height: auto;       /* 高度自适应 */
+   overflow-y: auto;
+   z-index: 10;
 }
 
 /* 目录容器本身的样式 */
@@ -167,9 +169,11 @@ aside {
     background-color: #404040;
   }
 }
+
 h1, h2, h3, h4, h5, h6 {
   scroll-margin-top: 100px; /* 根据实际情况调整 */
 }
+
 </style>
 
 <script>
