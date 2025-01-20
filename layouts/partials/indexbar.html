@@ -27,6 +27,15 @@
       {{ . }}
     </p>
     {{ end }}
+    <!-- 博客统计 -->
+    <div class="mb-6 text-center text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+        <p>  文章总数：{{ len (where .Site.RegularPages "Section" "posts") }}</p>
+        <p>总字数：{{ $wordCount := 0 }}{{ range .Site.RegularPages }}{{ $wordCount = add $wordCount .WordCount }}{{ end }}{{ $wordCount }}</p>
+        <p>分类数：{{ len .Site.Taxonomies.categories }}</p>
+        <p> 标签数：{{ len .Site.Taxonomies.tags }}</p>
+    </div>
+
+
 
     <!-- 社交链接优化 -->
     {{ with $.Scratch.Get "social_list" }}

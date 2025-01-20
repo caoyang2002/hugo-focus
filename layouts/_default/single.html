@@ -17,6 +17,10 @@
             $single_author }}
             <span class="mx-1">&middot;</span>
             <span>{{ $single_author }}</span>
+            <span class="mx-1">&middot;</span>
+            <span class="post-date">共 {{ .WordCount }} 字</span>，阅读约
+            <span class="more-meta"> {{ .ReadingTime }} 分钟 </span>
+
             {{ end }}<!---->
             <!-- 标签 -->
         </div>

@@ -1,0 +1,298 @@
+{{ define "main" }}
+<div class="search-page">
+    <div class="search-container">
+        <div class="search-input-wrap">
+            <input
+                type="search"
+                id="search-input"
+                class="search-input"
+                placeholder="搜索文章..."
+                autocomplete="off"
+            />
+            <div class="search-icon">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </div>
+        </div>
+        <div id="search-results" class="search-results"></div>
+    </div>
+
+    <!-- Fuse.js -->
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+
+    <script>
+        let fuse;
+
+        // 初始化搜索数据
+        async function initSearch() {
+            try {
+                const response = await fetch("/index.json");
+                if (!response.ok)
+                    throw new Error("Failed to load search index");
+                const searchData = await response.json();
+
+                // Fuse.js 配置
+                const fuseOptions = {
+                    keys: [
+                        { name: "title", weight: 0.7 },
+                        { name: "content", weight: 0.3 },
+                        { name: "tags", weight: 0.5 },
+                    ],
+                    ignoreLocation: true,
+                    threshold: 0.1,
+                    useExtendedSearch: true,
+                    minMatchCharLength: 1,
+                    includeMatches: true,
+                    findAllMatches: true,
+                };
+
+                fuse = new Fuse(searchData, fuseOptions);
+
+                // 初始化搜索输入监听
+                const searchInput = document.getElementById("search-input");
+                const debouncedSearch = debounce(handleSearch, 300);
+                searchInput.addEventListener("input", debouncedSearch);
+
+                // 初始显示
+                displayResults([], "");
+            } catch (error) {
+                console.error("Error initializing search:", error);
+                document.getElementById("search-results").innerHTML =
+                    '<div class="search-error">搜索功能加载失败</div>';
+            }
+        }
+
+        // 处理搜索
+        function handleSearch(event) {
+            if (!fuse) return;
+            const query = event.target.value;
+            if (!query) {
+                displayResults([], "");
+                return;
+            }
+            const results = fuse.search(query);
+            displayResults(results, query);
+        }
+
+        // 显示结果
+        function displayResults(results, query) {
+            const resultsContainer = document.getElementById("search-results");
+
+            if (!query) {
+                resultsContainer.innerHTML =
+                    '<div class="search-placeholder">输入关键词开始搜索...</div>';
+                return;
+            }
+
+            if (results.length === 0) {
+                resultsContainer.innerHTML =
+                    '<div class="search-empty">没有找到相关文章</div>';
+                return;
+            }
+
+            const html = results
+                .map((result) => {
+                    const tags = Array.isArray(result.item.tags)
+                        ? result.item.tags
+                        : [];
+                    return `
+          <article class="search-result">
+            <h3 class="result-title">
+              <a href="${result.item.url}">${highlightText(result.item.title, query)}</a>
+            </h3>
+            <div class="result-meta">
+              <time>${result.item.date}</time>
+              ${
+                  tags.length > 0
+                      ? `
+                <div class="result-tags">
+                  ${tags.map((tag) => `<span class="tag">${tag}</span>`).join("")}
+                </div>
+              `
+                      : ""
+              }
+            </div>
+            <p class="result-excerpt">
+              ${highlightText(truncateText(result.item.content, 200), query)}
+            </p>
+          </article>
+        `;
+                })
+                .join("");
+
+            resultsContainer.innerHTML = html;
+        }
+
+        // 工具函数
+        function highlightText(text, query) {
+            if (!query) return text;
+            return text.replace(
+                new RegExp(`(${escapeRegExp(query)})`, "gi"),
+                "<mark>$1</mark>",
+            );
+        }
+
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        }
+
+        function truncateText(text, length) {
+            if (!text || text.length <= length) return text || "";
+            const truncated = text.slice(0, length);
+            return truncated.slice(0, truncated.lastIndexOf(" ")) + "...";
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        // 初始化
+        document.addEventListener("DOMContentLoaded", () => {
+            initSearch();
+
+            // 键盘快捷键
+            document.addEventListener("keydown", (e) => {
+                if (
+                    (e.key === "/" || e.key === "k") &&
+                    (e.ctrlKey || e.metaKey)
+                ) {
+                    e.preventDefault();
+                    document.getElementById("search-input").focus();
+                }
+                if (
+                    e.key === "Escape" &&
+                    document.activeElement ===
+                        document.getElementById("search-input")
+                ) {
+                    const searchInput = document.getElementById("search-input");
+                    searchInput.value = "";
+                    searchInput.blur();
+                    displayResults([], "");
+                }
+            });
+        });
+    </script>
+
+    <style>
+        .search-page {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .search-container {
+            width: 100%;
+        }
+
+        .search-input-wrap {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            font-size: 1.1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #fff;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+
+        .search-result {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            line-height: 1.8;
+        }
+
+        .result-title {
+            margin: 0 0 0.5rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .result-title a {
+            color: #1a1a1a;
+            text-decoration: none;
+        }
+
+        .result-title a:hover {
+            color: #3b82f6;
+        }
+
+        .result-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .result-tags {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            padding: 0.25rem 0.75rem;
+            background: #f3f4f6;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+        }
+
+        .result-excerpt {
+            margin: 0;
+            color: #4b5563;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        mark {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 0.1em 0.2em;
+            border-radius: 0.2em;
+            background-color: rgba(255, 255, 0, 0.3);
+        }
+
+        .search-placeholder,
+        .search-empty {
+            text-align: center;
+            color: #6b7280;
+            padding: 3rem 0;
+        }
+
+        /* 暗色模式 */
+    </style>
+</div>
+{{ end }}
