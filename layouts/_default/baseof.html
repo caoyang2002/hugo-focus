@@ -71,6 +71,17 @@
             background-position: center top;
         }
     </style>
+    {{else}}
+    <style>
+        body {
+            min-height: 100vh;
+            background-color: var(--bg);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+
     {{ end }}
     <!--  -->
     {{ partial "head.html" . }}

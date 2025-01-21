@@ -1,11 +1,4 @@
 /*
- * Paper
- * A simple, clean, flexible Hugo theme
- * https://github.com/nanxiaobei/hugo-paper
- * Designed by 南小北 https://lee.so/
- */
-
-/*
  ! tailwindcss v3.4.10 | MIT License | https://tailwindcss.com
  */
 
@@ -461,25 +454,6 @@ video {
     --safe-padding-bottom: env(safe-area-inset-bottom, 0px);
     --safe-padding-left: env(safe-area-inset-left, 0rem);
     --safe-padding-right: env(safe-area-inset-right, 0rem);
-    /* 背景图片 */
-    background-image: url(./imgs/background_img.jpeg);
-    background-size: cover; /* 覆盖整个容器 */
-    background-repeat: no-repeat; /* 不重复 */
-    background-position: center; /* 居中显示 */
-    min-height: 100vh; /* 确保body有足够高度 */
-
-    /* 图片尺寸：第一个值指定图片的宽度，第二个值指定图片的高度 */
-    /* background-size: 50% auto;
-    background-repeat: repeat;
-    color: rgba(red, green, blue, 0); */
-}
-
-body {
-    min-height: 100vh;
-    /* background-color: var(--bg); */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-tap-highlight-color: transparent;
 }
 
 body:is(.dark *)::before {
@@ -906,7 +880,7 @@ pre {
 /* 行内代码 */
 /* 基础样式 - 亮色模式 */
 .prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-    background-color: #f3f4f6;
+    background-color: #f5ebb8;
     color: #24292f;
     padding: 0.2em 0.4em;
     border-radius: 0.375rem;
@@ -942,7 +916,7 @@ pre {
     :where(code):not(
         :where([class~="not-prose"], [class~="not-prose"] *)
     ):hover {
-    background-color: #e5e7eb;
+    background-color: #ffe678;
 }
 
 .dark
@@ -950,7 +924,7 @@ pre {
     :where(code):not(
         :where([class~="not-prose"], [class~="not-prose"] *)
     ):hover {
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: #70694a;
 }
 
 /* 确保代码块中的代码不受影响 */
@@ -1004,16 +978,17 @@ pre {
 .prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
     color: var(--tw-prose-pre-code);
     background-color: var(--tw-prose-pre-bg);
-    overflow-x: auto;
+    /* overflow-x: auto; */
     font-weight: 400;
     font-size: 0.875em;
-    line-height: 1.7142857;
-    margin-top: 1.7142857em;
-    margin-bottom: 1.7142857em;
+    /* line-height: 1.7142857; */
+    /* margin-top: 1.7142857em; */
+    margin: 1rem;
+    /* margin-bottom: 1.7142857em; */
     border-radius: 0.375rem;
-    padding-top: 0.8571429em;
-    padding-inline-end: 1.1428571em;
-    padding-bottom: 0.8571429em;
+    /* padding-top: 0.8571429em; */
+    /* padding-inline-end: 1.1428571em; */
+    /* padding-bottom: 0.8571429em; */
     padding-inline-start: 1.1428571em;
 }
 
@@ -1952,7 +1927,7 @@ article code {
     line-height: 1.5rem !important;
 }
 
-article .highlight {
+/* article .highlight {
     margin-top: 2rem;
     margin-bottom: 2rem;
     pre {
@@ -2015,7 +1990,7 @@ article .highlight {
             }
         }
     }
-}
+} */
 
 .\[background\:url\(\.\/theme\.png\)_left_center\/_auto_theme\(\'spacing\.6\'\)_no-repeat\] {
     background: url(./theme.png) left center/ auto 1.5rem no-repeat;

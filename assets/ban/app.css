@@ -87,7 +87,7 @@
         @apply inline-block !text-sm !leading-6;
     }
 
-    article .highlight {
+    /* article .highlight {
         @apply my-8;
 
         pre {
@@ -125,5 +125,5 @@
                 }
             }
         }
-    }
+    } */
 }

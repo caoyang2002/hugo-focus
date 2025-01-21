@@ -622,35 +622,29 @@
     });
 </script>
 
-<!-- <style>
+<style>
     .code-playground {
-        margin: 1.5em 0;
         border: 1px solid #ddd;
         border-radius: 0.5em;
         overflow: hidden;
     }
 
-    .python-playground {
-        margin: 1.5em 0;
-        border: 1px solid #ddd;
-        border-radius: 0.5em;
-        overflow: hidden;
-    }
-
-    .python-playground .code-wrapper {
+    /* .code-playground .code-wrapper {
         margin: 0;
         padding: 1em;
         background: var(--bg-code, #f8f9fa);
-    }
+    } */
 
-    .python-playground .controls {
-        padding: 0.5em;
+    .code-playground .controls {
+        border: 1px solid #ddd;
+        border-radius: 0.5em;
+        margin: 1rem;
         border-top: 1px solid #ddd;
-        background: #f8f9fa;
     }
 
-    .python-playground .run-button {
-        padding: 0.25em 1em;
+    .code-playground .run-button {
+        margin: 0.25rem;
+        padding: 0rem 4rem;
         background: #28a745;
         color: white;
         border: none;
@@ -658,37 +652,39 @@
         cursor: pointer;
     }
 
-    .python-playground .run-button:disabled {
+    .code-playground .run-button:disabled {
         background: #6c757d;
         cursor: not-allowed;
     }
 
-    .python-playground .output {
-        padding: 1em;
+    .code-playground .output {
         border-top: 1px solid #ddd;
         background: #f8f9fa;
+        margin: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 0.5em;
     }
 
-    .python-playground .output pre {
+    .code-playground .output pre {
         margin: 0;
         white-space: pre-wrap;
     }
 
     /* 深色模式支持 */
     @media (prefers-color-scheme: dark) {
-        .python-playground {
+        .code-playground {
             border-color: #444;
         }
 
-        .python-playground .code-wrapper {
+        .code-playground .code-wrapper {
             background: var(--bg-code-dark, #2d2d2d);
         }
 
-        .python-playground .controls,
-        .python-playground .output {
+        .code-playground .controls,
+        .code-playground .output {
             background: #2d2d2d;
             border-color: #444;
         }
     }
-</style> -->
+</style>
 {{ end }}
