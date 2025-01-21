@@ -461,11 +461,22 @@ video {
     --safe-padding-bottom: env(safe-area-inset-bottom, 0px);
     --safe-padding-left: env(safe-area-inset-left, 0rem);
     --safe-padding-right: env(safe-area-inset-right, 0rem);
+    /* 背景图片 */
+    background-image: url(./imgs/background_img.jpeg);
+    background-size: cover; /* 覆盖整个容器 */
+    background-repeat: no-repeat; /* 不重复 */
+    background-position: center; /* 居中显示 */
+    min-height: 100vh; /* 确保body有足够高度 */
+
+    /* 图片尺寸：第一个值指定图片的宽度，第二个值指定图片的高度 */
+    /* background-size: 50% auto;
+    background-repeat: repeat;
+    color: rgba(red, green, blue, 0); */
 }
 
 body {
     min-height: 100vh;
-    background-color: var(--bg);
+    /* background-color: var(--bg); */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
@@ -636,12 +647,12 @@ pre {
     color: inherit;
 }
 
-.prose
+/* .prose
     :where(blockquote strong):not(
         :where([class~="not-prose"], [class~="not-prose"] *)
     ) {
     color: inherit;
-}
+} */
 
 .prose
     :where(thead th strong):not(
@@ -759,30 +770,33 @@ pre {
     :where(blockquote):not(
         :where([class~="not-prose"], [class~="not-prose"] *)
     ) {
-    font-weight: 500;
+    font-weight: 400;
     font-style: italic;
-    color: var(--tw-prose-quotes);
+    /* color: var(--tw-prose-quotes); */
     border-inline-start-width: 0.25rem;
     border-inline-start-color: var(--tw-prose-quote-borders);
     quotes: "\201C" "\201D" "\2018" "\2019";
     margin-top: 1.6em;
     margin-bottom: 1.6em;
     padding-inline-start: 1em;
+    border-left: 4px solid #dfe2e5;
+    padding: 0 15px;
+    color: #777777;
 }
 
-.prose
+/* .prose
     :where(blockquote p:first-of-type):not(
         :where([class~="not-prose"], [class~="not-prose"] *)
     )::before {
     content: open-quote;
-}
+} */
 
-.prose
+/* .prose
     :where(blockquote p:last-of-type):not(
         :where([class~="not-prose"], [class~="not-prose"] *)
     )::after {
     content: close-quote;
-}
+} */
 
 .prose :where(h1):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
     color: var(--tw-prose-headings);
@@ -972,13 +986,13 @@ pre {
     :where(h4 code):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
     color: inherit;
 }
-
+/*
 .prose
     :where(blockquote code):not(
         :where([class~="not-prose"], [class~="not-prose"] *)
     ) {
     color: inherit;
-}
+} */
 
 .prose
     :where(thead th code):not(
@@ -1464,6 +1478,12 @@ pre {
     margin-top: -0.5rem;
 }
 /* margin left */
+.ml-4 {
+    margin-left: 1rem;
+}
+.ml-6 {
+    margin-left: 1.5rem;
+}
 .ml-8 {
     margin-left: 2rem;
 }

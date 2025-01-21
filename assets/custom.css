@@ -1,4 +1,55 @@
-/* Place custom css here. */
+@font-face {
+    font-family: "Hack";
+    font-style: normal;
+    font-weight: bold;
+    src:
+        local("Hack"),
+        local("Hack"),
+        rl("./font/Hack-Regular.ttf") format("ttf");
+}
+
 .bg-blue-500 {
     background-color: blue;
+}
+
+/* 阴影圆角和自适应缩放 */
+img[alt="zoom-shadow"],
+img[alt="shadow-zoom"],
+img[alt="圆角-阴影"],
+img[alt="阴影-圆角"] {
+    zoom: 60%;
+    border-radius: 8px;
+    border: 1px solid #e4e4e4;
+    box-shadow: 0px 20px 40px 1px rgba(0, 0, 0, 0.3);
+}
+
+p,
+blockquote,
+ul,
+ol,
+dl,
+table {
+    margin: 0.8em 0;
+}
+
+/* ---========================侧边栏、菜单栏、专注模式的样式====================------ */
+blockquote {
+    border-left: 4px solid #dfe2e5;
+    padding: 0 15px;
+    color: #777777;
+}
+
+blockquote blockquote {
+    padding-right: 0;
+}
+
+table {
+    padding: 0;
+    word-break: initial;
+}
+
+table tr {
+    border: 1px solid #dfe2e5;
+    margin: 0;
+    padding: 0;
 }

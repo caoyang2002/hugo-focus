@@ -42,9 +42,41 @@
     dir="{{ if site.Params.direction }}{{ site.Params.direction }}{{ else }}ltr{{ end }}"
 >
     <!-- 元数据 -->
+    {{ if .Site.Params.backgroundImage }}
+    <style>
+        body {
+            background-image: url("{{ .Site.Params.backgroundImage }}");
+            /* 保持图片原始大小 */
+            background-size: auto;
+            /* 只在垂直方向重复 */
+            background-repeat: repeat-y;
+            background-position: center top;
+        }
+
+        html,
+        body {
+            min-height: 100vh; /* 确保最小高度是视口高度 */
+        }
+        body::before {
+            content: "";
+            position: fixed; /* 使用 fixed 而不是 absolute */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* 确保背景在内容后面 */
+            background-image: url("{{ .Site.Params.backgroundImage }}");
+            background-size: 500px 300px; /* 固定图片尺寸 */
+            background-repeat: repeat-y;
+            background-position: center top;
+        }
+    </style>
+    {{ end }}
+    <!--  -->
     {{ partial "head.html" . }}
 
     <body class="text-black duration-200 ease-out dark:text-white">
+        <!--  -->
         {{ partial "header.html" . }}
 
         <div class="relative flex justify-start max-w-[90vw] px-8">
@@ -65,5 +97,8 @@
         </div>
 
         {{ partial "footer.html" . }}
+        <!-- 在底部引入 Python WASM 支持 -->
+        {{ if .Params.codeRunners }} {{ partial "code_runners.html" . }} {{ end
+        }}
     </body>
 </html>

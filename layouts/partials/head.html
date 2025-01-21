@@ -61,6 +61,19 @@
 
     <!-- highlight js -->
     {{ if and .IsPage (not site.Params.disableHLJS) }}
+    <!-- 引入 highlight.js CSS -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/monokai.min.css"
+    />
+
+    <!-- 引入 highlight.js JS -->
+    <script
+        defer
+        src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"
+        onload="hljs.initHighlightingOnLoad();"
+    ></script>
+    {{ end }} {{ if and .IsPage (not site.Params.disableHLJS) }}
     <script
         defer
         src="{{ `highlight.min.js` | absURL }}"

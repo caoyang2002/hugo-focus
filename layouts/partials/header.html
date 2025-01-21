@@ -79,7 +79,7 @@
         {{ $url := .RelPermalink }}<!---->
         {{ with site.Menus.main }}
         <nav
-            class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-10 rtl:space-x-reverse"
+            class="lg:ml-0 lg:flex lg:flex-row lg:items-center lg:space-x-10 rtl:space-x-reverse"
         >
             {{ range . }}
             <a
@@ -89,8 +89,12 @@
             >
             {{ end }}
             <!-- 搜索 -->
-            <a href="/search" class="search-link">
-                <svg
+            <a
+                href="/search"
+                class="block text-center text-xl leading-[5rem] lg:text-base lg:font-normal"
+            >
+                搜索
+                <!-- <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="20"
                     height="20"
@@ -103,7 +107,7 @@
                 >
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
+                </svg> -->
             </a>
         </nav>
         {{ end }}<!---->

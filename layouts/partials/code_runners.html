@@ -1,0 +1,694 @@
+{{/* layouts/partials/code_runners.html */}}
+<!-- x -->
+{{ if .Params.codeRunners }}
+<script>
+    // 添加 loadScript 工具函数
+    async function loadScript(src, timeout = 10000) {
+        return new Promise((resolve, reject) => {
+            if (!src) {
+                resolve();
+                return;
+            }
+
+            const existingScript = document.querySelector(
+                `script[src="${src}"]`,
+            );
+            if (existingScript) {
+                resolve();
+                return;
+            }
+
+            const script = document.createElement("script");
+            script.src = src;
+            script.async = true;
+
+            // 添加超时处理
+            const timeoutId = setTimeout(() => {
+                script.remove();
+                reject(new Error(`Script loading timed out: ${src}`));
+            }, timeout);
+
+            script.onload = () => {
+                clearTimeout(timeoutId);
+                resolve();
+            };
+
+            script.onerror = (e) => {
+                clearTimeout(timeoutId);
+                script.remove();
+                console.error(`Failed to load script: ${src}`, e);
+                reject(new Error(`脚本加载失败: ${src}`));
+            };
+
+            document.head.appendChild(script);
+        });
+    }
+
+    // 支持的语言运行时配置
+    const runners = {
+        // wasm
+        python: {
+            cdn: "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js",
+            init: async () => {
+                const pyodide = await loadPyodide({
+                    indexURL: "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/",
+                });
+                await pyodide.loadPackage(["numpy", "pandas"]);
+                return pyodide;
+            },
+            execute: async (code) => {
+                try {
+                    let output = [];
+                    const pyodide = runtimeInstances.python;
+                    // 重定向 Python 的打印输出
+                    pyodide.globals.set("print", (s) => output.push(s));
+                    const result = await pyodide.runPythonAsync(code);
+                    return output.join("\n") || String(result);
+                } catch (error) {
+                    throw new Error(`Python execution error: ${error.message}`);
+                }
+            },
+        },
+
+        //Playground
+        rust: {
+            cdn: null,
+            init: async () => {
+                // 简单返回一个空对象，因为我们不需要特殊的初始化
+                return {};
+            },
+            execute: async (code) => {
+                try {
+                    const response = await fetch(
+                        "https://play.rust-lang.org/execute",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                channel: "stable",
+                                mode: "debug",
+                                edition: "2021",
+                                crateType: "bin",
+                                tests: false,
+                                code: code,
+                            }),
+                        },
+                    );
+
+                    if (!response.ok) {
+                        throw new Error(
+                            `HTTP error! status: ${response.status}`,
+                        );
+                    }
+
+                    const result = await response.json();
+                    if (result.success) {
+                        return result.stdout || "(无输出)";
+                    } else {
+                        throw new Error(result.stderr);
+                    }
+                } catch (error) {
+                    if (error.message.includes("Failed to fetch")) {
+                        throw new Error(
+                            "无法连接到 Rust Playground。请检查网络连接。",
+                        );
+                    }
+                    throw new Error(`Rust 执行错误: ${error.message}`);
+                }
+            },
+        },
+
+        // Playground
+        go: {
+            cdn: "https://cdn.jsdelivr.net/gh/golang/go@go1.21.1/misc/wasm/wasm_exec.js",
+            init: async () => {
+                try {
+                    const go = new Go();
+                    return { instance: go };
+                } catch (error) {
+                    throw new Error(
+                        `Go runtime initialization error: ${error.message}`,
+                    );
+                }
+            },
+            execute: async (code) => {
+                try {
+                    // 首先修复代码格式
+                    const fixedCode = code
+                        .replace("package\n", "package main\n")
+                        .replace("print", "Println");
+
+                    // 使用 Go Playground API
+                    const response = await fetch(
+                        "https://play.golang.org/compile",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type":
+                                    "application/x-www-form-urlencoded",
+                            },
+                            body: `version=2&body=${encodeURIComponent(fixedCode)}&withVet=true`,
+                        },
+                    );
+
+                    if (!response.ok) {
+                        throw new Error(
+                            `HTTP error! status: ${response.status}`,
+                        );
+                    }
+
+                    const result = await response.json();
+
+                    if (result.Errors) {
+                        throw new Error(result.Errors);
+                    }
+
+                    // 返回结果
+                    return (
+                        result.Events.map((event) => event.Message).join(
+                            "\n",
+                        ) || "(无输出)"
+                    );
+                } catch (error) {
+                    if (error.message.includes("Failed to fetch")) {
+                        throw new Error(
+                            "无法连接到 Go Playground。请检查网络连接。",
+                        );
+                    }
+                    throw new Error(`Go 执行错误: ${error.message}`);
+                }
+            },
+        },
+
+        // cdn
+        typescript: {
+            cdn: "https://cdn.jsdelivr.net/npm/typescript@latest/lib/typescript.min.js",
+            init: async () => {
+                await loadScript(
+                    "https://cdn.jsdelivr.net/npm/typescript@latest/lib/typescript.min.js",
+                );
+                return window.ts;
+            },
+            execute: async (code) => {
+                try {
+                    // 捕获控制台输出
+                    let output = [];
+                    const originalLog = console.log;
+                    console.log = (...args) => {
+                        output.push(args.join(" "));
+                    };
+
+                    const jsCode = ts.transpileModule(code, {
+                        compilerOptions: {
+                            target: ts.ScriptTarget.ES2015,
+                            module: ts.ModuleKind.None,
+                            strictNullChecks: true,
+                        },
+                    }).outputText;
+
+                    eval(jsCode);
+
+                    // 恢复控制台
+                    console.log = originalLog;
+                    return output.join("\n");
+                } catch (e) {
+                    throw new Error(
+                        `TypeScript compilation/execution error: ${e.message}`,
+                    );
+                }
+            },
+        },
+        //
+        ts: {
+            cdn: "https://cdn.jsdelivr.net/npm/typescript@latest/lib/typescript.min.js",
+            init: async () => {
+                return runners.typescript.init();
+            },
+            execute: async (code) => {
+                return runners.typescript.execute(code);
+            },
+        },
+
+        // 原生
+        javascript: {
+            cdn: null,
+            init: async () => {
+                return window;
+            },
+        },
+        js: {
+            cdn: null,
+            init: async () => {
+                return runners.javascript.init();
+            },
+            execute: async (code) => {
+                return runners.javascript.execute(code);
+            },
+        },
+
+        // wasm
+        lisp: {
+            cdn: "https://unpkg.com/jscl@0.8.2/jscl.js",
+            init: async () => {
+                try {
+                    await loadScript("https://unpkg.com/jscl@0.8.2/jscl.js");
+                    return window.jscl;
+                } catch (error) {
+                    throw new Error(
+                        `Lisp runtime initialization error: ${error.message}`,
+                    );
+                }
+            },
+            execute: async (code) => {
+                try {
+                    const lisp = runtimeInstances.lisp;
+                    const output = [];
+                    const result = lisp.evaluateString(code, {
+                        output: (str) => output.push(str),
+                    });
+
+                    console.log("结果：", result);
+                    return output.join("\n") || String(result);
+                } catch (error) {
+                    throw new Error(`Lisp execution error: ${error.message}`);
+                }
+            },
+        },
+
+        // error
+        ruby: {
+            cdn: "https://cdn.jsdelivr.net/npm/@ruby/wasm-wasi@latest/dist/browser.esm.js",
+            init: async () => {
+                try {
+                    // First load the Ruby runtime script
+                    const rubyScript = document.createElement("script");
+                    rubyScript.type = "text/javascript";
+                    rubyScript.src =
+                        "https://cdn.jsdelivr.net/npm/@ruby/wasm-wasi@latest/dist/browser.umd.js";
+
+                    // Wait for the script to load
+                    await new Promise((resolve, reject) => {
+                        rubyScript.onload = resolve;
+                        rubyScript.onerror = () =>
+                            reject(new Error("Failed to load Ruby runtime"));
+                        document.head.appendChild(rubyScript);
+                    });
+
+                    // Load and instantiate the WASM module
+                    const wasmUrl =
+                        "https://cdn.jsdelivr.net/npm/@ruby/wasm-wasi@latest/dist/ruby.wasm";
+                    const wasmResponse = await fetch(wasmUrl);
+
+                    if (!wasmResponse.ok) {
+                        throw new Error(
+                            `Failed to fetch WASM module: ${wasmResponse.statusText}`,
+                        );
+                    }
+
+                    const wasmBinary = await wasmResponse.arrayBuffer();
+
+                    // Initialize Ruby runtime with the WASM binary
+                    const rubyVM = await RubyVM.load({
+                        wasmBinary: wasmBinary,
+                        printVersion: false,
+                    });
+
+                    // Test that the VM is working
+                    await rubyVM.eval(
+                        'puts "Ruby VM initialized successfully"',
+                    );
+
+                    return rubyVM;
+                } catch (error) {
+                    console.error("Detailed Ruby init error:", error);
+                    throw new Error(
+                        `Ruby runtime initialization error: ${error.message}`,
+                    );
+                }
+            },
+            execute: async (code) => {
+                try {
+                    let output = [];
+                    const vm = runtimeInstances.ruby;
+
+                    // Configure output capture
+                    const originalPuts = vm.eval("method(:puts)");
+                    vm.setPrintFunction((text) => output.push(text));
+
+                    // Execute the code
+                    await vm.eval(code);
+
+                    // Restore original puts if needed
+                    if (originalPuts) {
+                        vm.eval("define_method(:puts, method(:puts))");
+                    }
+
+                    // Return captured output
+                    return output.join("\n") || "(No output)";
+                } catch (error) {
+                    console.error("Ruby execution error details:", error);
+                    throw new Error(`Ruby execution error: ${error.message}`);
+                }
+            },
+        },
+
+        // error
+        swift: {
+            cdn: "https://cdn.jsdelivr.net/npm/@swiftwasm/swift-webpack-plugin@1.0.9/plugin.min.js",
+            init: async () => {
+                try {
+                    await loadScript(
+                        "https://cdn.jsdelivr.net/npm/@swiftwasm/swift-webpack-plugin@1.0.9/plugin.min.js",
+                    );
+
+                    // 初始化 Swift WASM 运行时
+                    const swift = await window.SwiftWeb.init({
+                        // 配置 WASM 模块路径
+                        wasmUrl:
+                            "https://cdn.jsdelivr.net/npm/@swiftwasm/swift-web@latest/dist/swift-web.wasm",
+                        // 标准输出和错误处理
+                        stdout: (text) => console.log("Swift output:", text),
+                        stderr: (text) => console.error("Swift error:", text),
+                    });
+
+                    return swift;
+                } catch (error) {
+                    console.error("Swift initialization error:", error);
+                    throw new Error(
+                        `Swift runtime initialization error: ${error.message}`,
+                    );
+                }
+            },
+            execute: async (code) => {
+                try {
+                    const swift = runtimeInstances.swift;
+                    let output = "";
+                    let error = "";
+
+                    // 执行代码
+                    const result = await swift.run(code, {
+                        stdout: (text) => {
+                            output += text + "\n";
+                        },
+                        stderr: (text) => {
+                            error += text + "\n";
+                        },
+                    });
+
+                    return {
+                        success: true,
+                        stdout: output.trim(),
+                        stderr: error.trim(),
+                        result: result,
+                    };
+                } catch (error) {
+                    console.error("Swift execution error:", error);
+                    throw new Error(`Swift execution error: ${error.message}`);
+                }
+            },
+        },
+
+        // playground
+        cpp: {
+            init: async () => {
+                return true;
+            },
+            execute: async (code) => {
+                try {
+                    const response = await fetch(
+                        "https://godbolt.org/api/compiler/g132/compile",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                Accept: "application/json",
+                            },
+                            body: JSON.stringify({
+                                source: code,
+                                options: {
+                                    userArguments: "-std=c++17",
+                                    executeParameters: {
+                                        args: [],
+                                        stdin: "",
+                                    },
+                                    compilerOptions: {
+                                        executorRequest: true,
+                                    },
+                                },
+                            }),
+                        },
+                    );
+
+                    if (!response.ok) {
+                        throw new Error(
+                            `Compilation failed with status: ${response.status}`,
+                        );
+                    }
+
+                    const result = await response.json();
+
+                    if (result.code !== 0) {
+                        throw new Error(
+                            result.stderr || "Unknown compilation error",
+                        );
+                    }
+
+                    const output =
+                        result.stdout.map((item) => item.text).join("\n") || "";
+                    const error = result.stderr || "";
+                    const exitCode = result.code || 0;
+                    const data = `输出: ${output}\n错误：${error}\n退出码: ${exitCode}`;
+                    console.log(data);
+
+                    return data;
+                    // {
+                    //     output: result.stdout || "",
+                    //     error: result.stderr || "",
+                    //     exitCode: result.code,
+                    // };
+                } catch (error) {
+                    throw new Error(`C++ execution error: ${error.message}`);
+                }
+            },
+        },
+        // error
+        java: {
+            cdn: "https://teavm.org/js/teavm.js",
+            init: async () => {
+                try {
+                    await loadScript("https://teavm.org/js/teavm.js");
+                    const java = await window.TeaVM.init();
+                    return java;
+                } catch (error) {
+                    throw new Error(
+                        `Java runtime initialization error: ${error.message}`,
+                    );
+                }
+            },
+            execute: async (code) => {
+                try {
+                    const java = runtimeInstances.java;
+                    return await java.run(code);
+                } catch (error) {
+                    throw new Error(`Java execution error: ${error.message}`);
+                }
+            },
+        },
+    };
+
+    // 添加 Rust WASM 编译和运行函数
+    async function compileAndRunRustWasm(code) {
+        // 添加必要的 WASM 导入
+        const rustCode = `
+        #[no_mangle]
+        pub extern "C" fn run() {
+            ${code}
+        }
+        `;
+
+        try {
+            // 使用 rust-wasm 工具链编译代码
+            const wasmModule = await window.rustc.compile(rustCode, {
+                target: "wasm32-unknown-unknown",
+                release: false,
+            });
+
+            // 创建 WASM 实例
+            const instance = await WebAssembly.instantiate(wasmModule, {
+                env: {
+                    memory: new WebAssembly.Memory({ initial: 256 }),
+                    abort: () => console.log("Rust 程序中止"),
+                },
+            });
+
+            // 捕获输出
+            let output = "";
+            const originalConsoleLog = console.log;
+            console.log = (...args) => {
+                output += args.join(" ") + "\n";
+            };
+
+            // 运行 WASM 代码
+            instance.exports.run();
+
+            // 恢复 console.log
+            console.log = originalConsoleLog;
+
+            return output || "(无输出)";
+        } catch (error) {
+            throw new Error(`Rust WASM 编译/执行错误: ${error.message}`);
+        }
+    }
+
+    let runtimeInstances = {};
+
+    async function initRuntime(language) {
+        console.log("初始化运行时");
+        if (!runners[language]) {
+            throw new Error(`不支持的语言: ${language}`);
+        }
+        console.log("开始实例化运行时");
+        try {
+            if (!runtimeInstances[language]) {
+                const runner = runners[language];
+                if (runners[language].cdn) {
+                    await loadScript(runners[language].cdn);
+                }
+                runtimeInstances[language] = await runner.init();
+            }
+            console.log("实例化成功");
+            return runtimeInstances[language];
+        } catch (error) {
+            console.error(
+                `Runtime initialization error for ${language}:`,
+                error,
+            );
+            throw new Error(`运行时初始化失败: ${error.message}`);
+        }
+    }
+
+    // 执行代码
+    async function executeCode(language, code, outputElement) {
+        try {
+            console.log("执行代码：", language);
+            const runtime = await initRuntime(language);
+            let result;
+
+            if (runners[language].execute) {
+                result = await runners[language].execute(code);
+            } else {
+                throw new Error(`${language} 没有实现执行方法`);
+            }
+
+            outputElement.textContent = result;
+            outputElement.parentElement.style.display = "block";
+        } catch (error) {
+            console.error(`Code execution error for ${language}:`, error);
+            outputElement.textContent = `错误: ${error.message}`;
+            outputElement.parentElement.style.display = "block";
+        }
+    }
+
+    // 初始化代码编辑器
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".code-playground").forEach((playground) => {
+            const language = playground.getAttribute("data-language");
+            const runButton = playground.querySelector(".run-button"); // 运行按钮
+            const codeElement = playground.querySelector("code");
+            const outputElement = playground.querySelector(".output-content");
+
+            runButton.addEventListener("click", async () => {
+                runButton.disabled = true;
+                runButton.textContent = `加载 ${language} 运行时...`;
+                outputElement.parentElement.style.display = "none";
+
+                try {
+                    await executeCode(
+                        language,
+                        codeElement.textContent,
+                        outputElement,
+                    );
+                } catch (error) {
+                    outputElement.textContent = `运行时错误: ${error.message}`;
+                    outputElement.parentElement.style.display = "block";
+                } finally {
+                    runButton.disabled = false;
+                    runButton.textContent = "运行";
+                }
+            });
+        });
+    });
+</script>
+
+<!-- <style>
+    .code-playground {
+        margin: 1.5em 0;
+        border: 1px solid #ddd;
+        border-radius: 0.5em;
+        overflow: hidden;
+    }
+
+    .python-playground {
+        margin: 1.5em 0;
+        border: 1px solid #ddd;
+        border-radius: 0.5em;
+        overflow: hidden;
+    }
+
+    .python-playground .code-wrapper {
+        margin: 0;
+        padding: 1em;
+        background: var(--bg-code, #f8f9fa);
+    }
+
+    .python-playground .controls {
+        padding: 0.5em;
+        border-top: 1px solid #ddd;
+        background: #f8f9fa;
+    }
+
+    .python-playground .run-button {
+        padding: 0.25em 1em;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 0.25em;
+        cursor: pointer;
+    }
+
+    .python-playground .run-button:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+    }
+
+    .python-playground .output {
+        padding: 1em;
+        border-top: 1px solid #ddd;
+        background: #f8f9fa;
+    }
+
+    .python-playground .output pre {
+        margin: 0;
+        white-space: pre-wrap;
+    }
+
+    /* 深色模式支持 */
+    @media (prefers-color-scheme: dark) {
+        .python-playground {
+            border-color: #444;
+        }
+
+        .python-playground .code-wrapper {
+            background: var(--bg-code-dark, #2d2d2d);
+        }
+
+        .python-playground .controls,
+        .python-playground .output {
+            background: #2d2d2d;
+            border-color: #444;
+        }
+    }
+</style> -->
+{{ end }}

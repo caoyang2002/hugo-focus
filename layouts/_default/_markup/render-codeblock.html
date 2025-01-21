@@ -1,0 +1,30 @@
+{{/* layouts/_default/_markup/render-codeblock.html */}}
+<!--  -->
+
+{{ $supportedLanguages := slice "python" "rust" "go" "ts" "typescript" "js"
+"javascript" "cpp" "lisp" }}
+<!-- "ruby" "swift" "java" -->
+<!--  -->
+{{ if in $supportedLanguages .Type }}
+<div class="code-playground" data-language="{{ .Type }}">
+    <div class="highlight">
+        <pre>
+                <code class="language-{{ .Type }}">{{ .Inner }}</code></pre>
+    </div>
+    <div class="controls">
+        <button class="run-button">运行</button>
+    </div>
+    <div class="output" style="display: none">
+        <pre class="output-content"></pre>
+    </div>
+</div>
+{{ else if eq .Type "mermaid" }}
+<div class="mermaid">{{- .Inner | safeHTML }}</div>
+{{ else }}
+
+<div class="highlight">
+    <pre
+        class="chroma"
+    ><code class="language-{{ .Type }}" data-lang="{{ .Type }}">{{ .Inner }}</code></pre>
+</div>
+{{ end }}
