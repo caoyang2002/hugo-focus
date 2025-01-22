@@ -1,7 +1,8 @@
-{{/* layouts/_default/_markup/render-image.html */}} {{ $image :=
-.Page.Resources.GetMatch (strings.TrimPrefix "/" .Destination) }} {{ with $image
-}} {{ $small := .Resize "600x" }} {{ $medium := .Resize "900x" }} {{ $large :=
-.Resize "1200x" }}
+{{/* layouts/_default/_markup/render-image.html */}}
+<!--  -->
+{{ $image := .Page.Resources.GetMatch (strings.TrimPrefix "/" .Destination) }}
+{{ with $image }} {{ $small := .Resize "600x" }} {{ $medium := .Resize "900x" }}
+{{ $large := .Resize "1200x" }}
 <figure>
     <img
         src="{{ $medium.RelPermalink }}"

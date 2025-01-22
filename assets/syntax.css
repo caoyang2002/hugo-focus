@@ -1,18 +1,4 @@
-/* Generated using: hugo gen chromastyles --style=monokai */
-
-/* Background */
 .bg {
     color: #f8f8f2;
     background-color: #272822;
 }
-
-/* code,
-kbd,
-samp,
-pre {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-        "Liberation Mono", "Courier New", monospace;
-    font-feature-settings: normal;
-    font-variation-settings: normal;
-    font-size: 1em;
-} */
