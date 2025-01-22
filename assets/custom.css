@@ -1,3 +1,242 @@
+/* 颜色配置 方便后面直接调用 */
+:root {
+    /* dy color */
+    --select-text-bg-color: #d6d8b6;
+    /* 文本选中背景色 */
+    /*--primary-color: red;/*
+    /*--bg-color: #262626; /* 整体背景色 */
+    /*--sidebarbg-color: #1a1a1a; /* 侧边栏背景色 */
+    --focus-color: #ff5d52;
+    /* 点击某些元素（如标题）显示的颜色 */
+    --titlebefore-color: #00c4b6;
+    /* 各级标题点缀颜色 */
+
+    /* ------------------------------------------------------------------------------代码块 */
+    --codeblockbg-color: rgb(251, 246, 235);
+    /* 代码块背景色 */
+    --codeblockbg-color-mini: rgba(245, 241, 232, 1);
+    /* 代码块背景色,小窗模式 */
+    --codeblockfont-color: #a9a9a9;
+    /* 代码块默认字体颜色 */
+    --codeblockline-color: #e1efb7;
+    /* 代码块选中行颜色（鼠标悬浮、选中） */
+    --codeblocknum-color: rgba(128, 128, 255, 0.8);
+    /* 代码块行编号颜色 */
+
+    /* -----------------------------------------------------------------------------引用块 */
+    --blockquoteicon-color: #a0a0a0;
+    /* blockquote提示图标色 */
+    --blockquotebg-color: #eaeaea;
+    /* blockquote背景色 */
+    --blockquotedangericon-color: #ea3c39;
+    /* 危险型blockquote提示图标色 */
+    --blockquotedangerbg-color: #f5848e;
+    /* 危险型blockquote背景色 */
+    --blockquotesuccessicon-color: #5cb85c;
+    /* 成功型blockquote提示图标色 */
+    --blockquotesuccessbg-color: #e2ffd9;
+    /* 成功型blockquote背景色 */
+    --blockquotewarnicon-color: #faa226;
+    /* 警告型blockquote提示图标色 */
+    --blockquotewarnbg-color: #e9d197;
+    /* 警告型blockquote背景色 */
+    --blockquotequestionicon-color: #f7ff0c;
+    /* 问题型blockquote提示图标色 */
+    --blockquotequestionbg-color: #f8fba9;
+    /* 问题型blockquote背景色 */
+
+    /* -----------------------------------------------------------------------------列表 */
+    --ulol-color: #8b8b8b;
+    /* 有序无序列表前缀颜色 */
+    --olfore-color: white;
+    /* 有序列表字体颜色 */
+
+    /* -----------------------------------------------------------------------------表格 */
+    --tableevenrow-color: #1a1a1a;
+    /* 表格偶数行颜色 */
+    --tablefocusrow-color: #263238;
+    /* 表格鼠标悬停行颜色 */
+    --tableborder-color: #2f642e;
+    /* 表格边框色 */
+    --tablethbg-color: #2f845e;
+    /* 表格表头背景色 */
+
+    /* -----------------------------------------------------------------------------滚动条 */
+    --scrollbar-color: #2f845e;
+    /* 滚动条颜色 */
+
+    /* -----------------------------------------------------------------------------目录 */
+    --toc-color: #00a0a0;
+    /* 目录颜色 */
+
+    /* -----------------------------------------------------------------------------超链接 */
+    --atext-color: #a9a9a9;
+    /* 超链接文本颜色 */
+    --ahover-color: black;
+    /* 超链接悬停文本颜色 */
+    --abottom-color: #81d8cf;
+    /* 超链接下划线颜色 */
+
+    /* -----------------------------------------------------------------------------行内代码 */
+    --code-color: #2e1c05;
+    /* 行内代码字体色 */
+    --codebg-color: #feffec;
+    /* 行内代码背景色 */
+
+    /* -----------------------------------------------------------------------------脚注 */
+    --footnote-color: #e96900;
+    /* 脚注上标前景色 */
+    --footnotebg-color: #f8f8f8;
+    /* 脚注上标背景色 */
+
+    /* ----------------------------------------------------------------------------- 高亮文本 */
+    --highlight-color: rgb(71, 4, 4);
+    /* 高亮文本前景色 */
+    --highlightbg-color: rgb(255, 255, 0);
+    /* 高亮文本背景色 */
+
+    /* -----------------------------------------------------------------------------分割线 */
+    --split-color: #7e7e7e;
+    /* 分割线颜色 */
+
+    /* -----------------------------------------------------------------------------任务列表 */
+    --taskborder-color: rgb(235, 127, 127);
+    /* 任务列表边框色 */
+    --taskfocus-color: #7bd7d1;
+    /* 任务列表选中填充色 */
+    --taskftext-color: rgb(112, 112, 112);
+    /* 任务完成字体色*/
+
+    /* -----------------------------------------------------------------------------小标签 */
+    --spannote-color: #e91e64;
+    /* 小标签背景色 */
+    /* -----------------------------------------------------------------------------强调文本 */
+    --emptext-color: #fe5f58;
+    /* 几款强调型文本的颜色 */
+    --hidetextcover-color: #a1a1a1;
+    /* 隐藏文本遮罩颜色 */
+    --hidetext-color: #a9a9a9;
+    /* 隐藏文本颜色 */
+
+    --spanbtn-color: #44d7b6;
+    /* 文本按钮颜色 */
+    --detailstxt-color: black;
+    /* 折叠框summary文字颜色 */
+    --detailsbg-color: #fbffe7;
+    /* 折叠框summary背景色 */
+    --detailsborder-color: #5fa7e4;
+    /* 折叠框边框色 */
+
+    --body-color: #e6e6e6;
+    /* 文本颜色 */
+    --para-color: #a9a9a9;
+    /* 段落文本颜色 */
+    --commonstr-color: #a9a9a9;
+    /* 常规字符串颜色 */
+    --commonstrbg-color: #263238;
+    /* 常规字符串背景色 */
+    --timebodybg-color: #a0a0a0;
+    /* 时间轴主体部分背景色 */
+
+    /* -----------------------------------------------------------------------------侧边栏 */
+    --sidelist-selected-color: #263238;
+    /* 侧边栏条目选中背景色 */
+
+    /* -----------------------------------------------------------------------------YAML */
+    --yamlbg-color: #1a1a1a;
+    /* 头部YAML背景色 */
+    --yaml-color: #7f9bb7;
+    /* 头部YAML字体颜色 */
+
+    /* -----------------------------------------------------------------------------编辑区域 */
+    --page-color: rgba(225, 225, 225, 0);
+    /* 透明 */
+    --page-color-mini: #fffefc;
+    /* 小窗 编辑区域（纸张）颜色 */
+
+    /* dy font */
+    --body-font: "Source Sans Pro", "等距更纱黑体 SC", "Helvetica Neue", Arial,
+        sans-serif;
+    /* 全局字体 */
+    --code-font: "JetBrains Mono";
+    /* 代码块以及行内代码字体 */
+    /* bg image */
+    /* -----------------------------------------------------------------------------背景图片 */
+    --bgimg-url: url(./thompsgo/background_img.jpeg);
+    /* -----------------------------------------------------------------------------文本颜色 */
+    --text-color: #1f0909;
+    --control-text-color: #777;
+    /* --side-bar-bg-color: #fafafa;  */
+
+    /* --------------------------------------------------------------------------------标题下划线颜色 */
+    --border-bottom-h1: #160c01;
+    --border-bottom-h2: #251504;
+    --border-bottom-h3: #34220e;
+    --border-bottom-h4: #473420;
+    --border-bottom-h5: #5b4835;
+    --border-bottom-h6: #6d5c4b;
+    /* ----------------------------------------------------------------------------------标题文字颜色 */
+    --font-h1: #130701;
+    --font-h2: #190c01;
+    --font-h3: #1f1303;
+    --font-h4: #261305;
+    --font-h5: #2d1a08;
+    --font-h6: #34210a;
+
+    /* -------------------------------------------------------------------------------------KBD按键颜色 */
+    --kbdbg-color: #2f1d02;
+    /* 背景颜色 */
+    --kbd-color: #02081b;
+    /* 字体颜色 */
+    --kbd-shadow: #3928064e;
+    /*投影颜色*/
+}
+
+blockquote {
+    width: 100%;
+    border-left: 4px solid #dfe2e5;
+    padding: 0 15px;
+    color: #777777;
+}
+
+blockquote blockquote {
+    padding-right: 0;
+}
+
+blockquote:hover {
+    border-left: 5px solid var(--blockquoteicon-color);
+}
+
+blockquote:hover:before {
+    color: var(--blockquoteicon-color);
+}
+
+blockquote[alt="danger"] {
+    border-left-color: var(--blockquotedangericon-color);
+    background-color: var(--blockquotedangerbg-color);
+}
+
+blockquote[alt="success"] {
+    border-left-color: var(--blockquotesuccessicon-color);
+    background-color: var(--blockquotesuccessbg-color);
+}
+
+blockquote[alt="warn"] {
+    border-left-color: var(--blockquotewarnicon-color);
+    background-color: var(--blockquotewarnbg-color);
+}
+
+/* blockquote[alt="warn"]::before {
+    content: '\e8c7';
+    font-family: "iconfont";
+    color: var(--blockquotewarnicon-color);
+} */
+
+blockquote[alt="question"] {
+    border-left-color: var(--blockquotequestionicon-color);
+    background-color: var(--blockquotequestionbg-color);
+}
+
 @font-face {
     font-family: "Hack";
     font-style: normal;
@@ -13,7 +252,7 @@
 }
 
 /* 阴影圆角和自适应缩放 */
-img[alt="zoom-shadow"],
+/* img[alt="zoom-shadow"],
 img[alt="shadow-zoom"],
 img[alt="圆角-阴影"],
 img[alt="阴影-圆角"] {
@@ -21,7 +260,7 @@ img[alt="阴影-圆角"] {
     border-radius: 8px;
     border: 1px solid #e4e4e4;
     box-shadow: 0px 20px 40px 1px rgba(0, 0, 0, 0.3);
-}
+} */
 
 p,
 blockquote,
@@ -52,4 +291,393 @@ table tr {
     border: 1px solid #dfe2e5;
     margin: 0;
     padding: 0;
+}
+
+/*  */
+
+/**------------------------------------------------------------- 小标签 ---------------------------------------------------------------**/
+font {
+    display: inline;
+    padding: 0.2em 0.6em;
+    font-size: 90%;
+    font-weight: 400;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    /*white-space: nowrap;*/
+    vertical-align: baseline;
+    border-radius: 0.1rem;
+    border-radius: 6px;
+    background-color: var(--spannote-color);
+}
+
+font[title="red"] {
+    background-color: #e91e64;
+}
+
+font[title="blue"] {
+    background-color: #02aaf4;
+}
+
+font[title="yellow"] {
+    background-color: #ffc50a;
+}
+
+font[title="green"] {
+    background-color: #8bc34a;
+}
+
+font[title="gray"] {
+    background-color: #4c4c4c;
+}
+
+/* 空心字等文字特效 https://www.cnblogs.com/xiaohuochai/p/7521282.html */
+span[alt="hollow"] {
+    color: white;
+    text-shadow:
+        1px 1px black,
+        -1px -1px black,
+        1px -1px black,
+        -1px 1px black;
+}
+
+@keyframes blink-smooth {
+    50% {
+        color: transparent;
+    }
+}
+
+/* 空心字 */
+span[alt="blink"] {
+    animation: 0.5s blink-smooth infinite alternate linear;
+}
+
+/** 隐藏型文本 **/
+span[alt="hide"] {
+    color: transparent;
+    background: var(--hidetextcover-color);
+    border-radius: 2px;
+    -webkit-transition: all 0.28s ease;
+    -moz-transition: all 0.28s ease;
+    -o-transition: all 0.28s ease;
+    -ms-transition: all 0.28s ease;
+    transition: all 0.28s ease;
+    -moz-transition: all 0.28s ease;
+    -webkit-transition: all 0.28s ease;
+    -o-transition: all 0.28s ease;
+}
+
+/** 抖音字效 **/
+@-webkit-keyframes uk-text-shadow-glitch {
+    0% {
+        text-shadow: none;
+    }
+
+    25% {
+        text-shadow:
+            -1px -1px 0 #ff0048,
+            1px 1px 0 #3234ff;
+    }
+
+    50% {
+        text-shadow:
+            1px -1px 0 #ff0048,
+            -1px 1px 0 #3234ff;
+    }
+
+    75% {
+        text-shadow:
+            -1px 1px 0 #ff0048,
+            1px -1px 0 #3234ff;
+    }
+
+    to {
+        text-shadow:
+            1px 1px 0 #ff0048,
+            -1px -1px 0 #3234ff;
+    }
+}
+
+@keyframes uk-text-shadow-glitch {
+    0% {
+        text-shadow: none;
+    }
+
+    25% {
+        text-shadow:
+            -1px -1px 0 #ff0048,
+            1px 1px 0 #3234ff;
+    }
+
+    50% {
+        text-shadow:
+            1px -1px 0 #ff0048,
+            -1px 1px 0 #3234ff;
+    }
+
+    75% {
+        text-shadow:
+            -1px 1px 0 #ff0048,
+            1px -1px 0 #3234ff;
+    }
+
+    to {
+        text-shadow:
+            1px 1px 0 #ff0048,
+            -1px -1px 0 #3234ff;
+    }
+}
+
+span[alt="shake"] {
+    -webkit-animation: uk-text-shadow-glitch 0.95s
+        cubic-bezier(1, -1.91, 0, 2.79) 0s infinite normal both running;
+    animation: uk-text-shadow-glitch 0.95s cubic-bezier(1, -1.91, 0, 2.79) 0s
+        infinite normal both running;
+}
+
+span[alt="str"] {
+    padding: 2px 4px;
+    color: var(--commonstr-color);
+    background-color: var(--commonstrbg-color);
+    border-radius: 3px;
+    font-size: 15px;
+    font-family: var(--body-font);
+}
+
+/* 时间轴（来自Volantis主题） */
+div[alt="timeline"] {
+    margin-top: 8px;
+    margin-left: 8px;
+}
+
+div[alt="timenode"] {
+    position: relative;
+}
+
+div[alt="timenode"]:after,
+div[alt="timenode"]:before {
+    content: "";
+    z-index: 1;
+    position: absolute;
+    background: rgba(68, 215, 182, 0.5);
+    width: 2px;
+    left: 7px;
+}
+
+div[alt="timenode"]:before {
+    top: 0px;
+    height: 6px;
+}
+
+div[alt="timenode"] div[alt="body"],
+div[alt="timenode"] div[alt="meta"] {
+    max-width: calc(100% - 24px);
+}
+
+div[alt="timenode"] div[alt="meta"] {
+    position: relative;
+    color: var(--para-color);
+    line-height: 32px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin: 0 0 0 24px;
+}
+
+div[alt="timenode"] div[alt="meta"]:after,
+div[alt="timenode"] div[alt="meta"]:before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    z-index: 2;
+    left: -24px;
+}
+
+div[alt="timenode"] div[alt="meta"]:before {
+    background: rgba(68, 215, 182, 0.5);
+    width: 16px;
+    height: 16px;
+    border-radius: 8px;
+}
+
+div[alt="timenode"] div[alt="meta"]:after {
+    background: #44d7b6;
+    margin-left: 2px;
+    margin-top: 2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    -webkit-transform: scale(0.5);
+    -moz-transform: scale(0.5);
+    -o-transform: scale(0.5);
+    -ms-transform: scale(0.5);
+    transform: scale(0.5);
+}
+
+div[alt="timenode"] div[alt="body"] {
+    margin: 4px 0 10px 24px;
+    padding: 10px;
+    border-radius: 12px;
+    background: var(--timebodybg-color);
+    display: inline-block;
+    font-size: 0.9rem;
+}
+
+div[alt="timenode"]:not(:last-child):after {
+    top: 26px;
+    height: calc(100% - 26px);
+}
+
+div[alt="timenode"]:last-child:after {
+    top: 26px;
+    height: calc(100% - 30px);
+}
+
+div[alt="timenode"]:hover div[alt="meta"] {
+    color: var(--para-color);
+}
+
+div[alt="timenode"]:hover div[alt="meta"]:before {
+    background: rgba(255, 87, 34, 0.5);
+}
+
+div[alt="timenode"]:hover div[alt="meta"]:after {
+    background: #ff5722;
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -o-transform: scale(1);
+    -ms-transform: scale(1);
+    transform: scale(1);
+}
+
+/* KBD按键样式 */
+kbd {
+    font-family: "Alibaba Sans";
+    /* font: var(--kbdbg-color);代码字体颜色 */
+    font-size: 0.8em;
+    /* background: var(--kbdbg-color);文字背景 (按键颜色)*/
+    color: var(--kbd-color);
+    /* 文字颜色 */
+    border-radius: 5px;
+    border-color: var(--kbdbg-color);
+    /* box-shadow: unset; */
+    box-shadow: 2px 2px 4px 1px var(--kbd-shadow);
+}
+
+/* https://www.jq22.com/webqd4214（爱是一道光，绿到你发慌） */
+span[alt="glow"] {
+    font-family: "Audiowide";
+    text-align: center;
+    /*color:black;*/
+    -webkit-transition: all 1.5s ease;
+    transition: all 1.5s ease;
+}
+
+/** 彩虹变换字体特效（来自黑石博客） **/
+@-webkit-keyframes rainbowan {
+    to {
+        background-position: -2000vw;
+    }
+}
+
+@keyframes rainbowan {
+    to {
+        background-position: -2000vw;
+    }
+}
+
+span[alt="rainbow"],
+span[alt="rainbow"] * {
+    padding-top: 3px;
+    background-image: linear-gradient(
+        to left,
+        orangered,
+        orange,
+        gold,
+        lightgreen,
+        cyan,
+        dodgerblue,
+        mediumpurple,
+        hotpink,
+        orangered
+    );
+    background-size: 110vw;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-animation: rainbowan 60s linear infinite;
+    animation: rainbowan 60s linear infinite;
+}
+
+/** 隐藏型文本 **/
+span[alt="hide"] {
+    color: transparent;
+    background: var(--hidetextcover-color);
+    border-radius: 2px;
+    -webkit-transition: all 0.28s ease;
+    -moz-transition: all 0.28s ease;
+    -o-transition: all 0.28s ease;
+    -ms-transition: all 0.28s ease;
+    transition: all 0.28s ease;
+    -moz-transition: all 0.28s ease;
+    -webkit-transition: all 0.28s ease;
+    -o-transition: all 0.28s ease;
+}
+
+span[alt="hide"]:hover {
+    color: var(--hidetext-color);
+    background: 0 0;
+}
+
+/** 折叠标签 **/
+details {
+    display: block;
+    padding: 16px;
+    margin: 1em 0;
+    border-radius: 4px;
+    background: var(--bg-color);
+    font-size: 14px;
+    -webkit-transition: all 0.28s ease;
+    -moz-transition: all 0.28s ease;
+    -o-transition: all 0.28s ease;
+    -ms-transition: all 0.28s ease;
+    transition: all 0.28s ease;
+    -moz-transition: all 0.28s ease;
+    -webkit-transition: all 0.28s ease;
+    -o-transition: all 0.28s ease;
+    border: 1px solid var(--bg-color);
+}
+
+summary {
+    display: list-item;
+}
+
+details summary {
+    cursor: pointer;
+    padding: 16px;
+    margin: -16px;
+    border-radius: 4px;
+    color: var(--detailstxt-color);
+    font-size: 0.875rem !important;
+    font-weight: 700;
+    position: relative;
+    line-height: normal;
+}
+
+details > summary {
+    background: var(--detailsbg-color);
+}
+
+details[open] {
+    border-color: var(--detailsborder-color);
+}
+
+details[open] > summary {
+    color: #444;
+    margin-bottom: 0;
+}
+
+details[open] > summary {
+    border-bottom: 1px solid var(--detailsborder-color);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
 }
