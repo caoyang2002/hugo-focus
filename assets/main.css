@@ -1475,6 +1475,9 @@ pre {
     margin-left: 3.5rem;
 }
 /* margin top */
+.mt-4 {
+    margin-top: 1rem;
+}
 .mt-8 {
     margin-top: 2rem;
 }
@@ -1562,6 +1565,19 @@ pre {
 
 .h-7 {
     height: 1.75rem;
+}
+.h-8 {
+    height: 2rem;
+}
+.h-10 {
+    height: 2.5rem;
+}
+.h-12 {
+    height: 3rem;
+}
+
+.h-16 {
+    height: 4rem;
 }
 
 .h-\[4\.5rem\] {
@@ -1724,6 +1740,13 @@ pre {
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
 }
+.py-12 {
+    padding: 3rem 0;
+}
+
+.pb-14 {
+    padding-top: 3.5rem;
+}
 
 .pb-16 {
     padding-bottom: 4rem;
@@ -1739,6 +1762,10 @@ pre {
 
 .pt-14 {
     padding-top: 3.5rem;
+}
+
+.pt-16 {
+    padding-top: 4rem;
 }
 
 .text-center {
