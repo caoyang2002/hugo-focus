@@ -1,0 +1,25 @@
+# 导航菜单配置
+[[main]]
+name = '首页'
+pageRef = '/'
+weight = 10
+
+[[main]]
+name = "关于"
+pageRef = "/about/"
+weight = 20
+
+[[main]]
+name = "联系"
+pageRef = "/contact/"
+weight = 30
+
+[[main]]
+name = "留言"
+pageRef = "/guestbook/"
+weight = 40
+
+[[main]]
+name = "搜索"
+pageRef = "/search/"
+weight = 50

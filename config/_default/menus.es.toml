@@ -1,0 +1,25 @@
+# Configuración del menú de navegación
+[[main]]
+name = 'Inicio'
+pageRef = '/'
+weight = 10
+
+[[main]]
+name = "Acerca de"
+pageRef = "/about/"
+weight = 20
+
+[[main]]
+name = "Contacto"
+pageRef = "/contact/"
+weight = 30
+
+[[main]]
+name = "Libro de visitas"
+pageRef = "/guestbook/"
+weight = 40
+
+[[main]]
+name = "Buscar"
+pageRef = "/search/"
+weight = 50

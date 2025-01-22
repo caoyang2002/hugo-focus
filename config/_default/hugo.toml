@@ -1,0 +1,203 @@
+# 基础配置
+baseURL = 'https://caoyang2002.xyz'
+languageCode = 'zh-CN'
+title = 'caoyang2002'
+
+
+# 基础优化配置
+enableGitInfo = true
+hasCJKLanguage = true
+summaryLength = 140
+# DefaultContentLanguage = "zh"
+
+# 全局功能开关
+comments = true
+math = true
+pagination.pagerSize = 10
+
+
+# 隐私相关配置
+[privacy]
+[privacy.x]
+disable = false
+enableDNT = false
+simple = false
+[privacy.vimeo]
+disabled = false
+simple = true
+
+# 评论服务配置
+[services.disqus]
+shortname = 'caoyang2002.xyz'
+
+# 分类配置
+[taxonomies]
+category = "categories"
+tag = "tags"
+series = "series"
+
+# Giscus评论系统配置
+[params.giscus]
+repo = 'caoyang2002/caoyang2002'
+repoId = 'R_kgDONgnnzg'
+category = 'Announcements'
+categoryId = 'DIC_kwDONgnnzs4ClayH'
+mapping = 'pathname'
+strict = "0"
+reactionsEnabled = "1"
+emitMetadata = "0"
+inputPosition = "top"
+# theme = "preferred_color_scheme"
+crossorigin = "anonymous"
+theme = 'light'
+lang = 'zh-CN'
+
+# RSS 订阅配置
+[params.rss]
+limit = 20
+fullContent = true
+
+# 文章配置
+[permalinks]
+posts = "/post/:year/:month/:filename/"
+
+# 图片配置
+[imaging]
+quality = 75
+resampleFilter = "Lanczos"
+anchor = "Smart"
+
+[imaging.exif]
+disableDate = true
+disableLatLong = true
+
+# Markdown配置
+[markup.tableOfContents]
+endLevel = 4
+startLevel = 1
+ordered = false
+# startLevel = 2
+
+# [markup.goldmark.renderer]
+# unsafe = true
+
+# 主题参数配置
+[params]
+color = 'linen'
+subtitle = 'The Best Widgets on Earth'
+toc = true                             # 全局启用目录
+# 背景图片
+# backgroundImage = "/imgs/background_img.jpg" # 放在 static 下
+
+# 社交媒体链接
+twitter = 'caoyang2002'
+github = 'caoyang2002'
+instagram = 'caoyang2002'
+
+# 个人信息配置
+avatar = '/about/avatar.jpg'
+name = '曹洋 simons'
+bio = '用光的艺术'
+
+disablePostNavigation = false # 禁用文章导航
+
+# 其他设置
+disableHLJS = false # 禁用 highlight.js 代码高亮
+# disablePostNavigation = true             # 禁用文章导航
+monoDarkIcon = false # 使用单色暗模式图标
+# gravatarCdn = 'GRAVATAR_CDN_LINK'        # Gravatar CDN 链接，例如 'https://cdn.v2ex.com/gravatar/'
+math = true        # 全局启用 KaTeX 数学公式排版
+localKatex = false # 使用本地 KaTeX js/css 而不是 CDN
+# graphCommentId = "YOUR_GRAPH_COMMENT_ID" # 使用 Graph Comment（Disqus 替代品）
+favicon = "favicon.ico"                 # 自定义网站图标
+appleTouchIcon = "apple-touch-icon.png" # 自定义苹果设备触摸图标
+
+# RTL 支持
+direction = "ltr" # 支持从右到左的语言排版
+
+pageViewConter = true
+
+[params.contact]
+email = 'info@example.org'
+phone = '+1 202-555-1212'
+
+# 主题模块导入
+# [[module.imports]]
+# path = "github.com/caoyang2002/hugo-focus"
+
+[outputs]
+home = ["HTML", "RSS", "JSON"]
+
+[sitemap]
+changefreq = "monthly"
+priority = 0.5
+filename = "sitemap.xml"
+
+[markup]
+defaultMarkdownHandler = 'goldmark'
+
+
+[markup.highlight]
+anchorLineNos = false
+lineAnchors = ''
+lineNoStart = 1
+lineNos = false
+tabWidth = 4
+# 启用代码围栏功能
+codeFences = true
+# 启用语言猜测
+guessSyntax = true
+# 启用行号
+# lineNos = true
+lineNumbersInTable = true
+# 使用 classes 而不是内联样式
+noClasses = false
+# 选择高亮主题
+style = "monokai" # 代码高亮主题
+
+
+# 多语言支持
+
+
+# 设置默认语言
+defaultContentLanguage = "zh"
+# 将内容放在语言子目录下
+defaultContentLanguageInSubdir = true
+
+# 语言配置
+[languages]
+# 中文
+[languages.zh]
+   contentDir = 'content/zh'
+   disabled = false
+   languageCode = 'zh-CN'
+   languageDirection = 'ltr'
+   languageName = 'Chinese'
+   title = 'Hugo Focus 文档'
+   weight = 1
+[languages.zh.params]
+    subtitle = '中文文档'
+
+# 英语
+[languages.en]
+    contentDir = 'content/en'
+    disabled = false
+    languageCode = 'en-US'
+    languageDirection = 'ltr'
+    languageName = 'English'
+    title = 'Hugo Focus Documentation'
+    weight = 2
+[languages.en.params]
+subtitle = 'Reference, Tutorials, and Explanations'
+
+# 西班牙语
+[languages.es]
+    contentDir = 'content/es'
+    disabled = false
+    languageCode = 'es-ES'
+    languageDirection = 'ltr'
+    languageName = 'Español'
+    title = 'Documentación de Hugo Focus'
+    weight = 3
+[languages.es.params]
+subtitle = 'Referencia, Tutoriales y Explicaciones'

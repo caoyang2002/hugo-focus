@@ -15,8 +15,8 @@ features = ["Responsive", "One Column", "Blog"]
 
 # If the theme has multiple authors
 authors = [
-  {name = 'simons', homepage = 'Website of author'},
-  {name = 'cuff', homepage = 'Website of author'}
+  {name = 'simons', homepage = 'caoyang2002.xyz'},
+  {name = 'cuff', homepage = 'caoyang2002.xyz'}
 ]
 
 # If the theme has a single author
@@ -27,5 +27,5 @@ authors = [
 # If porting an existing theme
 [original]
   author = 'caoyang2002'
-  homepage = 'caoyang2002'
+  homepage = 'caoyang2002.xyz'
   repo = 'https://github.com/caoyang2002/hugo-focus'

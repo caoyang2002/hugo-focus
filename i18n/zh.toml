@@ -1,0 +1,5 @@
+readMore = "阅读更多"
+posts = "{{ .Count }} 篇文章"
+lastUpdated = '最后更新于 {{ .Format "2006-01-02" }}'
+prev_page = "上一页"
+next_page = "下一页"

@@ -1,0 +1,7 @@
+readMore = "Read More"
+post = "{{ .Count }} post"
+posts =  "{{ .Count }} posts"
+lastUpdated =  "Last updated on {{ .Format \"2006-01-02\" }}"
+#
+prev_page= 'Prev Page'
+next_page = 'Next Page'

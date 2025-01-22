@@ -1,0 +1,108 @@
+<div class="inline-block text-left dropdown">
+    <!-- Language Selector Button -->
+
+    {{ .Language.LanguageName }}
+
+    <!-- </button> -->
+    <div style="background-color: red; z-index: 1000">
+        {{ if .IsTranslated }}
+
+        <ul class="dropdown-menu" id="dropdownMenu">
+            {{ range .Translations }}
+            <li>
+                <a
+                    href="{{ .RelPermalink }}"
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    role="menuitem"
+                >
+                    {{ .Language.LanguageName }}
+                </a>
+            </li>
+            {{ end }}
+        </ul>
+        {{ end }}
+    </div>
+</div>
+
+<script>
+    // JavaScript to handle dropdown functionality
+    const dropdownButton = document.getElementById("dropdownButton");
+    const dropdownMenu = document.getElementById("dropdownMenu");
+    const dropdownIcon = document.querySelector(".dropdown-icon");
+
+    // Toggle dropdown menu visibility
+    dropdownButton.addEventListener("click", function () {
+        dropdownMenu.classList.toggle("show");
+        dropdownButton.parentElement.classList.toggle("open");
+    });
+
+    // Handle menu item selection
+    dropdownMenu.querySelectorAll("li").forEach((item) => {
+        item.addEventListener("click", function () {
+            // Update button text
+            dropdownButton.textContent = item.textContent + " ";
+            dropdownButton.appendChild(dropdownIcon);
+
+            // Close the dropdown menu
+            dropdownMenu.classList.remove("show");
+            dropdownButton.parentElement.classList.remove("open");
+
+            // Optional: Do something with the selected value
+            const selectedValue = item.getAttribute("data-value");
+            console.log("Selected Language:", selectedValue);
+        });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", function (event) {
+        if (
+            !dropdownButton.contains(event.target) &&
+            !dropdownMenu.contains(event.target)
+        ) {
+            dropdownMenu.classList.remove("show");
+            dropdownButton.parentElement.classList.remove("open");
+        }
+    });
+</script>
+
+<style>
+    /* 菜单容器 */
+    .dropdown {
+        /* position: relative; */
+        display: inline-block;
+        margin: 0;
+    }
+
+    /* 菜单 */
+    .dropdown-menu {
+        /* top: 100%; */
+        /* left: 0; */
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+        /* list-style: none; */
+        padding: 0;
+        margin: 0;
+        display: none;
+        /* min-width: 160px; */
+        /* z-index: 50; */
+    }
+
+    .dropdown-menu.show {
+        display: block;
+    }
+
+    /* Dropdown Menu Items */
+    .dropdown-menu li {
+        padding: 0.2rem;
+        cursor: pointer;
+        color: #333;
+        /* transition: background-color 0.2s ease; */
+        /* background-color: initial;  */
+    }
+
+    .dropdown-menu > li:hover {
+        background-color: transparent; /* 提高优先级 */
+    }
+</style>
