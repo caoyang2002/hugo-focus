@@ -1,144 +1,143 @@
 <aside class="sticky w-64">
 
+
       <!-- 个人信息容器 -->
-    <div class="not-prose rounded-lg bg-white dark:bg-neutral-800 p-3 shadow-sm">
-        <!-- 个人信息卡片 -->
-        <div>
-            {{ with $.Scratch.Get "avatar_url" }}
-                <div class="mb-4 flex justify-center">
-                    <a href="{{ site.BaseURL }}" class="block relative group">
-                        <img
-                        src="{{ . }}"
-                        class="h-24 w-24 rounded-full border-2 border-neutral-200 dark:border-neutral-700 transition-transform duration-200 group-hover:scale-105"
-                        alt="avatar"
-                        />
-                        <div class="absolute inset-0 rounded-full bg-black opacity-0 transition-opacity duration-200 group-hover:opacity-10"></div>
-                    </a>
-                </div>
-            {{ end }}
 
-            {{ with site.Params.name }}
-                <h2 class="mb-2 text-center text-lg font-bold bg-gradient-to-r from-neutral-800 to-neutral-600 dark:from-neutral-200 dark:to-neutral-400 bg-clip-text text-transparent">
-                {{ . }}
-                </h2>
-            {{ end }}
+      <div class="sidebar-card">
+          <!-- 个人信息部分 -->
+          <div class="profile-section">
+              {{ with $.Scratch.Get "avatar_url" }}
+                  <div class="avatar-container">
+                      <a href="{{ site.BaseURL }}" class="avatar-link">
+                          <img src="{{ . }}" class="avatar" alt="avatar" />
+                          <div class="avatar-overlay"></div>
+                      </a>
+                  </div>
+              {{ end }}
 
-            {{ with site.Params.bio }}
-                <p class="mb-6 text-center text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                {{ . }}
-                </p>
-            {{ end }}
+              {{ with site.Params.name }}
+                  <h2 class="profile-name">{{ . }}</h2>
+              {{ end }}
 
-            <!-- 社交列表 -->
-            {{ with $.Scratch.Get "social_list" }}
-                <div
-                    class="space-x-4 flex justify-center dark:invert  lg:mt-0 lg:items-center"
-                >
-                    {{ range . }}<!---->
-                        <a
-                            class="h-7 w-7 text-[0] [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
-                            style="--url: url(./{{ . }}.svg)"
-                            href="{{ if eq . `rss` }}{{ `index.xml` | absURL }}{{ else if eq . `mastodon` }}{{ index site.Params . }}{{ else }}{{ if eq . `threads` }}https://threads.net/{{ else if eq . `bluesky` }}https://bsky.app/profile/{{ else }}https://{{ . }}.com/{{ end }}{{ if eq . `linkedin` }}in/{{ end }}{{ index site.Params . }}{{ end }}"
-                            target="_blank"
-                            rel="{{ if eq . `rss` }}alternate{{ else }}me{{ end }}"
-                        >
-                            {{ . }}
-                        </a>
-                    {{ end }}<!---->
-                </div>
-            {{ end }}
-        </div>
+              {{ with site.Params.bio }}
+                  <p class="profile-bio">{{ . }}</p>
+              {{ end }}
+<!-- 社交媒体 -->
+              {{ with $.Scratch.Get "social_list" }}
+                  <div class="social-links">
+                      {{ range . }}
+                          <a href="{{ if eq . `rss` }}{{ `index.xml` | absURL }}{{ else if eq . `mastodon` }}{{ index site.Params . }}{{ else }}{{ if eq . `threads` }}https://threads.net/{{ else if eq . `bluesky` }}https://bsky.app/profile/{{ else }}https://{{ . }}.com/{{ end }}{{ if eq . `linkedin` }}in/{{ end }}{{ index site.Params . }}{{ end }}"
+                             class="social-link"
+                             target="_blank"
+                             rel="{{ if eq . `rss` }}alternate{{ else }}me{{ end }}">
+                              <img class="social-logo" src="./{{ . }}.svg" alt="{{ . }}" style="width: 1rem; height: 1rem;" />
+                          </a>
+                      {{ end }}
+                  </div>
+              {{ end }}
+          </div>
 
-        <!-- 博客统计 -->
-        <div class="py-1 text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-            <div class="blog-analyze">
-                <h3>统计</h3>
-                <div class="">
-                    <p>  文章总数：{{ len (where .Site.RegularPages "Section" "posts") }}</p>
-                    <p>总字数：{{ $wordCount := 0 }}{{ range .Site.RegularPages }}{{ $wordCount = add $wordCount .WordCount }}{{ end }}{{ $wordCount }}</p>
-                    <p>分类数：{{ len .Site.Taxonomies.categories }}</p>
-                    <p> 标签数：{{ len .Site.Taxonomies.tags }}</p>
-                </div>
-            </div>
-        </div>
+          <!-- 内容部分 -->
+          <div class="content-section">
+              <!-- 博客统计 -->
+              <div class="stats-grid">
+                  <div class="stat-item">
+                      <p class="stat-label">文章总数</p>
+                      <p class="stat-value">{{ len (where .Site.RegularPages "Section" "posts") }}</p>
+                  </div>
+                  <div class="stat-item">
+                      <p class="stat-label">总字数</p>
+                      <p class="stat-value">{{ $wordCount := 0 }}{{ range .Site.RegularPages }}{{ $wordCount = add $wordCount .WordCount }}{{ end }}{{ $wordCount }}</p>
+                  </div>
+                  <div class="stat-item">
+                      <p class="stat-label">分类数</p>
+                      <p class="stat-value">{{ len .Site.Taxonomies.categories }}</p>
+                  </div>
+                  <div class="stat-item">
+                      <p class="stat-label">标签数</p>
+                      <p class="stat-value">{{ len .Site.Taxonomies.tags }}</p>
+                  </div>
+              </div>
 
-        <!-- 热门文章 -->
-        <div class="py-1">
-            <h3>热门文章</h3>
-            {{ range first 5 (where .Site.RegularPages.ByDate.Reverse "Section" "posts") }}
-                <p><a href="{{ .RelPermalink }}">{{ .Title }}</a></p>
-            {{ end }}
-        </div>
+              <!-- 热门文章 -->
+              <div class="popular-posts">
+                  <h3 class="section-title">热门文章</h3>
+                  {{ range first 5 (where .Site.RegularPages.ByDate.Reverse "Section" "posts") }}
+                      <a href="{{ .RelPermalink }}" class="post-link">
+                          {{ .Title }}
+                      </a>
+                  {{ end }}
+              </div>
 
-        <!-- 标签云 -->
-        <div class="py-1">
-            <h3>标签云</h3>
-            {{ range $name, $taxonomy := .Site.Taxonomies.tags }}
-            {{ $count := .Count }}
-            <a href="{{ "/tags/" | relLangURL }}{{ $name | urlize }}"
-            style="font-size: {{ add 0.8 (mul 0.1 (len $taxonomy)) }}rem">
-                {{ $name }} ({{ $count }})
-            </a>
-            {{ end }}
-        </div>
+              <!-- 标签云 -->
+              <div class="tag-cloud">
+                  <h3 class="section-title">标签云</h3>
+                  <div class="tag-list">
+                      {{ range $name, $taxonomy := .Site.Taxonomies.tags }}
+                          {{ $count := .Count }}
+                          <a href="{{ "/tags/" | relLangURL }}{{ $name | urlize }}"
+                             class="tag-link"
+                             style="font-size: {{ add 0.8 (mul 0.1 (len $taxonomy)) }}rem">
+                              {{ $name }} ({{ $count }})
+                          </a>
+                      {{ end }}
+                  </div>
+              </div>
 
-        <!-- 最新内容 -->
-        <!-- <div class="dynamic-content"
-                data-api="{{ .Site.Params.apiEndpoint }}"
-                data-refresh="60">
-            {{ range first 5 .Site.RegularPages }}
-                <article class="dynamic-item">
-                    <h3>{{ .Title }}</h3>
-                    <time>{{ .Date.Format "2006-01-02" }}</time>
-                </article>
-            {{ end }}
-        </div> -->
+              <!-- 归档 -->
+              <div class="archives">
+                  <h3 class="section-title">归档</h3>
+                  {{ range .Site.RegularPages.GroupByDate "2006" }}
+                      <details class="archive-year">
+                          <summary class="year-summary">
+                              <span>{{ .Key }}</span>
+                              <span>{{ len .Pages }} 篇</span>
+                          </summary>
 
-        <!-- 归档 -->
-        <div class="py-1">
-            <h3>归档</h3>
-            {{ range .Site.RegularPages.GroupByDate "2006" }}
-                <!-- 年份折叠 -->
-                <details class="archive-year mb-3">
-                    <summary class="cursor-pointer hover:text-primary-500 font-medium">
-                        {{ .Key }} ({{ len .Pages }} 篇)
-                    </summary>
+                          <div class="month-list">
+                              {{ range .Pages.GroupByDate "January" }}
+                                  <details class="month-item">
+                                      <summary class="year-summary">
+                                          <span>{{ .Key }}</span>
+                                          <span>{{ len .Pages }} 篇</span>
+                                      </summary>
 
-                    {{ range .Pages.GroupByDate "January" }}
-                        <!-- 月份折叠 -->
-                        <details class="archive-month ml-4 mb-2">
-                            <summary class="cursor-pointer hover:text-primary-500">
-                                {{ .Key }} ({{ len .Pages }} 篇)
-                            </summary>
-
-                            <div class="ml-4">
-                                {{ range .Pages }}
-                                    <article style="font-size: 12px;" class="flex items-center gap-2 py-1">
-                                        <time class="text-sm text-neutral-500">{{ .Date.Format "02" }}</time>
-                                        <a href="{{ .RelPermalink }}" class="hover:text-primary-500 ">{{ .Title }}</a>
-                                        <span class="text-sm text-neutral-500">{{ .ReadingTime }} 分钟阅读</span>
-                                    </article>
-                                {{ end }}
-                            </div>
-                        </details>
-                    {{ end }}
-                </details>
-            {{ end }}
-        </div>
-    </div>
+                                      <div class="post-list">
+                                          {{ range .Pages }}
+                                              <article class="post-item">
+                                                  <time class="post-date">{{ .Date.Format "02" }}</time>
+                                                  <a href="{{ .RelPermalink }}" class="post-title">{{ .Title }}</a>
+                                                  <span class="reading-time">{{ .ReadingTime }} 分钟阅读</span>
+                                              </article>
+                                          {{ end }}
+                                      </div>
+                                  </details>
+                              {{ end }}
+                          </div>
+                      </details>
+                  {{ end }}
+              </div>
+          </div>
+      </div>
 </aside>
 
 <style>
+/*响应式*/
+@media (max-width: 768px) {
+    aside{
+        display: none;  /* 完全隐藏元素 */
+    }
+}
 /* 固定目录样式 */
 aside {
-  position: fixed;  /* 改为固定定位 */
-  top: 8rem;          /* 距离顶部 8rem */
-   bottom: 8rem;       /* 距离底部 2rem */
-   right: 0rem;
-   width: 14rem;
-   height: auto;       /* 高度自适应 */
-   overflow-y: auto;
-   z-index: 10;
+    position: fixed;  /* 改为固定定位 */
+    top: 6rem;          /* 距离顶部 8rem */
+    bottom: 4rem;       /* 距离底部 2rem */
+    right: 1rem;
+    width: 14rem;
+    height: auto;       /* 高度自适应 */
+    overflow-y: auto;
+    z-index: 10;
 }
 
 /* 自定义折叠箭头样式 */
@@ -163,6 +162,8 @@ details[open] > div {
     animation: slideDown 0.3s ease-out;
 }
 
+
+
 @keyframes slideDown {
     from {
         opacity: 0;
@@ -173,6 +174,378 @@ details[open] > div {
         transform: translateY(0);
     }
 }
+
+.sidebar-card {
+   background: #fff;
+   border-radius: 12px;
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+   overflow: hidden;
+ }
+
+ .profile-section {
+   position: sticky;
+   top: 0;
+   padding: 0.5rem;
+   background: rgba(255, 255, 255, 0.95);
+   backdrop-filter: blur(8px);
+   border-bottom: 1px solid #eee;
+   z-index: 10;
+ }
+
+ .avatar-container {
+   margin: 0.1rem;
+   text-align: center;
+ }
+
+ .avatar-link {
+   display: inline-block;
+   position: relative;
+ }
+
+ .avatar {
+   width: 96px;
+   height: 96px;
+   border-radius: 50%;
+   border: 2px solid #eee;
+   transition: transform 0.3s ease;
+ }
+
+ .avatar-link:hover .avatar {
+   transform: scale(1.05);
+ }
+
+ .avatar-overlay {
+   position: absolute;
+   inset: 0;
+   border-radius: 50%;
+   background: #000;
+   opacity: 0;
+   transition: opacity 0.3s ease;
+ }
+
+ .avatar-link:hover .avatar-overlay {
+   opacity: 0.1;
+ }
+
+ .profile-name {
+   margin: 0.1rem;
+   font-size: 1rem;
+   font-weight: bold;
+   text-align: center;
+   background: linear-gradient(to right, #2d3748, #4a5568);
+   -webkit-background-clip: text;
+   background-clip: text;
+   color: transparent;
+ }
+
+ .profile-bio {
+   margin-top: 0.1rem;
+   margin-bottom: 0.25rem;
+   font-size: 0.75rem;
+   text-align: center;
+   color: #666;
+   line-height: 1.5;
+ }
+
+ .social-links {
+   display: flex;
+   justify-content: center;
+   gap: 1rem;
+ }
+
+
+ .social-link {
+   width: 2rem;
+   height: 2rem;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   border-radius: 50%;
+   background: #f5f5f5;
+   transition: background-color 0.2s ease;
+ }
+/* logo */
+ .social-link:hover {
+   background: #0024da;
+ }
+ .social-link .social-logo:is(.dark *) {
+     filter: brightness(0) invert(1);
+ }
+
+ .social-link .social-logo {
+   filter: brightness(0) invert(0);
+ }
+
+ .social-link .social-logo:hover {
+     filter: brightness(0) invert(1);
+ }
+
+ .content-section {
+   padding: 0.5rem;
+ }
+
+ .stats-grid {
+   display: grid;
+   grid-template-columns: repeat(2, 1fr);
+   gap: 1rem;
+   background: #f9f9f9;
+   padding: 0.5rem;
+   border-radius: 8px;
+   margin: 0.25rem;
+ }
+
+ .stat-item {
+   background: #fff;
+   padding: 0.25rem;
+   border-radius: 8px;
+   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+ }
+
+ .stat-label {
+   font-size: 0.75rem;
+   color: #666;
+   margin: 0.25rem;
+ }
+
+ .stat-value {
+   font-size: 1rem;
+   font-weight: bold;
+    margin: 0.25rem;
+   color: #333;
+ }
+
+ .section-title {
+    margin: 0 0.25rem;
+   font-size: 0.8rem;
+   font-weight: 600;
+   color: #333;
+
+ }
+
+ /* 热门文章 */
+ .popular-posts {
+   margin: 0.25rem;
+   border:1px solid #ddd;
+   border-radius: 6px;
+ }
+
+ .popular-posts:is(.dark *) {
+   margin: 0.25rem;
+   border:1px solid #555;
+   border-radius: 6px;
+ }
+
+ .post-link {
+   display: block;
+   font-size: 0.75rem;
+   line-height: 1;
+   margin: 0.1rem 0.25rem;
+   padding: 0.1rem 0.25rem;
+   border-radius: 6px;
+   color: #333;
+   text-decoration: none;
+   transition: background-color 0.2s ease;
+ }
+
+ .post-link:hover {
+   background: #f5f5f5;
+ }
+
+/* 标签云 */
+ .tag-cloud {
+   margin: 0.25rem;
+   border:1px solid #ddd;
+   border-radius: 6px;
+ }
+
+ .tag-cloud:is(.dark *) {
+   margin: 0.25rem;
+   border:1px solid #555;
+   border-radius: 6px;
+ }
+
+
+ .tag-list {
+     margin: 0.1rem 0.25rem;
+   display: flex;
+   flex-wrap: wrap;
+   gap: 0.2rem;
+ }
+
+
+ .tag-link {
+   display: inline-block;
+   margin: 0 0.25rem;
+   padding: 0.2rem 0.2rem;
+   border-radius: 4px;
+   background: #f5f5f5;
+   color: #666;
+   text-decoration: none;
+   font-size: 0.75rem !important;
+   line-height: 1;
+   transition: background-color 0.2s ease;
+ }
+
+
+ .tag-link:hover {
+   background: #999;
+    color: #fff;
+ }
+
+
+ /* 归档 */
+ .archives {
+   margin: 0.25rem;
+   /* border:1px solid #ddd;
+   border-radius: 6px; */
+ }
+
+ .archive-year {
+   border-left: 2px solid #eee;
+   margin-bottom: 0.25rem;
+ }
+
+ .year-summary {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding: 0.1rem 0.25rem;
+   cursor: pointer;
+   color: #333;
+   font-weight: 500;
+   font-size: 0.75rem;
+ }
+
+ .year-summary:hover {
+   background: #f5f5f5;
+ }
+
+ .month-list {
+   margin-left: 0.5rem;
+
+ }
+
+ .month-item {
+   margin-left: 1rem;
+   padding: 0.1rem 0;
+ }
+
+ .post-item {
+   display: flex;
+   align-items: center;
+   gap: 0.75rem;
+   padding: 0.1rem 0;
+   font-size: 0.75rem;
+   color: #666;
+ }
+
+ .post-date {
+   color: #999;
+ }
+
+ .post-title {
+   color: #333;
+   text-decoration: none;
+ }
+
+ .post-title:hover {
+   color: #000;
+ }
+
+ .reading-time {
+   color: #999;
+ }
+
+ /* Dark mode support */
+
+   .sidebar-card:is(.dark *) {
+     background: #1a1a1a;
+   }
+
+   .profile-section:is(.dark *) {
+     background: rgba(26, 26, 26, 0.95);
+     border-bottom-color: #333;
+   }
+
+   .profile-name:is(.dark *) {
+     background: linear-gradient(to right, #e2e8f0, #a0aec0);
+     -webkit-background-clip: text;
+     background-clip: text;
+   }
+
+   .profile-bio:is(.dark *) {
+     color: #999;
+   }
+
+   .social-link:is(.dark *) {
+     background: #333;
+   }
+
+   .social-link:is(.dark *):hover {
+     background: #404040;
+   }
+
+   .stats-grid:is(.dark *) {
+     background: #262626;
+   }
+
+   .stat-item:is(.dark *) {
+     background: #1a1a1a;
+   }
+
+   .stat-label:is(.dark *) {
+     color: #999;
+   }
+
+   .stat-value:is(.dark *) {
+     color: #fff;
+   }
+
+   .section-title:is(.dark *) {
+     color: #fff;
+   }
+
+   .post-link:is(.dark *) {
+     color: #fff;
+   }
+
+   .post-link:is(.dark *):hover {
+     background: #262626;
+   }
+
+   .tag-link:is(.dark *) {
+     background: #333;
+     color: #999;
+   }
+
+   .tag-link:is(.dark *):hover {
+     background: #404040;
+   }
+
+   .archive-year:is(.dark *) {
+     border-left-color: #333;
+   }
+
+   .year-summary:is(.dark *) {
+     color: #fff;
+   }
+
+   .year-summary:is(.dark *):hover {
+     background: #262626;
+   }
+
+   .post-item:is(.dark *) {
+     color: #999;
+   }
+
+   .post-title:is(.dark *) {
+     color: #ccc;
+   }
+
+   .post-title:is(.dark *):hover {
+     color: #fff;
+   }
+
 
 </style>
 
