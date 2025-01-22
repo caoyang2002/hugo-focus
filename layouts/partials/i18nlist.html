@@ -1,7 +1,8 @@
 <div class="inline-block text-left dropdown">
     <!-- Language Selector Button -->
-
-    {{ .Language.LanguageName }}
+    <div>
+        <p class="selected-language">{{ .Language.LanguageName }}</p>
+    </div>
 
     <!-- </button> -->
     <div style="background-color: red; z-index: 1000">
@@ -104,5 +105,8 @@
 
     .dropdown-menu > li:hover {
         background-color: transparent; /* 提高优先级 */
+    }
+    .selected-language:hover {
+        color: #0042da;
     }
 </style>

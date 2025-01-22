@@ -1,9 +1,9 @@
 {{ define "main" }}
 <!-- 首页 -->
 <div class="mt-4">
-    {{ range .Pages }}
+    <!-- {{ range .Pages }}
     <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
-    {{ end }}
+    {{ end }} -->
     <!-- Tag Title -->
     {{ if and .Title (eq .Type "tags") }}
     <h1 class="mb-14">#{{ .Title }}</h1>

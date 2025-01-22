@@ -81,19 +81,19 @@
         <nav
             class="lg:ml-0 lg:flex lg:flex-row lg:items-center lg:space-x-10 rtl:space-x-reverse"
         >
-            {{ with site.Menus.main }} {{ range . }}
+            {{ with site.Menus.main }}
+            <!--  -->
+            {{ range . }}
             <a
                 class="block text-center text-xl leading-[5rem] lg:text-base lg:font-normal header-menu"
                 href="{{ .URL }}"
-                >{{ .Name }}</a
-            >
+                >{{ .Name }}
+            </a>
             {{ end }}
             <!--  -->
             {{ end }}<!---->
             <div class="language-selector">{{ partial "i18nlist.html" . }}</div>
         </nav>
-
-        <!-- 语言按钮 -->
     </div>
 </header>
 
@@ -102,6 +102,7 @@
     .language-selector {
         position: relative; /* 相对定位 */
         display: inline-block; /* 保持与导航栏其他项一致 */
+        z-index: 10;
     }
 
     /* 语言切换按钮的下拉菜单 */

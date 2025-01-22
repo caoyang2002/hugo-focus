@@ -1,7 +1,8 @@
 name = 'Hugo-focus'
 license = 'MIT'
-licenselink = 'https://github.com/caoyang2002/hugo-focus/LICENSE'
+licenselink = 'https://github.com/caoyang2002/hugo-focus/blob/main/LICENSE'
 description = 'Theme description'
+
 
 # The home page of the theme, where the source can be found
 homepage = 'https://github.com/caoyang2002/hugo-focus'
@@ -15,17 +16,17 @@ features = ["Responsive", "One Column", "Blog"]
 
 # If the theme has multiple authors
 authors = [
-  {name = 'simons', homepage = 'caoyang2002.xyz'},
-  {name = 'cuff', homepage = 'caoyang2002.xyz'}
+  {name = 'simons', homepage = 'https://caoyang2002.xyz'},
+  {name = 'cuff', homepage = 'https://caoyang2002.xyz'}
 ]
 
 # If the theme has a single author
 [author]
   name = 'caoyang2002'
-  homepage = 'caoyang2002.xyz'
+  homepage = 'https://caoyang2002.xyz'
 
 # If porting an existing theme
 [original]
   author = 'caoyang2002'
-  homepage = 'caoyang2002.xyz'
+  homepage = 'https://caoyang2002.xyz'
   repo = 'https://github.com/caoyang2002/hugo-focus'
