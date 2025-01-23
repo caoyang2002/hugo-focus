@@ -5,3 +5,20 @@ lastUpdated =  "Last updated on {{ .Format \"2006-01-02\" }}"
 #
 prev_page= 'Prev Page'
 next_page = 'Next Page'
+
+# 统计信息
+total_tag_count = "Tag Count"
+total_class_count = "Class Total"
+total_article_count = "Articles Total"
+total_word_count = "Total Word Count"
+hot_articles = "Hot Articles"
+all_labels = "All Labels"
+archivist = "Archivist"
+min_read = "Min Read"
+articles = "Articles"
+total_number_website_visits = "Total number of visits to this site"
+catalogue = "Catalogue"
+back_home = "BACK TO HOME"
+search_articles_placeholder = "Please enter characters to search for articles..."
+search_articles_tips = "Enter keywords to start a search.."
+search_articles_notfound = "No related article found"

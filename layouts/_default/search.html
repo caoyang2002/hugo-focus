@@ -6,7 +6,7 @@
                 type="search"
                 id="search-input"
                 class="search-input"
-                placeholder="搜索文章..."
+                placeholder='{{ i18n "search_articles_placeholder"}}'
                 autocomplete="off"
             />
             <div class="search-icon">
@@ -68,7 +68,7 @@
             } catch (error) {
                 console.error("Error initializing search:", error);
                 document.getElementById("search-results").innerHTML =
-                    '<div class="search-error">搜索功能加载失败</div>';
+                    '<div class="search-error">{{  i18n "search_articles_failed_load" }}</div>';
             }
         }
 
@@ -90,13 +90,13 @@
 
             if (!query) {
                 resultsContainer.innerHTML =
-                    '<div class="search-placeholder">输入关键词开始搜索...</div>';
+                    '<div class="search-placeholder">{{ i18n "search_articles_tips" }}</div>';
                 return;
             }
 
             if (results.length === 0) {
                 resultsContainer.innerHTML =
-                    '<div class="search-empty">没有找到相关文章</div>';
+                    '<div class="search-empty">{{ i18n "search_articles_notfound" }}</div>';
                 return;
             }
 
@@ -204,7 +204,7 @@
         }
 
         .search-input {
-            width: 100%;
+            width: 50vw;
             padding: 0.75rem 1rem 0.75rem 2.5rem;
             font-size: 1.1rem;
             border: 2px solid #e5e7eb;

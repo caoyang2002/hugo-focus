@@ -42,26 +42,26 @@
               <!-- 博客统计 -->
               <div class="stats-grid">
                   <div class="stat-item">
-                      <p class="stat-label">文章总数</p>
+                      <p class="stat-label">{{ i18n "total_article_count" }}</p>
                       <p class="stat-value">{{ len (where .Site.RegularPages "Section" "posts") }}</p>
                   </div>
                   <div class="stat-item">
-                      <p class="stat-label">总字数</p>
+                      <p class="stat-label">{{ i18n "total_word_count" }}</p>
                       <p class="stat-value">{{ $wordCount := 0 }}{{ range .Site.RegularPages }}{{ $wordCount = add $wordCount .WordCount }}{{ end }}{{ $wordCount }}</p>
                   </div>
                   <div class="stat-item">
-                      <p class="stat-label">分类数</p>
+                      <p class="stat-label">{{ i18n "total_class_count" }}</p>
                       <p class="stat-value">{{ len .Site.Taxonomies.categories }}</p>
                   </div>
                   <div class="stat-item">
-                      <p class="stat-label">标签数</p>
+                      <p class="stat-label">{{ i18n "total_tag_count" }}</p>
                       <p class="stat-value">{{ len .Site.Taxonomies.tags }}</p>
                   </div>
               </div>
 
               <!-- 热门文章 -->
               <div class="popular-posts">
-                  <h3 class="section-title">热门文章</h3>
+                  <h3 class="section-title">{{ i18n "hot_articles" }}</h3>
                   {{ range first 5 (where .Site.RegularPages.ByDate.Reverse "Section" "posts") }}
                       <a href="{{ .RelPermalink }}" class="post-link">
                           {{ .Title }}
@@ -71,7 +71,7 @@
 
               <!-- 标签云 -->
               <div class="tag-cloud">
-                  <h3 class="section-title">标签云</h3>
+                  <h3 class="section-title">{{ i18n "all_labels" }}</h3>
                   <div class="tag-list">
                       {{ range $name, $taxonomy := .Site.Taxonomies.tags }}
                           {{ $count := .Count }}
@@ -86,12 +86,12 @@
 
               <!-- 归档 -->
               <div class="archives">
-                  <h3 class="section-title">归档</h3>
+                  <h3 class="section-title">{{ i18n "archivist" }}</h3>
                   {{ range .Site.RegularPages.GroupByDate "2006" }}
                       <details class="archive-year">
                           <summary class="year-summary">
                               <span>{{ .Key }}</span>
-                              <span>{{ len .Pages }} 篇</span>
+                              <span>{{ len .Pages }} {{ i18n "articles" }}</span>
                           </summary>
 
                           <div class="month-list">
@@ -99,7 +99,7 @@
                                   <details class="month-item">
                                       <summary class="year-summary">
                                           <span>{{ .Key }}</span>
-                                          <span>{{ len .Pages }} 篇</span>
+                                          <span>{{ len .Pages }} {{ i18n "articles" }}</span>
                                       </summary>
 
                                       <div class="post-list">
@@ -107,7 +107,7 @@
                                               <article class="post-item">
                                                   <time class="post-date">{{ .Date.Format "02" }}</time>
                                                   <a href="{{ .RelPermalink }}" class="post-title">{{ .Title }}</a>
-                                                  <span class="reading-time">{{ .ReadingTime }} 分钟阅读</span>
+                                                  <span class="reading-time">{{ .ReadingTime }} {{ i18n "min_read" }}</span>
                                               </article>
                                           {{ end }}
                                       </div>
@@ -305,6 +305,7 @@ details[open] > div {
    font-size: 0.75rem;
    color: #666;
    margin: 0.25rem;
+   line-height: 1;
  }
 
  .stat-value {
@@ -446,6 +447,7 @@ details[open] > div {
  .post-title {
    color: #333;
    text-decoration: none;
+   line-height: 1;
  }
 
  .post-title:hover {
@@ -454,6 +456,7 @@ details[open] > div {
 
  .reading-time {
    color: #999;
+   line-height: 1;
  }
 
  /* Dark mode support */

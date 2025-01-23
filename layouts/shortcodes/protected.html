@@ -1,0 +1,49 @@
+<!-- layouts/shortcodes/protected.html -->
+{{ with .Inner }}
+<div class="protected-content">
+    <div class="password-form">
+        <input type="password" placeholder="输入访问密码" class="pass-input" />
+        <button onclick="decryptContent(this)" class="pass-btn">访问</button>
+    </div>
+    <div
+        class="encrypted-content"
+        style="display: none"
+        data-content="{{ . }}"
+    ></div>
+</div>
+
+<script>
+    function decryptContent(btn) {
+        const container = btn.closest(".protected-content");
+        const input = container.querySelector(".pass-input");
+        const content = container.querySelector(".encrypted-content");
+
+        if (input.value === "{{ $.Get 0 }}") {
+            content.innerHTML = content.dataset.content;
+            content.style.display = "block";
+            container.querySelector(".password-form").style.display = "none";
+        } else {
+            alert("密码错误");
+        }
+    }
+</script>
+<style>
+    .protected-content {
+        border: 1px solid #eee;
+        padding: 20px;
+        border-radius: 5px;
+    }
+    .pass-input {
+        padding: 8px;
+        margin-right: 10px;
+    }
+    .pass-btn {
+        padding: 8px 16px;
+        background: #0066cc;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+</style>
+{{ end }}

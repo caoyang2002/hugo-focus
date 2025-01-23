@@ -72,6 +72,13 @@
         src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"
     ></script>
     <!-- 引入 highlight.js JS -->
+
+    <!-- <script
+        defer
+        src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/mariadb.min.js"
+        onload="hljs.initHighlightingOnLoad();"
+    ></script> -->
+
     <script
         defer
         src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"
@@ -83,6 +90,17 @@
         src="{{ `highlight.min.js` | absURL }}"
         onload="hljs.initHighlightingOnLoad();"
     ></script>
+
+    <!-- <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script> -->
+
+    <script>
+        window.onload = function () {
+            hljs.highlightAll();
+        };
+    </script>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/lisp.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/mariadb.min.js"></script>
     {{ end }}
 
     <!-- math -->
