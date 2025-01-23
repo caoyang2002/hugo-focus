@@ -1,51 +1,5 @@
 {{ define "main" }}
-<div>
-    <link
-        rel="stylesheet"
-        href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"
-    />
-    <div>
-        本站访问
-        <span id="website_visits_value">
-            <i className="fa fa-spinner fa-spin"></i>
-        </span>
-        次
-    </div>
-    <div>
-        当前页面访问
-        <span id="_page_visits">
-            <i className="fa fa-spinner fa-spin"></i>
-        </span>
-        次
-    </div>
-    <div>
-        文章评分
-        <span id="artical_star_value_pv">
-            <i className="fa fa-spinner fa-spin"></i>
-        </span>
-        分 评分总人数(
-        <span id="people_star_sum_value_pv">
-            <i className="fa fa-spinner fa-spin"></i>
-        </span>
-        ) 平均分(
-        <span id="artical_star_sum_value_pv">
-            <i className="fa fa-spinner fa-spin"></i>
-        </span>
-        )
-    </div>
-    <Rating />
-    <div className="rating">
-        <i className="fa fa-star rating-star text-red-500" data-value="1"></i>
-        <i className="fa fa-star rating-star" data-value="2"></i>
-        <i className="fa fa-star rating-star" data-value="3"></i>
-        <i className="fa fa-star rating-star" data-value="4"></i>
-        <i className="fa fa-star rating-star" data-value="5"></i>
-    </div>
-    <script
-        async
-        src="https://website-statistics.vercel.app/js/analytics.pure.mini.js"
-    ></script>
-</div>
+
 <!-- 文章页面 -->
 <article class="text-left">
     <!-- 元数据 -->
