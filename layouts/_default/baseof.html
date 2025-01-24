@@ -46,8 +46,6 @@
     <style>
         body {
             background-image: url("{{ .Site.Params.backgroundImage }}") !important;
-            /* 背景图片宽度跟随屏幕宽度变化 */
-            background-size: 100% auto;
             /* 不重复 */
             background-repeat: no-repeat;
             /* 固定在屏幕底部 */
@@ -56,6 +54,22 @@
             background-attachment: fixed;
             /* 确保 body 高度至少为视口高度 */
             min-height: 100vh;
+        }
+
+        /* 桌面设备：宽度对齐 */
+        @media (min-width: 768px) {
+            body {
+                /* 背景图片宽度跟随屏幕宽度变化 */
+                background-size: 100% auto;
+            }
+        }
+
+        /* 移动设备：高度对齐 */
+        @media (max-width: 767px) {
+            body {
+                /* 背景图片高度跟随屏幕高度变化 */
+                background-size: auto 100%;
+            }
         }
         html,
         body {
