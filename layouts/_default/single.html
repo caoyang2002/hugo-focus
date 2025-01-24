@@ -93,6 +93,7 @@
     <div class="mt-12 rounded-xl" style="text-align: center">
         {{ if site.Params.Feedback }} {{ partial "feedback.html" . }} {{end}}
     </div>
+
     <!-- Disqus -->
     {{ if and site.Config.Services.Disqus.Shortname (not (eq .Params.comments
     false)) }}

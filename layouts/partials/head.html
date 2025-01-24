@@ -29,13 +29,15 @@
     {{ end }}
 
     <!-- css & js -->
-    {{ $syntax := resources.Get "css/syntax.css" }}
+    <!-- <link href="/css/code-copy.css" rel="stylesheet" /> -->
+    <script src="/js/code-copy.js" defer></script>
+    {{ $main := resources.Get "css/main.css" }} {{ $custom := resources.Get
+    "css/custom.css" }} {{ $syntax := resources.Get "css/syntax.css" }} {{
+    $code_copy := resources.Get "css/code-copy.css" }}
     <!--  -->
-    {{ $main := resources.Get "main.css" }}
-    <!---->
-    {{ $custom := resources.Get "custom.css" }}
-    <!---->
-    {{ $css := slice $main $custom | resources.Concat "main.css" | minify }}
+    {{ $css := slice $main $custom $syntax $code_copy | resources.Concat
+    "bundle.css" | minify }}
+
     <link rel="preload stylesheet" as="style" href="{{ $css.Permalink }}" />
 
     <!-- dark icon -->
@@ -72,13 +74,6 @@
         src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"
     ></script>
     <!-- 引入 highlight.js JS -->
-
-    <!-- <script
-        defer
-        src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/mariadb.min.js"
-        onload="hljs.initHighlightingOnLoad();"
-    ></script> -->
-
     <script
         defer
         src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"

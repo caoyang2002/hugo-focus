@@ -184,7 +184,8 @@
     --font-h6: #34210a;
 
     /* -------------------------------------------------------------------------------------KBD按键颜色 */
-    --kbdbg-color: #2f1d02;
+    --kbdbg-color: #f0feff;
+    --kbdbg-color-dark: #2b3434;
     /* 背景颜色 */
     --kbd-color: #02081b;
     /* 字体颜色 */
@@ -554,11 +555,24 @@ kbd {
     font-family: "Alibaba Sans";
     /* font: var(--kbdbg-color);代码字体颜色 */
     font-size: 0.8em;
-    /* background: var(--kbdbg-color);文字背景 (按键颜色)*/
+    background: var(--kbdbg-color);
     color: var(--kbd-color);
     /* 文字颜色 */
     border-radius: 5px;
     border-color: var(--kbdbg-color);
+    /* box-shadow: unset; */
+    box-shadow: 2px 2px 4px 1px var(--kbd-shadow);
+}
+
+kbd:is(.dark *) {
+    font-family: "Alibaba Sans";
+    /* font: var(--kbdbg-color);代码字体颜色 */
+    font-size: 0.8em;
+    background: var(--kbdbg-color-dark);
+
+    /* 文字颜色 */
+    border-radius: 5px;
+    border-color: var(--kbdbg-color-dark);
     /* box-shadow: unset; */
     box-shadow: 2px 2px 4px 1px var(--kbd-shadow);
 }
