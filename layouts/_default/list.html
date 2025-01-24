@@ -21,18 +21,40 @@
     {{ range $index, $page := $paginator.Pages }}<!---->
 
     <section class="relative my-10 first-of-type:mt-0 last-of-type:mb-0">
+        <!-- 置顶：文章的 weight 字段是否大于 0 -->
         {{ if gt .Weight 0 }}
-        <span class="mb-1 inline-block text-xs tracking-wider text-orange-500"
-            >Featured</span
-        >
+        <span class="mb-1 inline-block text-xs tracking-wider text-orange-500">
+            Featured
+        </span>
         {{ end }}
-        <h2 class="!my-0">{{ .Title }}</h2>
+        <!-- 普通文章 -->
+        <div>
+            <h2 class="!my-0 flex flex-row">
+                {{ .Title }}
+                <div class="flex flex-col ml-4">
+                    <span class="text-xs antialiased opacity-60">
+                        分类：{{ delimit (.Params.categories | default
+                        .Site.Params.defaults.categories) ", " }}
+                    </span>
+                    <span class="text-xs antialiased opacity-60">
+                        标签：{{ delimit (.Params.tags | default
+                        .Site.Params.defaults.tags) ", " }}
+                    </span>
+                </div>
+            </h2>
+            <p class="text-xs antialiased opacity-60 mb-1">
+                {{ .Description | default .Site.Params.defaults.description }}
+            </p>
+        </div>
         <time class="text-xs antialiased opacity-60"
             >{{ .Date | time.Format ":date_medium" }}</time
         >
-        <a class="absolute inset-0 text-[0]" href="{{ .Permalink }}"
-            >{{ .Title }}</a
-        >
+        <!-- 保留 title， -->
+        <a
+            class="absolute inset-0"
+            href="{{ .Permalink }}"
+            aria-label="Read more about {{ .Title }}"
+        ></a>
     </section>
     {{ end }}
 
