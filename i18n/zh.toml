@@ -22,3 +22,11 @@ search_articles_placeholder = "请输入字符以搜索文章..."
 search_articles_tips = "输入关键字开始搜索"
 search_articles_notfound = "文章没有找到"
 search_articles_failed_load = "加载失败"
+
+
+# 文章统计信息
+article_analyze_characters_before = "本文共"
+article_analyze_characters_behind = "个字"
+article_analyze_reading_before = "预计需要阅读"
+article_analyze_reading_behind = "分钟"
+and = "，"

@@ -24,3 +24,10 @@ search_articles_placeholder = "Please enter characters to search for articles...
 search_articles_tips = "Enter keywords to start a search.."
 search_articles_notfound = "No related article found"
 search_articles_failed_load = "Failed to load the search function"
+
+# 文章统计信息
+article_analyze_characters_before = "This article is"
+article_analyze_characters_behind = "characters long"
+article_analyze_reading_before = "should take about"
+article_analyze_reading_behind = "minutes_to_read"
+and = "and"

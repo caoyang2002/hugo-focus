@@ -45,19 +45,23 @@
     {{ if .Site.Params.backgroundImage }}
     <style>
         body {
-            background-image: url("{{ .Site.Params.backgroundImage }}");
-            /* 保持图片原始大小 */
-            background-size: auto;
-            /* 只在垂直方向重复 */
-            background-repeat: repeat-y;
-            background-position: center top;
+            background-image: url("{{ .Site.Params.backgroundImage }}") !important;
+            /* 背景图片宽度跟随屏幕宽度变化 */
+            background-size: 100% auto;
+            /* 不重复 */
+            background-repeat: no-repeat;
+            /* 固定在屏幕底部 */
+            background-position: center bottom;
+            /* 背景图片不随页面滚动 */
+            background-attachment: fixed;
+            /* 确保 body 高度至少为视口高度 */
+            min-height: 100vh;
         }
-
         html,
         body {
             min-height: 100vh; /* 确保最小高度是视口高度 */
         }
-        body::before {
+        /* body::before {
             content: "";
             position: fixed;
             top: 0;
@@ -69,7 +73,7 @@
             background-size: 500px 300px;
             background-repeat: repeat-y;
             background-position: center top;
-        }
+        } */
     </style>
     {{else}}
     <style>
@@ -96,7 +100,6 @@
             >
                 {{ block "main" . }} {{ end }}
             </main>
-
             {{ if .IsHome }}
             <div class="hidden lg:block ml-8">
                 {{ partial "homebar.html" . }}

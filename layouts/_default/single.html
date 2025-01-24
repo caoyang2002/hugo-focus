@@ -8,24 +8,51 @@
 
         {{ if ne .Type "page" }}
         <div class="text-xs antialiased opacity-60">
-            <!-- 日期 -->
-            {{ if .Date }}
-            <time>{{ .Date | time.Format ":date_medium" }}</time>
-            {{ end }}<!---->
-            <!-- 作者 -->
-            {{ $single_author := or .Params.Author site.Author.name }} {{ if
-            $single_author }}
-            <span class="mx-1">&middot;</span>
-            <span>{{ $single_author }}</span>
-            <span class="mx-1">&middot;</span>
-            <span class="post-date">
-                {{ i18n "total_word_count"}}: {{ .WordCount }}
-            </span>
-            <span class="mx-1">&middot;</span>
-            {{ i18n "min_read"}}:
-            <span class="more-meta"> {{ .ReadingTime }} </span>
+            <!-- <div>
+                <p>
+                    作者：{{ .Params.author | default
+                    .Site.Params.defaults.author }}
+                </p>
+                <p>
+                    日期：{{ .Date | default .Site.Params.defaults.date |
+                    time.Format ":date_medium"}}
+                </p>
+                <p>
+                    描述：{{ .Description | default
+                    .Site.Params.defaults.description }}
+                </p>
+                <p>
+                    分类：{{ delimit (.Params.categories | default
+                    .Site.Params.defaults.categories) ", " }}
+                </p>
+                <p>
+                    标签：{{ delimit (.Params.tags | default
+                    .Site.Params.defaults.tags) ", " }}
+                </p>
+            </div> -->
 
-            {{ end }}<!---->
+            <!-- 日期 -->
+
+            <time>
+                {{ .Date | default .Site.Params.defaults.date | time.Format
+                ":date_full"}}
+            </time>
+
+            <!-- 作者 -->
+            <span class="mx-1">&middot;</span>
+            <span>
+                {{ .Params.author | default .Site.Params.defaults.author }}
+            </span>
+            <!-- 字数统计 -->
+            <span class="mx-1">&middot;</span>
+
+            <span class="post-date">
+                {{ i18n "article_analyze_characters_before"}} {{ .WordCount }}
+                {{i18n "article_analyze_characters_behind"}} {{i18n "and"}} {{
+                i18n "article_analyze_reading_before"}} {{ .ReadingTime }}
+                {{i18n "article_analyze_reading_behind"}}
+            </span>
+
             <!-- 标签 -->
         </div>
         {{ if .Params.tags }}
