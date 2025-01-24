@@ -1,8 +1,5 @@
 <aside class="sticky w-64">
-
-
       <!-- 个人信息容器 -->
-
       <div class="sidebar-card">
           <!-- 个人信息部分 -->
           <div class="profile-section">
@@ -42,47 +39,70 @@
               <!-- 博客统计 -->
               <div class="stats-grid">
                   <div class="stat-item">
-                      <p class="stat-label">{{ i18n "total_article_count" }}</p>
+                    <a href="#">
+                      <p class="stat-tag">{{ i18n "total_article_count" }}</p>
                       <p class="stat-value">{{ len (where .Site.RegularPages "Section" "posts") }}</p>
+                    </a>
                   </div>
+
                   <div class="stat-item">
-                      <p class="stat-label">{{ i18n "total_word_count" }}</p>
-                      <p class="stat-value">{{ $wordCount := 0 }}{{ range .Site.RegularPages }}{{ $wordCount = add $wordCount .WordCount }}{{ end }}{{ $wordCount }}</p>
+                      <a href="#">
+                        <p class="stat-tag">{{ i18n "total_word_count" }}</p>
+                        <p class="stat-value">{{ $wordCount := 0 }}{{ range .Site.RegularPages }}{{ $wordCount = add $wordCount .WordCount }}{{ end }}{{ $wordCount }}</p>
+                      </a>
                   </div>
+
                   <div class="stat-item">
-                      <p class="stat-label">{{ i18n "total_class_count" }}</p>
+                         <a href="#">
+                      <p class="stat-tag">{{ i18n "total_class_count" }}</p>
                       <p class="stat-value">{{ len .Site.Taxonomies.categories }}</p>
+                         </a>
                   </div>
                   <div class="stat-item">
-                      <p class="stat-label">{{ i18n "total_tag_count" }}</p>
+                      <p class="stat-tag">{{ i18n "total_tag_count" }}</p>
                       <p class="stat-value">{{ len .Site.Taxonomies.tags }}</p>
                   </div>
               </div>
+            <!-- 所有分类 -->
+            <div class="all-categories">
+                <h3 class="section-title">{{ i18n "all_categorites" }}</h3>
+                <div class="categories-list">
 
-              <!-- 热门文章 -->
-              <div class="popular-posts">
-                  <h3 class="section-title">{{ i18n "hot_articles" }}</h3>
-                  {{ range first 5 (where .Site.RegularPages.ByDate.Reverse "Section" "posts") }}
-                      <a href="{{ .RelPermalink }}" class="post-link">
-                          {{ .Title }}
-                      </a>
-                  {{ end }}
-              </div>
+                {{ range $name, $taxonomy := .Site.Taxonomies.categories }}
 
-              <!-- 标签云 -->
-              <div class="tag-cloud">
-                  <h3 class="section-title">{{ i18n "all_labels" }}</h3>
-                  <div class="tag-list">
-                      {{ range $name, $taxonomy := .Site.Taxonomies.tags }}
-                          {{ $count := .Count }}
-                          <a href="{{ "/tags/" | relLangURL }}{{ $name | urlize }}"
-                             class="tag-link"
-                             style="font-size: {{ add 0.8 (mul 0.1 (len $taxonomy)) }}rem">
-                              {{ $name }} ({{ $count }})
-                          </a>
-                      {{ end }}
-                  </div>
-              </div>
+                        <a class="categories-link" href='{{ "/categories/" | relLangURL }}{{ $name | urlize }}'>
+                        {{ $name }} ({{ len $taxonomy }})
+                    </a>
+
+                {{ end }}
+                </div>
+            </div>
+
+            <!-- 标签云 -->
+            <div class="tag-cloud">
+                <h3 class="section-title">{{ i18n "all_tags" }}</h3>
+                <div class="tag-list">
+                    {{ range $name, $taxonomy := .Site.Taxonomies.tags }}
+                        {{ $count := .Count }}
+                        <a href="{{ "/tags/" | relLangURL }}{{ $name | urlize }}"
+                           class="tag-link"
+                           style="font-size: {{ add 0.8 (mul 0.1 (len $taxonomy)) }}rem">
+                            {{ $name }} ({{ $count }})
+                        </a>
+                    {{ end }}
+                </div>
+            </div>
+            <!-- 热门文章 -->
+            <div class="popular-posts">
+                <h3 class="section-title">{{ i18n "hot_articles" }}</h3>
+                {{ range first 5 (where .Site.RegularPages.ByDate.Reverse "Section" "posts") }}
+                    <a href="{{ .RelPermalink }}" class="post-link">
+                        {{ .Title }}
+                    </a>
+                {{ end }}
+            </div>
+
+
 
               <!-- 归档 -->
               <div class="archives">
@@ -301,7 +321,7 @@ details[open] > div {
    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
  }
 
- .stat-label {
+ .stat-tag {
    font-size: 0.75rem;
    color: #666;
    margin: 0.25rem;
@@ -322,34 +342,43 @@ details[open] > div {
    color: #333;
 
  }
-
- /* 热门文章 */
- .popular-posts {
-   margin: 0.25rem;
-   border:1px solid #ddd;
-   border-radius: 6px;
+ /* 所有分类 */
+ .all-categories{
+     margin: 0.25rem;
+     border:1px solid #ddd;
+     border-radius: 6px;
  }
 
- .popular-posts:is(.dark *) {
-   margin: 0.25rem;
-   border:1px solid #555;
-   border-radius: 6px;
+ .all-categories:is(.dark *){
+     margin: 0.25rem;
+     border:1px solid #555;
+     border-radius: 6px;
  }
 
- .post-link {
-   display: block;
-   font-size: 0.75rem;
-   line-height: 1;
-   margin: 0.1rem 0.25rem;
-   padding: 0.1rem 0.25rem;
-   border-radius: 6px;
-   color: #333;
-   text-decoration: none;
-   transition: background-color 0.2s ease;
+
+ .categories-list {
+     margin: 0.1rem 0.25rem;
+   display: flex;
+   flex-wrap: wrap;
+   gap: 0.2rem;
  }
 
- .post-link:hover {
-   background: #f5f5f5;
+  .categories-link{
+     display: inline-block;
+     margin: 0 0.25rem;
+     padding: 0.2rem 0.2rem;
+     border-radius: 4px;
+     background: #f5f5f5;
+     color: #666;
+     text-decoration: none;
+     font-size: 0.75rem !important;
+     line-height: 1;
+     transition: background-color 0.2s ease;
+ }
+
+ .categories-link:hover {
+     background: #999;
+      color: #fff;
  }
 
 /* 标签云 */
@@ -394,6 +423,35 @@ details[open] > div {
  }
 
 
+ /* 热门文章 */
+ .popular-posts {
+   margin: 0.25rem;
+   border:1px solid #ddd;
+   border-radius: 6px;
+ }
+
+ .popular-posts:is(.dark *) {
+   margin: 0.25rem;
+   border:1px solid #555;
+   border-radius: 6px;
+ }
+
+ .post-link {
+   display: block;
+   font-size: 0.75rem;
+   line-height: 1;
+   margin: 0.1rem 0.25rem;
+   padding: 0.1rem 0.25rem;
+   border-radius: 6px;
+   color: #333;
+   text-decoration: none;
+   transition: background-color 0.2s ease;
+ }
+
+ .post-link:hover {
+   background: #f5f5f5;
+ }
+
  /* 归档 */
  .archives {
    margin: 0.25rem;
@@ -403,18 +461,21 @@ details[open] > div {
 
  .archive-year {
    border-left: 2px solid #eee;
-   margin-bottom: 0.25rem;
+   margin-bottom: 0.1rem;
+   margin-top: 0.25rem;
+   padding-bottom: 0.1rem;
  }
 
  .year-summary {
    display: flex;
    justify-content: space-between;
    align-items: center;
-   padding: 0.1rem 0.25rem;
+   padding: 0rem 0.25rem;
    cursor: pointer;
    color: #333;
    font-weight: 500;
    font-size: 0.75rem;
+
  }
 
  .year-summary:hover {
@@ -496,7 +557,7 @@ details[open] > div {
      background: #1a1a1a;
    }
 
-   .stat-label:is(.dark *) {
+   .stat-tag:is(.dark *) {
      color: #999;
    }
 
@@ -516,6 +577,15 @@ details[open] > div {
      background: #262626;
    }
 
+
+   .categories-link:is(.dark *) {
+     background: #333;
+     color: #999;
+   }
+
+   .categories-link:is(.dark *):hover {
+     background: #404040;
+   }
    .tag-link:is(.dark *) {
      background: #333;
      color: #999;
@@ -531,6 +601,7 @@ details[open] > div {
 
    .year-summary:is(.dark *) {
      color: #fff;
+     background-color: #000;
    }
 
    .year-summary:is(.dark *):hover {

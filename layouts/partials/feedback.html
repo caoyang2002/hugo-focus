@@ -1,0 +1,77 @@
+{{ $email := site.Params.Email }} {{$site_name := site.BaseURL}}
+
+<button class="feedback-trigger" onclick="toggleFeedback()">建议 / 反馈</button>
+<div class="feedback-form hidden">
+    <form id="feedback-form" onsubmit="sendFeedback(event)">
+        <input type="text" name="name" placeholder="怎么称呼？" required />
+        <input type="email" name="email" placeholder="您的邮箱？" required />
+        <textarea
+            name="message"
+            placeholder="请输入您的建议或意见..."
+            required
+        ></textarea>
+        <button type="submit">发送</button>
+    </form>
+</div>
+
+<style>
+    .feedback-trigger {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        margin: 1rem;
+    }
+
+    .feedback-form {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 10px;
+    }
+
+    .feedback-form.hidden {
+        display: none;
+    }
+
+    .feedback-form input,
+    .feedback-form textarea {
+        width: 100%;
+        margin-bottom: 10px;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    .feedback-form textarea {
+        height: 100px;
+        resize: vertical;
+    }
+
+    .feedback-form button {
+        width: 100%;
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 8px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+</style>
+
+<script>
+    function toggleFeedback() {
+        document.querySelector(".feedback-form").classList.toggle("hidden");
+    }
+
+    function sendFeedback(e) {
+        e.preventDefault();
+        const form = e.target;
+        const mailtoLink = `mailto:{{$email}}?subject={{$site_name}} Feedback from ${form.name.value}&body=${encodeURIComponent(form.message.value)}%0D%0A%0D%0AFrom: ${form.name.value}%0D%0AEmail: ${form.email.value}`;
+        window.location.href = mailtoLink;
+    }
+</script>
