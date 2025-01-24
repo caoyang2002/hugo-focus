@@ -26,13 +26,30 @@
             >Featured</span
         >
         {{ end }}
-        <h2 class="!my-0">{{ .Title }}</h2>
-        <time class="text-xs antialiased opacity-60"
+        <h2 class="!my-0 flex items-center">
+            {{ .Title }}
+            <div class="flex flex-col ml-4">
+                <span class="text-xs antialiased opacity-60">
+                    分类：{{ delimit (.Params.categories | default
+                    .Site.Params.defaults.categories) ", " }}
+                </span>
+                <span class="text-xs antialiased opacity-60">
+                    标签：{{ delimit (.Params.tags | default
+                    .Site.Params.defaults.tags) ", " }}
+                </span>
+            </div>
+        </h2>
+        <p class="text-xs antialiased opacity-60" style="margin: 0">
+            {{ .Description | default .Site.Params.defaults.description }}
+        </p>
+        <time class="text-xs antialiased opacity-60" style="margin: 0"
             >{{ .Date | time.Format ":date_medium" }}</time
         >
-        <a class="absolute inset-0 text-[0]" href="{{ .Permalink }}"
-            >{{ .Title }}</a
-        >
+        <a
+            class="absolute inset-0"
+            href="{{ .Permalink }}"
+            aria-label="{{.Title}}"
+        ></a>
     </section>
     {{ end }}
 
