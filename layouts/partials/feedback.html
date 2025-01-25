@@ -2,9 +2,10 @@
 
 <button class="feedback-trigger" onclick="toggleFeedback()">建议 / 反馈</button>
 <div class="feedback-form hidden">
+    <p>感谢你的提议，我将会尽快使用回复您！（此反馈将使用您的邮箱发送）</p>
     <form id="feedback-form" onsubmit="sendFeedback(event)">
         <input type="text" name="name" placeholder="怎么称呼？" required />
-        <input type="email" name="email" placeholder="您的邮箱？" required />
+        <!-- <input type="email" name="email" placeholder="您的邮箱？" required /> -->
         <textarea
             name="message"
             placeholder="请输入您的建议或意见..."

@@ -32,11 +32,17 @@
             <h2 class="!my-0 flex flex-row">
                 {{ .Title }}
                 <div class="flex flex-col ml-4">
-                    <span class="text-xs antialiased opacity-60">
+                    <span
+                        class="text-xs antialiased opacity-60"
+                        style="font-weight: 400; font-size: 0.6rem"
+                    >
                         分类：{{ delimit (.Params.categories | default
                         .Site.Params.defaults.categories) ", " }}
                     </span>
-                    <span class="text-xs antialiased opacity-60">
+                    <span
+                        class="text-xs antialiased opacity-60"
+                        style="font-weight: 400; font-size: 0.6rem"
+                    >
                         标签：{{ delimit (.Params.tags | default
                         .Site.Params.defaults.tags) ", " }}
                     </span>
