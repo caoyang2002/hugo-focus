@@ -1,16 +1,22 @@
-{{/* layouts/_default/_markup/render-codeblock.html */}}
-<!--  -->
+<!-- {{ .Page.Params }} -->
+<!--  {{ .Page.Params.codeRunner }} -->
+<!-- {{ .Page.Title }}  -->
+{{ $isRunCode := .Page.Params.codeRunners }}
 
+<!--  -->
 {{ $supportedLanguages := slice "python" "rust" "go" "ts" "typescript" "js"
 "javascript" "c++" "cpp" "lisp" }}
 <!-- "ruby" "swift" "java" -->
-<!--  -->
 {{ if in $supportedLanguages .Type }}
 <div class="code-playground" data-language="{{ .Type }}">
+    <!-- 代码 -->
     <div>
         <pre>
                 <code class="language-{{ .Type }}">{{ .Inner }}</code></pre>
     </div>
+    <!-- 运行 -->
+
+    {{with $isRunCode}}
     <div class="controls">
         <button class="run-button">
             <span style="display: flex; align-items: center; gap: 4px"
@@ -39,6 +45,7 @@
     <div class="output" style="display: none">
         <pre class="output-content"></pre>
     </div>
+    {{end}}
 </div>
 {{ else if eq .Type "mermaid" }}
 <div class="mermaid">{{- .Inner | safeHTML }}</div>
