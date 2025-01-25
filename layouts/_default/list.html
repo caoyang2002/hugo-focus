@@ -65,19 +65,20 @@
     {{ end }}
 
     <!-- Main Nav -->
-    {{ if gt $paginator.TotalPages 1 }}
+    <!-- {{ if gt $paginator.TotalPages 1 }}
     <nav class="pagination-nav">
         {{ if $paginator.HasPrev }}
         <a class="btn" href="{{ $paginator.Prev.URL }}"
             >← {{ i18n "prev_page" }}</a
         >
-        {{ end }}<!---->
-        {{ if $paginator.HasNext }}
+        123456 {{ end }} {{ if $paginator.HasNext }}
         <a class="btn" href="{{ $paginator.Next.URL }}"
             >{{ i18n "next_page" }} →</a
         >
         {{ end }}
     </nav>
-    {{ end }}<!---->
+    {{ end }} -->
+
+    {{ partial "page_nav.html" . }}
 </div>
 {{ end }}
