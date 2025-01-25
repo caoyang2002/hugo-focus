@@ -1,0 +1,103 @@
+{{ $content := .Inner | base64Encode }}
+<div class="crypto-content">
+    <div class="crypto-form">
+        <input
+            type="password"
+            placeholder="输入密码"
+            class="crypto-input"
+            id="crypto-password"
+        />
+        <button onclick="decrypt()" class="crypto-btn">解密</button>
+    </div>
+    <div
+        class="encrypted-content"
+        id="crypto-output"
+        data-content="{{ $content }}"
+    >
+        已加密，请输入密码
+    </div>
+</div>
+
+<script>
+    async function decrypt() {
+        try {
+            const input = document.getElementById('crypto-password');
+            const output = document.getElementById('crypto-output');
+            const form = document.querySelector('.crypto-form');
+
+            if(!input?.value) {
+                showError('请输入密码');
+                return;
+            }
+
+            const password = input.value;
+            const publishDate = {{ now.Format "20060102" }};
+            const hash = await sha256(password + publishDate);
+            const targetHash = await sha256("123456" + publishDate);
+
+            if(hash !== targetHash) {
+                throw new Error('密码错误');
+            }
+
+            const base64 = output.getAttribute('data-content');
+            const decoder = new TextDecoder();
+            const decoded = decoder.decode(Uint8Array.from(atob(base64), c => c.charCodeAt(0)));
+            output.textContent = decoded;
+            form.style.display = 'none';
+        } catch(e) {
+            showError('密码错误，请重试');
+        }
+    }
+
+    async function sha256(text) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+        const hash = await crypto.subtle.digest('SHA-256', data);
+        return Array.from(new Uint8Array(hash))
+            .map(b => b.toString(16).padStart(2, '0'))
+            .join('');
+    }
+
+    function showError(message) {
+        const output = document.getElementById('crypto-output');
+        output.textContent = message;
+        output.className = 'encrypted-content error-msg';
+    }
+</script>
+
+<style>
+    .crypto-content {
+        margin: 0;
+        padding: 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    .crypto-form {
+        display: flex;
+        gap: 0;
+    }
+    .crypto-input {
+        flex: 1;
+        padding: 0;
+        margin: 1rem 1rem 0 1rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    .crypto-btn {
+        padding: 0.25rem;
+        margin: 1rem 1rem 0 1rem;
+        background: #4a4a4a;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .error-msg {
+        color: #ff4444;
+    }
+    .encrypted-content {
+        margin: 0 1rem 1rem 1rem;
+        /* white-space: pre-wrap; */
+        word-break: break-all;
+    }
+</style>
