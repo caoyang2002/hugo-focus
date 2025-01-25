@@ -45,49 +45,18 @@
     {{ if .Site.Params.backgroundImage }}
     <style>
         body {
-            background-image: url("{{ .Site.Params.backgroundImage }}") !important;
-            /* 不重复 */
+            background-image: url("{{ .Site.Params.backgroundImage }}");
             background-repeat: no-repeat;
-            /* 固定在屏幕底部 */
-            background-position: center bottom;
-            /* 背景图片不随页面滚动 */
+            background-position: center center;
             background-attachment: fixed;
-            /* 确保 body 高度至少为视口高度 */
+            background-size: cover;
             min-height: 100vh;
         }
 
-        /* 桌面设备：宽度对齐 */
-        @media (min-width: 768px) {
-            body {
-                /* 背景图片宽度跟随屏幕宽度变化 */
-                background-size: 100% auto;
-            }
-        }
-
-        /* 移动设备：高度对齐 */
-        @media (max-width: 767px) {
-            body {
-                /* 背景图片高度跟随屏幕高度变化 */
-                background-size: auto 100%;
-            }
-        }
         html,
         body {
-            min-height: 100vh; /* 确保最小高度是视口高度 */
+            min-height: 100vh;
         }
-        /* body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background-image: url("{{ .Site.Params.backgroundImage }}");
-            background-size: 500px 300px;
-            background-repeat: repeat-y;
-            background-position: center top;
-        } */
     </style>
     {{else}}
     <style>
