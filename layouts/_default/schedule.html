@@ -132,7 +132,7 @@
                             todayMarker {{ .Params.gantt.todayMarker}}
                             {{ range $index, $event := .Params.events }}
                                 section {{ $event.category }}
-                                {{ $event.title }}:event-{{ $index }}, {{ $event.start }},{{ $event.end }}
+                                {{ $event.title }}:{{ if $event.status }} {{$event.status}},{{ end }}event-{{ $index }}, {{ $event.start }},{{ $event.end }}
                             {{ end }}
                     </pre>
                     <h1>最近</h1>
@@ -159,9 +159,9 @@
                             {{end}}<!---->
                             {{ end }}
 
-                            click event-0 href "http://localhost:1313/"
+                            <!-- click event-0 href "http://localhost:1313/"
                             click event-1 call printArguments("test1", "test2")
-                            click event-2 call printTask()
+                            click event-2 call printTask() -->
                     </pre>
                     <h2>1～3 月</h2>
                     <pre class="mermaid">
