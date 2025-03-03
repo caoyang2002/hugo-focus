@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="zh">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{{ .Title }}</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.css"
+        />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+        <style>
+            body {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                line-height: 1.6;
+                color: #333;
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+            h1 {
+                margin-bottom: 30px;
+                color: #2c3e50;
+            }
+            .category-filter {
+                margin-bottom: 20px;
+            }
+            .category-filter button {
+                background-color: #f1f1f1;
+                border: none;
+                padding: 8px 16px;
+                margin-right: 10px;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+            .category-filter button.active {
+                background-color: #4a6fa5;
+                color: white;
+            }
+            .gantt-container {
+                margin-top: 30px;
+                overflow-x: auto;
+            }
+            .event-details {
+                display: none;
+                position: absolute;
+                background-color: white;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                padding: 15px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                z-index: 100;
+                max-width: 400px;
+            }
+            .event-details h3 {
+                margin-top: 0;
+                color: #2c3e50;
+            }
+            .event-details .progress-bar {
+                height: 8px;
+                background-color: #e0e0e0;
+                border-radius: 4px;
+                margin: 10px 0;
+            }
+            .event-details .progress-bar .progress {
+                height: 100%;
+                background-color: #4a6fa5;
+                border-radius: 4px;
+            }
+            .event-details .description {
+                margin: 10px 0;
+                white-space: pre-line;
+            }
+            .event-details .links {
+                margin-top: 15px;
+            }
+            .event-details .links a {
+                display: block;
+                color: #4a6fa5;
+                text-decoration: none;
+                margin-bottom: 5px;
+            }
+            .event-details .links a:hover {
+                text-decoration: underline;
+            }
+        </style>
+    </head>
+    <body>
+        <a href="javascript:history.back()"><button>返回</button></a>
+
+        <!---->
+
+        <h1>{{ .Title }}</h1>
+
+        <!-- 分类筛选按钮 -->
+        <div class="category-filter">
+            <button class="category-btn active" data-category="schedule">
+                日程
+            </button>
+            <button class="category-btn" data-category="task">任务</button>
+            <button class="category-btn" data-category="appointment">
+                预约
+            </button>
+        </div>
+
+        <!-- 内容容器 -->
+        <div class="content-container">
+            <!-- 日程内容 -->
+            <div class="content-item" data-category="schedule">
+                {{ $currentDate := now | time.AsTime }}<!---->
+                {{ printf "当前日期: %s" $currentDate }}<!---->
+                {{ $weekWorkStart := $currentDate.AddDate 0 0 -7 | time.Format
+                "2006-01-02" | time }}<!---->
+                <br />
+                {{ $weekWorkEnd := $currentDate.AddDate 0 0 14 | time.Format
+                "2006-01-02" | time}}<!---->
+                <br />
+                {{ printf "开始工作周：%s" $weekWorkStart }}
+                <br />
+                {{ printf "结束工作周：%s" $weekWorkEnd }}
+                <!--  -->
+                <br />
+                <div class="gantt-container">
+                    <h1>概览</h1>
+                    <pre class="mermaid">
+                        gantt
+                            title       {{ .Title }}
+                            dateFormat  {{ .Params.gantt.dateFormat }}
+                            excludes    {{ .Params.gantt.excludes}}
+                            axisFormat  {{ .Params.gantt.overviewAxisFormat}}
+                            tickInterval {{ .Params.gantt.overviewTickInterval}}
+                            todayMarker {{ .Params.gantt.todayMarker}}
+                            {{ range $index, $event := .Params.events }}
+                                section {{ $event.category }}
+                                {{ $event.title }}:event-{{ $index }}, {{ $event.start }},{{ $event.end }}
+                            {{ end }}
+                    </pre>
+                    <h1>最近</h1>
+                    <pre class="mermaid">
+                        gantt
+                            title       {{ .Title }}
+                            dateFormat  {{ .Params.gantt.dateFormat }}
+                            excludes    {{ .Params.gantt.excludes}}
+                            axisFormat  {{ .Params.gantt.axisFormat}}
+                            tickInterval {{ .Params.gantt.tickInterval}}
+                            todayMarker {{ .Params.gantt.todayMarker}}
+                            <!--  -->
+                            {{ range $index, $event := .Params.events }}
+                            {{ $eventStart := $event.start | time }}<!---->
+                            {{ $eventEnd := $event.end | time }}<!---->
+                            <!-- 如果事件的开始时间小于工作时间，就不显示 -->
+                            {{ if  $eventStart.After $weekWorkEnd}}
+                            {{continue}}
+                            {{end}}
+                            <!--  如果事件的开始时间在工作周的起始时间之后，显示事件的起始时间，否则显示工作周的开始时间-->
+                            <!--  如果事件的结束时间在工作周的结束时间之前，显示工作周的结束时间，否则显示事件的结束时间-->
+                            section {{ $event.category }}
+                            {{ $event.title }}:event-{{ $index }}, {{ if $eventStart.Before $weekWorkStart }} {{ $weekWorkStart | time | dateFormat "2006-01-02"}} {{ else }} {{ $eventStart | time | dateFormat "2006-01-02" }} {{end}},{{ if $eventEnd.After $weekWorkEnd}} {{ $weekWorkEnd | time | dateFormat "2006-01-02" }} {{else}} {{ $eventEnd | time | dateFormat "2006-01-02" }}<!---->
+                            {{end}}<!---->
+                            {{ end }}
+
+                            click event-0 href "http://localhost:1313/"
+                            click event-1 call printArguments("test1", "test2")
+                            click event-2 call printTask()
+                    </pre>
+                    <h2>1～3 月</h2>
+                    <pre class="mermaid">
+                        {{ $timeWorkStart := "2025-01-01" | time }}
+                        {{ $timeWorkEnd := "2025-03-31" | time}}
+
+                        gantt
+                            title {{ .Title }}
+                            dateFormat YYYY-MM-DD
+                            excludes    weekends
+                            start :start, 2025-01-01, 1d
+                            end :crit, end, 2025-03-31, 1d
+                            {{ range $index, $event := .Params.events }}
+                            {{ $eventStart := $event.start | time }}<!---->
+                            {{ $eventEnd := $event.end | time }}<!---->
+                            <!-- 如果事件的开始时间小于工作时间，就不显示 -->
+
+                            {{ if  $eventStart.After $timeWorkEnd}}
+                            {{continue}}
+                            {{end}}
+                            <!--  如果事件的开始时间在工作周的起始时间之后，显示事件的起始时间，否则显示工作周的开始时间-->
+                            <!--  如果事件的结束时间在工作周的结束时间之前，显示工作周的结束时间，否则显示事件的结束时间-->
+                            section {{ $event.category }}
+                            {{ $event.title }}:event-{{ $index }}, {{ if $eventStart.Before $timeWorkStart }} {{ $timeWorkStart | time | dateFormat "2006-01-02"}} {{ else }} {{ $eventStart | time | dateFormat "2006-01-02" }} {{end}},{{ if $eventEnd.After $timeWorkEnd}} {{ $timeWorkEnd | time | dateFormat "2006-01-02" }} {{else}} {{ $eventEnd | time | dateFormat "2006-01-02" }}<!---->
+                            {{end}}<!---->
+                            {{ end }}
+                    </pre>
+                    <h2>4～6 月</h2>
+                    <pre class="mermaid">
+                        <!-- 春季 -->
+                        {{ $timeWorkStart := "2025-04-01" | time }}
+                        {{ $timeWorkEnd := "2025-06-30" | time}}
+
+                        gantt
+                            title {{ .Title }}
+                            dateFormat YYYY-MM-DD
+                            excludes    weekends
+                            start :start, 2025-04-01, 1d
+                            end :crit, end, 2025-06-30, 1d
+                            {{ range $index, $event := .Params.events }}
+                            {{ $eventStart := $event.start | time }}<!---->
+                            {{ $eventEnd := $event.end | time }}<!---->
+                            <!-- 如果事件的开始时间小于工作时间，就不显示 -->
+
+                            {{ if  $eventStart.After $timeWorkEnd}}
+                            {{continue}}
+                            {{end}}
+                            <!--  如果事件的开始时间在工作周的起始时间之后，显示事件的起始时间，否则显示工作周的开始时间-->
+                            <!--  如果事件的结束时间在工作周的结束时间之前，显示工作周的结束时间，否则显示事件的结束时间-->
+                            section {{ $event.category }}
+                            {{ $event.title }}:event-{{ $index }}, {{ if $eventStart.Before $timeWorkStart }} {{ $timeWorkStart | time | dateFormat "2006-01-02"}} {{ else }} {{ $eventStart | time | dateFormat "2006-01-02" }} {{end}},{{ if $eventEnd.After $timeWorkEnd}} {{ $timeWorkEnd | time | dateFormat "2006-01-02" }} {{else}} {{ $eventEnd | time | dateFormat "2006-01-02" }}<!---->
+                            {{end}}<!---->
+                            {{ end }}
+                    </pre>
+                    <h2>7～9 月</h2>
+                    <pre class="mermaid">
+                        <!-- 春季 -->
+                        {{ $timeWorkStart := "2025-07-01" | time }}
+                        {{ $timeWorkEnd := "2025-09-30" | time}}
+
+                        gantt
+                            title {{ .Title }}
+                            dateFormat YYYY-MM-DD
+                            excludes    weekends
+                            start :start, 2025-07-01, 1d
+                            end :crit, end, 2025-09-30, 1d
+                            {{ range $index, $event := .Params.events }}
+                            {{ $eventStart := $event.start | time }}<!---->
+                            {{ $eventEnd := $event.end | time }}<!---->
+                            <!-- 如果事件的开始时间小于工作时间，就不显示 -->
+
+                            {{ if  $eventStart.After $timeWorkEnd}}
+                            {{continue}}
+                            {{end}}
+                            <!--  如果事件的开始时间在工作周的起始时间之后，显示事件的起始时间，否则显示工作周的开始时间-->
+                            <!--  如果事件的结束时间在工作周的结束时间之前，显示工作周的结束时间，否则显示事件的结束时间-->
+                            section {{ $event.category }}
+                            {{ $event.title }}:event-{{ $index }}, {{ if $eventStart.Before $timeWorkStart }} {{ $timeWorkStart | time | dateFormat "2006-01-02"}} {{ else }} {{ $eventStart | time | dateFormat "2006-01-02" }} {{end}},{{ if $eventEnd.After $timeWorkEnd}} {{ $timeWorkEnd | time | dateFormat "2006-01-02" }} {{else}} {{ $eventEnd | time | dateFormat "2006-01-02" }}<!---->
+                            {{end}}<!---->
+                            {{ end }}
+                    </pre>
+                    <h2>10～12 月</h2>
+                    <pre class="mermaid">
+                        <!-- 春季 -->
+                        {{ $timeWorkStart := "2025-10-01" | time }}
+                        {{ $timeWorkEnd := "2025-12-31" | time}}
+
+                        gantt
+                            title {{ .Title }}
+                            dateFormat YYYY-MM-DD
+                            excludes    weekends
+                            start :start, 2025-10-01, 1d
+                            end :crit, end, 2025-12-31, 1d
+                            {{ range $index, $event := .Params.events }}
+                            {{ $eventStart := $event.start | time }}<!---->
+                            {{ $eventEnd := $event.end | time }}<!---->
+                            <!-- 如果事件的开始时间小于工作时间，就不显示 -->
+
+                            {{ if  $eventStart.After $timeWorkEnd}}
+                            {{continue}}
+                            {{end}}
+                            <!--  如果事件的开始时间在工作周的起始时间之后，显示事件的起始时间，否则显示工作周的开始时间-->
+                            <!--  如果事件的结束时间在工作周的结束时间之前，显示工作周的结束时间，否则显示事件的结束时间-->
+                            section {{ $event.category }}
+                            {{ $event.title }}:event-{{ $index }}, {{ if $eventStart.Before $timeWorkStart }} {{ $timeWorkStart | time | dateFormat "2006-01-02"}} {{ else }} {{ $eventStart | time | dateFormat "2006-01-02" }} {{end}},{{ if $eventEnd.After $timeWorkEnd}} {{ $timeWorkEnd | time | dateFormat "2006-01-02" }} {{else}} {{ $eventEnd | time | dateFormat "2006-01-02" }}<!---->
+                            {{end}}<!---->
+                            {{ end }}
+                    </pre>
+                </div>
+            </div>
+
+            <!-- 任务内容 -->
+            <div class="content-item" data-category="task">
+                <h3>待办任务</h3>
+                <pre class="mermaid">
+                    quadrantChart
+                        title 决策矩阵
+                        x-axis "不重要" --> "重要"
+                        y-axis "不紧急" --> "紧急"
+                        quadrant-1 "立即处理"
+                        quadrant-2 "可能需要立即处理"
+                        quadrant-3 "浪费时间的事情"
+                        quadrant-4 "不需要立即处理"
+                        "DEV:Hugo-Focus": [0.6, 0.10]
+                        "WRI:营销文章": [0.9, 0.9]
+                        "DEV:WBC-平台": [0.6, 0.15]
+                        "DEV:群晖-文本编辑器": [0.1, 0.3]
+                        "DEV:CCJ-个人网站": [0.52, 0.2]
+                        "DEV:LHC-设计系统": [0.35, 0.78]
+                        "DEV-DNB-社区网站":[0.1,0.7]
+
+                </pre>
+            </div>
+
+            <!-- 预约内容 -->
+            <div class="content-item" data-category="appointment">
+                <h3>价格</h3>
+                <ul>
+                    <li>营销咨询：6,700 元/小时</li>
+                    <li>公众号文章代发：2,200 元/篇</li>
+                    <li>
+                        <strike>网站开发：300 元/小时</strike>&nbsp;
+                        <span>本人已不接</span>
+                    </li>
+                    <li>
+                        <strike>LOGO 设计：12,000 元/个</strike>&nbsp;
+                        <span>本人已不接</span>
+                    </li>
+                    <li>
+                        <strike>VIS 设计：98,000 元/次</strike>&nbsp;
+                        <span>本人已不接</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <style>
+            /* 基础样式 */
+            .category-filter {
+                margin: 20px 0;
+                display: flex;
+                gap: 10px;
+            }
+
+            .category-btn {
+                padding: 8px 20px;
+                border: 2px solid #007bff;
+                border-radius: 25px;
+                background: transparent;
+                color: #007bff;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+
+            .category-btn.active {
+                background: #007bff;
+                color: white;
+            }
+
+            .content-item {
+                display: none;
+                padding: 20px;
+                border: 1px solid #eee;
+                border-radius: 8px;
+                animation: fadeIn 0.3s ease;
+            }
+
+            .content-item.active {
+                display: block;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        </style>
+
+        <script>
+            (function () {
+                // 缓存DOM元素
+                const buttons = document.querySelectorAll(".category-btn");
+                const contents = document.querySelectorAll(".content-item");
+
+                // 显示对应内容函数
+                function showContent(category) {
+                    contents.forEach((content) => {
+                        content.classList.toggle(
+                            "active",
+                            content.dataset.category === category,
+                        );
+                    });
+                }
+
+                // 按钮点击处理
+                buttons.forEach((btn) => {
+                    btn.addEventListener("click", () => {
+                        // 移除所有按钮激活状态
+                        buttons.forEach((b) => b.classList.remove("active"));
+
+                        // 设置当前按钮激活
+                        btn.classList.add("active");
+
+                        // 获取分类并显示内容
+                        const category = btn.dataset.category;
+                        showContent(category);
+                    });
+                });
+
+                // 默认显示第一个分类
+                document.querySelector(".category-btn").click();
+            })();
+        </script>
+
+        <div class="event-details" id="event-popup">
+            <h3 class="title"></h3>
+            <div><strong>时间:</strong> <span class="dates"></span></div>
+            <div>
+                <strong>进度:</strong> <span class="progress-value"></span>
+                <div class="progress-bar">
+                    <div class="progress"></div>
+                </div>
+            </div>
+            <div class="description"></div>
+            <div class="links"></div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // 初始化 Mermaid
+                mermaid.initialize({
+                    startOnLoad: true,
+                    securityLevel: 'loose',
+                    theme: 'default',
+                    gantt: {
+                        titleTopMargin: 25,
+                        barHeight: 20,
+                        barGap: 4,
+                        topPadding: 50,
+                        sidePadding: 75
+                    }
+                });
+
+                // 点击事件
+                const printArguments = function (arg1, arg2, arg3) {
+                      alert('printArguments called with arguments: ' + arg1 + ', ' + arg2 + ', ' + arg3);
+                    };
+                const printTask = function (taskId) {
+                  alert('taskId: ' + taskId);
+                };
+
+                // 事件数据
+                const events = {{ .Params.events | jsonify }};
+
+                // 等待 Mermaid 渲染完成
+                setTimeout(function() {
+                    // 为甘特图任务添加鼠标事件
+                    console.log("点击事件")
+                    events.forEach((event, index) => {
+                        const eventId = `event-${index}`;
+                        const taskElements = document.querySelectorAll(`rect[id*="${eventId}"]`);
+
+                        taskElements.forEach(taskElement => {
+                            if (taskElement) {
+                                taskElement.style.cursor = 'pointer';
+
+                                // 鼠标悬浮显示详情
+                                taskElement.addEventListener('mouseenter', function(e) {
+                                    showEventDetails(event, index, e);
+                                });
+
+                                // 鼠标离开隐藏详情
+                                taskElement.addEventListener('mouseleave', function() {
+                                    hideEventDetails();
+                                });
+                            }
+                        });
+                    });
+
+                    // 分类过滤功能
+                    const categoryButtons = document.querySelectorAll('.category-btn');
+                    categoryButtons.forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const category = this.getAttribute('data-category');
+
+                            // 更新按钮状态
+                            categoryButtons.forEach(b => b.classList.remove('active'));
+                            this.classList.add('active');
+
+                            // 过滤事件
+                            const sections = document.querySelectorAll('g.section');
+                            sections.forEach(section => {
+                                const sectionTitle = section.querySelector('text.sectionTitle');
+                                if (sectionTitle) {
+                                    const sectionCategory = sectionTitle.textContent.trim();
+
+                                    if (category === 'all' || sectionCategory === category) {
+                                        section.style.display = 'block';
+                                    } else {
+                                        section.style.display = 'none';
+                                    }
+                                }
+                            });
+                        });
+                    });
+                }, 1000);
+
+                // 显示事件详情
+                function showEventDetails(event, index, e) {
+                    const popup = document.getElementById('event-popup');
+
+                    // 设置内容
+                    popup.querySelector('.title').textContent = event.title;
+                    popup.querySelector('.dates').textContent = `${event.start} 至 ${event.end}`;
+                    popup.querySelector('.progress-value').textContent = `${event.progress}%`;
+                    popup.querySelector('.progress').style.width = `${event.progress}%`;
+
+                    // 设置描述
+                    const descElem = popup.querySelector('.description');
+                    if (event.description) {
+                        descElem.textContent = event.description;
+                        descElem.style.display = 'block';
+                    } else {
+                        descElem.style.display = 'none';
+                    }
+
+                    // 设置链接
+                    const linksElem = popup.querySelector('.links');
+                    linksElem.innerHTML = '';
+                    if (event.links && event.links.length > 0) {
+                        event.links.forEach(link => {
+                            const a = document.createElement('a');
+                            a.href = link.url;
+                            a.textContent = link.text;
+                            linksElem.appendChild(a);
+                        });
+                        linksElem.style.display = 'block';
+                    } else {
+                        linksElem.style.display = 'none';
+                    }
+
+                    // 定位弹窗
+                    popup.style.left = `${e.pageX + 10}px`;
+                    popup.style.top = `${e.pageY + 10}px`;
+                    popup.style.display = 'block';
+                }
+
+                // 隐藏事件详情
+                function hideEventDetails() {
+                    document.getElementById('event-popup').style.display = 'none';
+                }
+            });
+        </script>
+    </body>
+</html>

@@ -1,5 +1,13 @@
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("pre").forEach((pre) => {
+    const codeElement = pre.querySelector("code");
+    if (
+      codeElement &&
+      (codeElement.classList.contains("mermaid") ||
+        codeElement.classList.contains("language-mermaid"))
+    ) {
+      return; // 跳过处理
+    }
     // 创建复制按钮容器
     const header = document.createElement("div");
     header.className = "code-header";
