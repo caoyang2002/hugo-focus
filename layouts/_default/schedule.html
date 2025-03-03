@@ -300,23 +300,73 @@
 
             <!-- 预约内容 -->
             <div class="content-item" data-category="appointment">
-                <h3>价格</h3>
-                <ul>
-                    <li>营销咨询：6,700 元/小时</li>
-                    <li>公众号文章代发：2,200 元/篇</li>
-                    <li>
-                        <strike>网站开发：300 元/小时</strike>&nbsp;
-                        <span>本人已不接</span>
-                    </li>
-                    <li>
-                        <strike>LOGO 设计：12,000 元/个</strike>&nbsp;
-                        <span>本人已不接</span>
-                    </li>
-                    <li>
-                        <strike>VIS 设计：98,000 元/次</strike>&nbsp;
-                        <span>本人已不接</span>
-                    </li>
-                </ul>
+                <h2>价格和历史</h2>
+                {{ with .Params }}
+                <!--  -->
+                {{ range .reservation }}
+                <h3>{{.title}}</h3>
+                {{if .active }}
+                <blockquote
+                    style="
+                        border-left: 4px solid #dfe2e5;
+                        margin-inline-start: 1rem;
+                    "
+                >
+                    <p style="margin-left: 0.5rem">{{ .remake }}</p>
+
+                    <h4 style="margin: 0 0 0 1rem">
+                        价格：<span style="color: red">{{ .price }}</span>
+                        <span>{{ .unit}}</span>
+                    </h4>
+
+                    {{ if .history}}
+                    <h4 style="margin: 0 0 0 1rem">
+                        历史价格：
+                        <ul>
+                            <li>{{ .history.title }}</li>
+                            <li>{{ .history.job }}</li>
+                            <li>{{ .history.price }} {{ .history.unit }}</li>
+                            <li>共 {{ .history.amounts }}</li>
+                            <li>{{ .history.date }}</li>
+                        </ul>
+                    </h4>
+                    {{ end }}
+                </blockquote>
+
+                {{ else }}
+
+                <blockquote
+                    style="
+                        border-left: 4px solid #dfe2e5;
+                        margin-inline-start: 1rem;
+                    "
+                >
+                    <p style="margin-left: 0.5rem">{{ .remake }}</p>
+                    <strike>
+                        <h4 style="margin: 0 0 0 1rem">
+                            价格：<span style="color: red">{{ .price }}</span>
+                            <span>{{ .unit}}</span>
+                        </h4>
+                        {{ if .history}}
+                        <h4 style="margin: 0 0 0 1rem">
+                            历史价格：
+                            <ul>
+                                <li>{{ .history.title }}</li>
+                                <li>{{ .history.job }}</li>
+                                <li>
+                                    {{ .history.price }} {{ .history.unit }}
+                                </li>
+                                <li>共 {{ .history.amounts }}</li>
+                                <li>{{ .history.date }}</li>
+                            </ul>
+                        </h4>
+                        {{ end }} {{ end }}
+                    </strike>
+                </blockquote>
+                {{ end }}
+
+                <!--  -->
+                {{ end }}
             </div>
         </div>
 
