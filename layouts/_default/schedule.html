@@ -130,6 +130,8 @@
                             axisFormat  {{ .Params.gantt.overviewAxisFormat}}
                             tickInterval {{ .Params.gantt.overviewTickInterval}}
                             todayMarker {{ .Params.gantt.todayMarker}}
+                            start :start, 2025-01-01, 1d
+                            end :crit, end, 2025-12-31, 1d
                             {{ range $index, $event := .Params.events }}
                                 section {{ $event.category }}
                                 {{ $event.title }}:{{ if $event.status }} {{$event.status}},{{ end }}event-{{ $index }}, {{ $event.start }},{{ $event.end }}
@@ -155,7 +157,7 @@
                             <!--  如果事件的开始时间在工作周的起始时间之后，显示事件的起始时间，否则显示工作周的开始时间-->
                             <!--  如果事件的结束时间在工作周的结束时间之前，显示工作周的结束时间，否则显示事件的结束时间-->
                             section {{ $event.category }}
-                            {{ $event.title }}:event-{{ $index }}, {{ if $eventStart.Before $weekWorkStart }} {{ $weekWorkStart | time | dateFormat "2006-01-02"}} {{ else }} {{ $eventStart | time | dateFormat "2006-01-02" }} {{end}},{{ if $eventEnd.After $weekWorkEnd}} {{ $weekWorkEnd | time | dateFormat "2006-01-02" }} {{else}} {{ $eventEnd | time | dateFormat "2006-01-02" }}<!---->
+                            {{ $event.title }}:{{ if $event.status }} {{$event.status}},{{ end }}event-{{ $index }}, {{ if $eventStart.Before $weekWorkStart }} {{ $weekWorkStart | time | dateFormat "2006-01-02"}} {{ else }} {{ $eventStart | time | dateFormat "2006-01-02" }} {{end}},{{ if $eventEnd.After $weekWorkEnd}} {{ $weekWorkEnd | time | dateFormat "2006-01-02" }} {{else}} {{ $eventEnd | time | dateFormat "2006-01-02" }}<!---->
                             {{end}}<!---->
                             {{ end }}
 
@@ -185,7 +187,7 @@
                             <!--  如果事件的开始时间在工作周的起始时间之后，显示事件的起始时间，否则显示工作周的开始时间-->
                             <!--  如果事件的结束时间在工作周的结束时间之前，显示工作周的结束时间，否则显示事件的结束时间-->
                             section {{ $event.category }}
-                            {{ $event.title }}:event-{{ $index }}, {{ if $eventStart.Before $timeWorkStart }} {{ $timeWorkStart | time | dateFormat "2006-01-02"}} {{ else }} {{ $eventStart | time | dateFormat "2006-01-02" }} {{end}},{{ if $eventEnd.After $timeWorkEnd}} {{ $timeWorkEnd | time | dateFormat "2006-01-02" }} {{else}} {{ $eventEnd | time | dateFormat "2006-01-02" }}<!---->
+                            {{ $event.title }}:{{ if $event.status }} {{$event.status}},{{ end }}event-{{ $index }}, {{ if $eventStart.Before $timeWorkStart }} {{ $timeWorkStart | time | dateFormat "2006-01-02"}} {{ else }} {{ $eventStart | time | dateFormat "2006-01-02" }} {{end}},{{ if $eventEnd.After $timeWorkEnd}} {{ $timeWorkEnd | time | dateFormat "2006-01-02" }} {{else}} {{ $eventEnd | time | dateFormat "2006-01-02" }}<!---->
                             {{end}}<!---->
                             {{ end }}
                     </pre>
@@ -212,7 +214,7 @@
                             <!--  如果事件的开始时间在工作周的起始时间之后，显示事件的起始时间，否则显示工作周的开始时间-->
                             <!--  如果事件的结束时间在工作周的结束时间之前，显示工作周的结束时间，否则显示事件的结束时间-->
                             section {{ $event.category }}
-                            {{ $event.title }}:event-{{ $index }}, {{ if $eventStart.Before $timeWorkStart }} {{ $timeWorkStart | time | dateFormat "2006-01-02"}} {{ else }} {{ $eventStart | time | dateFormat "2006-01-02" }} {{end}},{{ if $eventEnd.After $timeWorkEnd}} {{ $timeWorkEnd | time | dateFormat "2006-01-02" }} {{else}} {{ $eventEnd | time | dateFormat "2006-01-02" }}<!---->
+                            {{ $event.title }}:{{ if $event.status }} {{$event.status}},{{ end }}event-{{ $index }}, {{ if $eventStart.Before $timeWorkStart }} {{ $timeWorkStart | time | dateFormat "2006-01-02"}} {{ else }} {{ $eventStart | time | dateFormat "2006-01-02" }} {{end}},{{ if $eventEnd.After $timeWorkEnd}} {{ $timeWorkEnd | time | dateFormat "2006-01-02" }} {{else}} {{ $eventEnd | time | dateFormat "2006-01-02" }}<!---->
                             {{end}}<!---->
                             {{ end }}
                     </pre>
@@ -239,7 +241,7 @@
                             <!--  如果事件的开始时间在工作周的起始时间之后，显示事件的起始时间，否则显示工作周的开始时间-->
                             <!--  如果事件的结束时间在工作周的结束时间之前，显示工作周的结束时间，否则显示事件的结束时间-->
                             section {{ $event.category }}
-                            {{ $event.title }}:event-{{ $index }}, {{ if $eventStart.Before $timeWorkStart }} {{ $timeWorkStart | time | dateFormat "2006-01-02"}} {{ else }} {{ $eventStart | time | dateFormat "2006-01-02" }} {{end}},{{ if $eventEnd.After $timeWorkEnd}} {{ $timeWorkEnd | time | dateFormat "2006-01-02" }} {{else}} {{ $eventEnd | time | dateFormat "2006-01-02" }}<!---->
+                            {{ $event.title }}:{{ if $event.status }} {{$event.status}},{{ end }}event-{{ $index }}, {{ if $eventStart.Before $timeWorkStart }} {{ $timeWorkStart | time | dateFormat "2006-01-02"}} {{ else }} {{ $eventStart | time | dateFormat "2006-01-02" }} {{end}},{{ if $eventEnd.After $timeWorkEnd}} {{ $timeWorkEnd | time | dateFormat "2006-01-02" }} {{else}} {{ $eventEnd | time | dateFormat "2006-01-02" }}<!---->
                             {{end}}<!---->
                             {{ end }}
                     </pre>
@@ -266,7 +268,7 @@
                             <!--  如果事件的开始时间在工作周的起始时间之后，显示事件的起始时间，否则显示工作周的开始时间-->
                             <!--  如果事件的结束时间在工作周的结束时间之前，显示工作周的结束时间，否则显示事件的结束时间-->
                             section {{ $event.category }}
-                            {{ $event.title }}:event-{{ $index }}, {{ if $eventStart.Before $timeWorkStart }} {{ $timeWorkStart | time | dateFormat "2006-01-02"}} {{ else }} {{ $eventStart | time | dateFormat "2006-01-02" }} {{end}},{{ if $eventEnd.After $timeWorkEnd}} {{ $timeWorkEnd | time | dateFormat "2006-01-02" }} {{else}} {{ $eventEnd | time | dateFormat "2006-01-02" }}<!---->
+                            {{ $event.title }}:{{ if $event.status }} {{$event.status}},{{ end }}event-{{ $index }}, {{ if $eventStart.Before $timeWorkStart }} {{ $timeWorkStart | time | dateFormat "2006-01-02"}} {{ else }} {{ $eventStart | time | dateFormat "2006-01-02" }} {{end}},{{ if $eventEnd.After $timeWorkEnd}} {{ $timeWorkEnd | time | dateFormat "2006-01-02" }} {{else}} {{ $eventEnd | time | dateFormat "2006-01-02" }}<!---->
                             {{end}}<!---->
                             {{ end }}
                     </pre>
