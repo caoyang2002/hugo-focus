@@ -280,20 +280,24 @@
                 <h3>待办任务</h3>
                 <pre class="mermaid">
                     quadrantChart
-                        title 决策矩阵
-                        x-axis "不重要" --> "重要"
-                        y-axis "不紧急" --> "紧急"
-                        quadrant-1 "立即处理"
-                        quadrant-2 "可能需要立即处理"
-                        quadrant-3 "浪费时间的事情"
-                        quadrant-4 "不需要立即处理"
-                        "DEV:Hugo-Focus": [0.6, 0.10]
-                        "WRI:营销文章": [0.9, 0.9]
-                        "DEV:WBC-平台": [0.6, 0.15]
-                        "DEV:群晖-文本编辑器": [0.1, 0.3]
-                        "DEV:CCJ-个人网站": [0.52, 0.2]
-                        "DEV:LHC-设计系统": [0.35, 0.78]
-                        "DEV-DNB-社区网站":[0.1,0.7]
+                        title {{ .Params.decision.title }}
+                        x-axis "{{ .Params.decision.xAxisLeft }}" --> "{{ .Params.decision.xAxisRight }}"
+                        y-axis "{{ .Params.decision.yAxisDown }}" --> "{{ .Params.decision.yAxisUp }}"
+                        quadrant-1 "{{ .Params.decision.quadrant1 }}"
+                        quadrant-2 "{{ .Params.decision.quadrant2 }}"
+                        quadrant-3 "{{ .Params.decision.quadrant3 }}"
+                        quadrant-4 "{{ .Params.decision.quadrant4 }}"
+                        {{ with .Params}}
+                        <!--  -->
+
+                        {{ range $event := .events}}
+                        {{ if $event.rate}}
+                        <!--  -->
+                        "{{ $event.title}}": {{ $event.rate}}<!---->
+
+                       <!---->
+                        {{ end }} {{ end }} {{ end }}
+
 
                 </pre>
             </div>
