@@ -1,0 +1,220 @@
+{{ define "main" }}
+<style>
+    /* 整体布局 */
+    .container {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        padding: 16px;
+    }
+
+    /* 标题行 */
+    .title-row {
+        display: flex;
+        justify-content: flex-start;
+        gap: 16px;
+        padding: 16px;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+    }
+
+    /* 单个标题 */
+    .title-item {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        cursor: pointer;
+        padding: 8px 16px;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+    }
+
+    .title-item:hover {
+        background-color: #e0e0e0;
+    }
+
+    .title-item.active {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    /* 内容列 */
+    .content-column {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    /* 卡片样式 */
+    .card {
+        background-color: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 16px;
+        transition:
+            transform 0.2s,
+            box-shadow 0.2s;
+    }
+
+    .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .card h3 {
+        margin: 0 0 8px;
+        font-size: 16px;
+        color: #333;
+    }
+
+    .card a {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .card a:hover {
+        text-decoration: underline;
+    }
+
+    /* 隐藏内容 */
+    .content-container {
+        display: none;
+    }
+
+    .content-container.active {
+        /* display: block; */
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        padding: 16px;
+    }
+</style>
+
+<div class="container" id="container">
+    <!-- 标题行 -->
+    <div class="title-row" id="title-row">
+        <!-- 标题将动态插入到这里 -->
+    </div>
+
+    <!-- 内容列 -->
+    <div id="content-container">
+        <!-- 内容将动态插入到这里 -->
+    </div>
+</div>
+
+<script>
+    // 获取模板中的参数
+    const baseUrl = "{{ .Params.baseUrl }}";
+    const listStr = {{ .Params.list | jsonify }}; // 将数组转换为 JSON 字符串
+
+    // 将 JSON 字符串解析为数组
+    let list = [];
+    try {
+      list = JSON.parse(listStr); // 解析 JSON 字符串
+    } catch (error) {
+      console.error('Failed to parse list:', error);
+    }
+
+    console.log('Parsed list:', list); // 检查解析后的数组
+
+    // 确保 list 是一个数组
+    if (Array.isArray(list)) {
+      // 遍历列表，发出请求
+      list.forEach((type, index) => {
+        const url = `${baseUrl}${type.trim()}`; // 去除可能的空格
+
+        fetch(url)
+          .then(response => response.json())
+          .then(data => {
+            console.log(`Data for ${type}:`, data);
+            renderTitle(data, index); // 渲染标题
+            renderContent(data, index); // 渲染内容
+          })
+          .catch(error => {
+            console.error(`Error fetching data for ${type}:`, error);
+          });
+      });
+    } else {
+      console.error('list is not an array:', list);
+    }
+
+    // 渲染标题的函数
+    function renderTitle(data, index) {
+      const titleRow = document.getElementById('title-row');
+      const titleItem = document.createElement('div');
+      titleItem.className = 'title-item';
+      titleItem.textContent = data.title;
+      titleItem.dataset.index = index; // 为标题添加索引
+
+      // 点击标题切换内容
+      titleItem.addEventListener('click', () => {
+        console.log(`Clicked title: ${data.title}`); // 打印点击事件
+        switchContent(index); // 切换到对应内容
+        setActiveTitle(index); // 设置当前标题为选中状态
+      });
+
+      // 默认选中第一个标题
+      if (index === 0) {
+        titleItem.classList.add('active');
+      }
+
+      titleRow.appendChild(titleItem);
+    }
+
+    // 渲染内容的函数
+    function renderContent(data, index) {
+      const contentContainer = document.getElementById('content-container');
+
+      // 创建内容容器
+      const contentColumn = document.createElement('div');
+      contentColumn.className = `content-container ${index === 0 ? 'active' : ''}`; // 默认显示第一个内容
+      contentColumn.id = `content-${index}`;
+
+      // 创建数据卡片
+      data.data.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <a href="${item.url}" target="_blank">
+            <h3>${item.index}. ${item.title}</h3>
+            <p>${item.url}</p>
+          </a>
+        `;
+        contentColumn.appendChild(card);
+      });
+
+      contentContainer.appendChild(contentColumn);
+    }
+
+    // 切换内容的函数
+    function switchContent(index) {
+      const contentContainers = document.querySelectorAll('.content-container');
+      console.log(`Switching to content-${index}`); // 打印切换操作
+      contentContainers.forEach(container => {
+        container.classList.remove('active');
+      });
+
+      const activeContent = document.getElementById(`content-${index}`);
+      if (activeContent) {
+        activeContent.classList.add('active');
+        console.log(`Active content: content-${index}`); // 打印当前激活的内容
+      } else {
+        console.error(`Content container content-${index} not found!`);
+      }
+    }
+
+    // 设置当前标题为选中状态
+    function setActiveTitle(index) {
+      const titleItems = document.querySelectorAll('.title-item');
+      titleItems.forEach(item => {
+        item.classList.remove('active');
+      });
+
+      const activeTitle = document.querySelector(`.title-item[data-index="${index}"]`);
+      if (activeTitle) {
+        activeTitle.classList.add('active');
+      }
+    }
+</script>
+{{ end }}
