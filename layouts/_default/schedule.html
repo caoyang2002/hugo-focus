@@ -4,6 +4,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{{ .Title }}</title>
+
         <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.css"
@@ -91,6 +92,9 @@
         <!---->
 
         <h1>{{ .Title }}</h1>
+        <h4>{{ .Params.bio }}</h4>
+        <p>邮箱： {{ .Params.email }}</p>
+        <p>微信： {{ .Params.wechat }}</p>
 
         <!-- 分类筛选按钮 -->
         <div class="category-filter">
