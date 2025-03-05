@@ -128,6 +128,7 @@
           .then(response => response.json())
           .then(data => {
             console.log(`Data for ${type}:`, data);
+
             renderTitle(data, index); // 渲染标题
             renderContent(data, index); // 渲染内容
           })
@@ -144,7 +145,7 @@
       const titleRow = document.getElementById('title-row');
       const titleItem = document.createElement('div');
       titleItem.className = 'title-item';
-      titleItem.textContent = data.title;
+      titleItem.textContent = data.title + data.subtitle;
       titleItem.dataset.index = index; // 为标题添加索引
 
       // 点击标题切换内容
@@ -178,6 +179,7 @@
         card.innerHTML = `
           <a href="${item.url}" target="_blank">
             <h3>${item.index}. ${item.title}</h3>
+            <p>${item.hot}</p>
             <p>${item.url}</p>
           </a>
         `;
