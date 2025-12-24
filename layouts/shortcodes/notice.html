@@ -1,2 +1,8 @@
 {{/* layouts/shortcodes/notice.html */}}
 <div class="notice {{ .Get 0 }}">{{ .Inner | markdownify }}</div>
+
+<style>
+    .notice {
+        color: red;
+    }
+</style>

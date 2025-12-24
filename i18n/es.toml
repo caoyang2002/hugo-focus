@@ -1,5 +1,5 @@
-readMore = "Leer más"
-posts = "{{ .Count }} artículos"
-lastUpdated = 'Última actualización el {{ .Format "2006-01-02" }}'
+# readMore = "Leer más"
+# posts = "{{ .Count }} artículos"
+# lastUpdated = 'Última actualización el {{ .Format "2006-01-02" }}'
 prev_page = "Página anterior"
 next_page = "Página siguiente"

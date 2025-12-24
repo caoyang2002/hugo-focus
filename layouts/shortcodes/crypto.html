@@ -1,11 +1,14 @@
 {{ $content := .Inner | base64Encode }} {{ $paramName := .Get "pwd" | default
 "title" }}
+<!-- 密码 -->
+{{ $pwd_value := index .Page.Params $paramName }} {{ $pwd_value }}
 <!--  -->
-<!-- {{ $pwd_value := index .Page.Params $paramName }} {{ if $pwd_value }}
+<!--{{ $pwd_value := index .Page.Params $paramName }}
+{{ if $pwd_value }}
 <div class="param-display">{{ $paramName | humanize }}: {{ $pwd_value }}</div>
 {{ else }}
 <div class="warning">字段 {{ $paramName }} 不存在</div>
-{{ end }} -->
+{{ end }}-->
 
 <!-- 查看页面所有字段 -->
 <!-- <pre>{{ .Page.Params | jsonify (dict "indent" "  ") }}</pre> -->

@@ -1,4 +1,4 @@
-<!-- y元数据 -->
+<!-- head.html 元数据 -->
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -29,23 +29,22 @@
     {{ end }}
 
     <!-- css & js -->
-    <!-- <link href="/css/code-copy.css" rel="stylesheet" /> -->
-    <script src="/js/code-copy.js" defer></script>
+    <script src="{{ `js/code-copy.js` | relURL }}" defer></script>
     {{ $main := resources.Get "css/main.css" }} {{ $custom := resources.Get
     "css/custom.css" }} {{ $syntax := resources.Get "css/syntax.css" }} {{
     $code_copy := resources.Get "css/code-copy.css" }}
     <!--  -->
     {{ $css := slice $main $custom $syntax $code_copy | resources.Concat
-    "bundle.css" | minify }}
+    "bundle.css" | minify | fingerprint }}
 
-    <link rel="preload stylesheet" as="style" href="{{ $css.Permalink }}" />
+    <link rel="preload stylesheet" as="style" href="{{ $css.RelPermalink }}" />
 
     <!-- dark icon -->
     {{ $dark_icon := "theme.png" }}
     <!---->
     {{ if site.Params.monoDarkIcon }}{{ $dark_icon = "theme.svg" }}{{ end }}
     <!---->
-    <link rel="preload" as="image" href="{{ $dark_icon | absURL }}" />
+    <link rel="preload" as="image" href="{{ $dark_icon | relURL }}" />
 
     <!-- avatar -->
     {{ $avatar_url := $.Scratch.Get "avatar_url" }}
@@ -57,7 +56,7 @@
 
     <!-- social list -->
     {{ range $.Scratch.Get "social_list" }}
-    <link rel="preload" as="image" href="{{ printf `%s.svg` . | absURL }}" />
+    <link rel="preload" as="image" href="{{ printf `%s.svg` . | relURL }}" />
     {{ end }}
     <!---->
 
@@ -77,25 +76,18 @@
     <script
         defer
         src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"
-        onload="hljs.initHighlightingOnLoad();"
+        onload="hljs.highlightAll();"
     ></script>
-    {{ end }} {{ if and .IsPage (not site.Params.disableHLJS) }}
+
+    <!-- 额外的语言支持 -->
     <script
         defer
-        src="{{ `highlight.min.js` | absURL }}"
-        onload="hljs.initHighlightingOnLoad();"
+        src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/lisp.min.js"
     ></script>
-
-    <!-- <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script> -->
-
-    <script>
-        window.onload = function () {
-            hljs.highlightAll();
-        };
-    </script>
-
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/lisp.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/mariadb.min.js"></script>
+    <script
+        defer
+        src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"
+    ></script>
     {{ end }}
 
     <!-- math -->
@@ -109,11 +101,11 @@
     <!-- favicon -->
     <link
         rel="icon"
-        href="{{ site.Params.favicon | default `favicon.ico` | absURL }}"
+        href="{{ site.Params.favicon | default `favicon.ico` | relURL }}"
     />
     <link
         rel="apple-touch-icon"
-        href="{{ site.Params.appleTouchIcon | default `apple-touch-icon.png` | absURL }}"
+        href="{{ site.Params.appleTouchIcon | default `apple-touch-icon.png` | relURL }}"
     />
 
     <!-- generator -->

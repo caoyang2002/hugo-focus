@@ -1,33 +1,33 @@
-readMore = "Read More"
-post = "{{ .Count }} post"
-posts =  "{{ .Count }} posts"
-lastUpdated =  "Last updated on {{ .Format \"2006-01-02\" }}"
-#
-prev_page= 'Prev Page'
-next_page = 'Next Page'
 
-# 统计信息
-total_tag_count = "Tag Count"
-total_class_count = "Class Total"
-total_article_count = "Articles Total"
-total_word_count = "Total Word Count"
-hot_articles = "Hot Articles"
-all_tags = "All Tags"
-all_categorites = "All Categorites"
-archivist = "Archivist"
-min_read = "Min Read"
-articles = "Articles"
-total_number_website_visits = "Total number of visits to this site"
-catalogue = "Catalogue"
-back_home = "BACK TO HOME"
-search_articles_placeholder = "Please enter characters to search for articles..."
-search_articles_tips = "Enter keywords to start a search.."
-search_articles_notfound = "No related article found"
-search_articles_failed_load = "Failed to load the search function"
+# readMore = "阅读更多"
+# posts = "{{ .Count }} 篇文章"
+# lastUpdated = '最后更新于 {{ .Format "2006-01-02" }}'
+prev_page = "上一页"
+next_page = "下一页"
 
-# 文章统计信息
-article_analyze_characters_before = "This article is"
-article_analyze_characters_behind = "characters long"
-article_analyze_reading_before = "should take about"
-article_analyze_reading_behind = "minutes_to_read"
-and = "and"
+# # 统计信息
+# total_tag_count = "标签总数"
+# total_class_count = "分类总数"
+# total_article_count = "文章总数"
+# total_word_count = "字符总数"
+# all_categorites = "所有分类"
+# hot_articles = "热门文章"
+# all_tags = "所有标签"
+# archivist = "归档"
+# min_read = "阅读时长"
+# articles = "篇"
+# total_number_website_visits = "本站累计访问次数"
+# catalogue = "目录"
+# back_home = "返回主页"
+# search_articles_placeholder = "请输入字符以搜索文章..."
+# search_articles_tips = "输入关键字开始搜索"
+# search_articles_notfound = "文章没有找到"
+# search_articles_failed_load = "加载失败"
+
+
+# # 文章统计信息
+# article_analyze_characters_before = "本文共"
+# article_analyze_characters_behind = "个字"
+# article_analyze_reading_before = "预计需要阅读"
+# article_analyze_reading_behind = "分钟"
+# and = "，"
