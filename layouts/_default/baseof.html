@@ -75,6 +75,7 @@
         id="LA_COLLECT"
         src="//sdk.51.la/js-sdk-pro.min.js"
     ></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         LA.init({ id: "3L3XAvCJS5maI7j0", ck: "3L3XAvCJS5maI7j0" });
     </script>
@@ -86,9 +87,11 @@
         {{ partial "header.html" . }}
 
         <div class="relative flex justify-start max-w-[90vw] px-8">
-            <main
+             <!-- <main
                 class="min-h-[calc(100vh-5rem)] py-12 prose prose-neutral flex-1 dark:prose-invert text-left"
-            >
+            >  -->
+            <main class="min-h-[calc(100vh-5rem)] py-12 prose prose-neutral flex-1 dark:prose-invert text-left max-w-full lg:max-w-4xl xl:max-w-6xl">
+            <!-- <main class="min-h-[calc(100vh-5rem)] py-12 flex-1 test-left bg-red-500"> -->
                 {{ block "main" . }} {{ end }}
             </main>
             {{ if .IsHome }}
