@@ -7,8 +7,19 @@
 2. Allow adding a border to an element by just adding a border-width. (https://github.com/tailwindcss/tailwindcss/pull/116)
 */
 
-* {
-    letter-spacing: 0.08em; /* 默认值为normal，建议使用em单位 */
+/* 注意：这是CSS4草案功能，浏览器支持有限 */
+@supports (letter-spacing: 0.08em) {
+    /* 针对中文字符 */
+    * {
+        letter-spacing: 0.08em;
+    }
+    
+    /* 重置英文字母和数字 */
+    * {
+        letter-spacing: normal;
+        letter-spacing: 
+            normal; /* 默认值 */
+    }
 }
 
 /* 基础文本 */
