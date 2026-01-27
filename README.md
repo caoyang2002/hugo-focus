@@ -620,11 +620,11 @@ Typora 现在支持 YAML Front Matter 。 在文章顶部输入 --- 然后按 En
        ---
        # 注释：导出的yaml设置
        title: Thompsgo使用方法
-       author: 曹洋
-       creator: 曹洋
+       author: simons
+       creator: simons
        subject: Usage
        keywords: [使用方法、markdown、HTML、YAML]
-       info: 这是一本关于thompsgo主题的手册，内含markdown、mermiad、html等语言和的基础语法。本主题由 @曹洋 开发，开源地址：https://github.io/caoyang2002
+       info: 这是一本关于thompsgo主题的手册，内含markdown、mermiad、html等语言和的基础语法。本主题由 @simons 开发，开源地址：https://github.io/caoyang2002
        ---
        ```
 
@@ -1996,7 +1996,7 @@ pie title 字符统计
   	<blockquote cite=" ">
   		<p style="text-align:center;font-size:3rem">这是一本关于Thompsgo主题的介绍手册</p>
   		<br>
-  		<p style="text-align:right;padding-right:10%;font-size:1.5rem">作者：曹洋</p>
+  		<p style="text-align:right;padding-right:10%;font-size:1.5rem">作者：simons</p>
 		</blockquote>
   </div>
 </div>
