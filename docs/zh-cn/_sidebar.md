@@ -1,4 +1,4 @@
-* [🏠 首页](README.md)
+* [🏠 首页](/zh-cn/)
 * [🚀 快速开始](guide.md)
 * [⚙️ 配置](config.md)
 
@@ -23,11 +23,16 @@
   * [折叠菜单](content/feature/details.md)
   * [嵌入](content/feature/iframe.md)
   * [加密](content/feature/crypto.md)
+  * [图片](content/feature/images.md)
+  * [文本](content/feature/text.md)
+
 
 * Q & A
   * [如何创建一个独立页面](content/qa/create_sigle_page.md)
+  * [如何配置多语言](content/qa/i18n_basic.md)
+
   
 * 资源链接
-  * [GitHub](https://github.com/caoyang2002/themes)
-  * [示例网站](https://example.com)
+  * [GitHub](https://github.com/caoyang2002/hugo-focus)
+  * [示例网站](https://simons.qzz.io)
   * [Hugo 文档](https://gohugo.io/)
