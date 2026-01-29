@@ -32,13 +32,19 @@
     <script src="{{ `js/code-copy.js` | relURL }}" defer></script>
     {{ $main := resources.Get "css/main.css" }} {{ $custom := resources.Get
     "css/custom.css" }} {{ $syntax := resources.Get "css/syntax.css" }} {{
-    $code_copy := resources.Get "css/code-copy.css" }}
-    <!--  -->
-    {{ $css := slice $main $custom $syntax $code_copy | resources.Concat
-    "bundle.css" | minify | fingerprint }}
+    $code_copy := resources.Get "css/code-copy.css" }} {{ $prose :=
+    resources.Get "css/prose.css" }}
 
+    <!-- 安全合并版本 -->
+    {{ $resources := slice }} {{ if $main }}{{ $resources = $resources | append
+    $main }}{{ end }} {{ if $custom }}{{ $resources = $resources | append
+    $custom }}{{ end }} {{ if $syntax }}{{ $resources = $resources | append
+    $syntax }}{{ end }} {{ if $code_copy }}{{ $resources = $resources | append
+    $code_copy }}{{ end }} {{ if $prose }}{{ $resources = $resources | append
+    $prose }}{{ end }} {{ if gt (len $resources) 0 }} {{ $css := $resources |
+    resources.Concat "bundle.css" | minify | fingerprint }}
     <link rel="preload stylesheet" as="style" href="{{ $css.RelPermalink }}" />
-
+    {{ end }}
     <!-- dark icon -->
     {{ $dark_icon := "theme.png" }}
     <!---->
