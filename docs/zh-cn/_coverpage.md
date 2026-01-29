@@ -12,4 +12,4 @@
 - 易于定制
 
 [GitHub](https://github.com/caoyang2002/hugo-focus)
-[开始使用](README.md)
+[开始使用](zh-cn/)
