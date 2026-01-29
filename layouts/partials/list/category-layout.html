@@ -1,23 +1,21 @@
 {{- /* layouts/partials/list/category-layout.html */ -}}
 <div class="category-page">
     {{- /* 分类标题和描述 */ -}}
-    <header class="mb-10">
-        <h1 class="text-4xl font-bold mb-3">{{ .Title }}</h1>
-        {{- with .Description -}}
-        <p class="text-lg text-gray-600 dark:text-gray-400 mb-4">{{ . }}</p>
-        {{- end -}}
-        <div class="flex items-center text-sm text-gray-500">
-            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
-                <path
-                    fill-rule="evenodd"
-                    d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
-                    clip-rule="evenodd"
-                ></path>
-            </svg>
-            {{ len .Pages }} 篇文章
-        </div>
-    </header>
+    <!-- <header class="mb-10"> -->
+    <h1 class="mt-6 text-4xl font-bold mb-3">{{ .Title }}</h1>
+    {{- with .Description -}}
+    <p class="text-lg text-gray-600 dark:text-gray-400 mb-4">{{ . }}</p>
+    {{- end -}}
+    <div class="flex items-center text-sm text-gray-500">
+        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+            <path fill-rule="evenodd"
+                d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
+                clip-rule="evenodd"></path>
+        </svg>
+        {{ len .Pages }} 篇文章
+    </div>
+    <!-- </header> -->
 
     {{- $pages := .Pages -}} {{- $paginator := .Paginate $pages -}} {{- /*
     网格布局 */ -}}

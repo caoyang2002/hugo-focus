@@ -1,5 +1,6 @@
 {{- /* layouts/partials/list/section-layout.html */ -}}
 <div class="section-page docs-layout">
+
     {{- /* 专题标题区 */ -}}
     <!--<header class="mb-12 pb-8 border-b-2 border-gray-200 dark:border-gray-700">-->
     <h1 class="mt-6 text-4xl font-bold mb-4">{{ .Title }}</h1>
@@ -9,16 +10,10 @@
     <div class="flex flex-wrap gap-4 text-sm">
         {{- with .Params.keywords -}}
         <div class="flex items-center">
-            <svg
-                class="w-4 h-4 mr-1 text-gray-500"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-            >
-                <path
-                    fill-rule="evenodd"
+            <svg class="w-4 h-4 mr-1 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd"
                     d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z"
-                    clip-rule="evenodd"
-                ></path>
+                    clip-rule="evenodd"></path>
             </svg>
             <span class="text-gray-600 dark:text-gray-400">
                 {{ delimit . ", " }}
@@ -29,8 +24,8 @@
         <div class="flex items-center text-gray-600 dark:text-gray-400">
             <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                 <path
-                    d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"
-                ></path>
+                    d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z">
+                </path>
             </svg>
             {{ len .RegularPages }} 篇文章
         </div>
@@ -47,10 +42,8 @@
         <h2 class="text-2xl font-semibold mb-6">子专题</h2>
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {{- range $sections -}}
-            <a
-                href="{{ .RelPermalink }}"
-                class="block p-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow"
-            >
+            <a href="{{ .RelPermalink }}"
+                class="block p-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
                 <h3 class="text-xl font-semibold mb-2">{{ .Title }}</h3>
                 {{- with .Description -}}
                 <p class="text-gray-600 dark:text-gray-400 text-sm mb-3">
@@ -69,9 +62,7 @@
         {{- if .Params.showSummary -}} {{- /* 显示摘要的卡片布局 */ -}}
         <div class="space-y-6">
             {{- range $pages -}}
-            <article
-                class="p-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
-            >
+            <article class="p-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                 <div class="flex items-start">
                     {{- if .Params.icon -}}
                     <div class="flex-shrink-0 mr-4 text-3xl">
@@ -80,10 +71,7 @@
                     {{- end -}}
                     <div class="flex-1">
                         <h3 class="text-xl font-semibold mb-2">
-                            <a
-                                href="{{ .RelPermalink }}"
-                                class="hover:text-blue-500"
-                            >
+                            <a href="{{ .RelPermalink }}" class="hover:text-blue-500">
                                 {{ .Title }}
                             </a>
                         </h3>
@@ -93,9 +81,7 @@
                         </p>
                         {{- end -}}
                         <div class="flex items-center text-xs text-gray-500">
-                            <time
-                                >{{ .Date | time.Format ":date_medium" }}</time
-                            >
+                            <time>{{ .Date | time.Format ":date_medium" }}</time>
                             {{- if .ReadingTime -}}
                             <span class="mx-2">·</span>
                             <span>{{ .ReadingTime }} 分钟阅读</span>
@@ -109,10 +95,8 @@
         {{- else -}} {{- /* 紧凑的文档列表 */ -}}
         <div class="docs-list space-y-1">
             {{- range $pages -}}
-            <a
-                href="{{ .RelPermalink }}"
-                class="flex items-center px-4 py-3 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
-            >
+            <a href="{{ .RelPermalink }}"
+                class="flex items-center px-4 py-3 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group">
                 {{- if .Params.icon -}}
                 <span class="mr-3 text-xl">{{ .Params.icon }}</span>
                 {{- else -}}
@@ -130,8 +114,7 @@
                 </div>
                 {{- if gt .Weight 0 -}}
                 <span
-                    class="ml-2 px-2 py-1 text-xs bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300 rounded"
-                >
+                    class="ml-2 px-2 py-1 text-xs bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300 rounded">
                     推荐
                 </span>
                 {{- end -}}

@@ -1,9 +1,0 @@
-* [首页](/)
-* [文档]
-  * [快速开始](guide.md)
-  * [配置](config.md)
-  * [API](api.md)
-* [特性]
-  * [示例一](chapter1/page1.md)
-  * [示例二](chapter1/page2.md)
-* [GitHub](https://github.com/caoyang2002/themes)

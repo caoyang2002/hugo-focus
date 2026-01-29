@@ -1,0 +1,7 @@
+
+## 12. 折叠菜单
+
+<details>
+  <summary>I have keys but no locks. I have space but no room. You can enter but can't leave. What am I?</summary>
+  A keyboard.
+</details>

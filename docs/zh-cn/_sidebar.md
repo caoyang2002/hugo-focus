@@ -22,7 +22,11 @@
   * [时间线](content/feature/timeline.md)
   * [折叠菜单](content/feature/details.md)
   * [嵌入](content/feature/iframe.md)
+  * [加密](content/feature/crypto.md)
 
+* Q & A
+  * [如何创建一个独立页面](content/qa/create_sigle_page.md)
+  
 * 资源链接
   * [GitHub](https://github.com/caoyang2002/themes)
   * [示例网站](https://example.com)
