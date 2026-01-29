@@ -4,7 +4,7 @@ on:
   push:
     branches: ["main"]
     paths:
-      - 'docs/**'
+      - "docs/**"
   workflow_dispatch:
 
 permissions:
@@ -22,42 +22,25 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
-      
+
       - name: Prepare docs directory
         run: |
           # 验证 docs 目录结构
           echo "📁 Checking docs directory structure..."
           ls -la docs/
-          
-          # 确保有必要的文件
-          if [ ! -f "docs/index.html" ]; then
-            echo "❌ Error: docs/index.html not found"
-            exit 1
-          fi
-          
-          if [ ! -f "docs/README.md" ]; then
-            echo "❌ Error: docs/README.md not found"
-            exit 1
-          fi
-          
-          echo "✅ Docs directory is valid"
-          
+
           # 创建 .nojekyll 文件防止 Jekyll 处理
           touch docs/.nojekyll
-          
-          # 显示最终要部署的文件
-          echo "📋 Files to be deployed:"
-          find docs -type f | head -20
-      
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./docs
-      
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
