@@ -127,6 +127,14 @@ hr {
     /* 3 */
 }
 
+li::marker {
+    color: #05001b !important;
+    font-size: 1.2em;
+}
+
+li {
+    color: black; /* 保持文字颜色 */
+}
 /*
 Add the correct text decoration in Chrome, Edge, and Safari.
 */
