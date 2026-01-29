@@ -4,8 +4,9 @@
 
 * 基本使用
   * [安装](content/quick_start/)
-  * [基本配置](content/quick_start/page1.md)
-  * [启动](content/quick_start/page2.md)
+  * [基本配置](content/quick_start/install.md)
+  * [基本配置](content/quick_start/config.md)
+  * [启动](content/quick_start/run.md)
 
 * 特性
   * [开发](content/feature/)
@@ -13,7 +14,6 @@
   * [数学](content/feature/latex.md)
   * [多语言](content/feature/i18n.md)
   * [统计](content/feature/stats.md)
-  * [Latex](content/feature/latex.md)
   * [数学](content/feature/latex.md)
   * [目录](content/feature/toc.md)
   * [搜索](content/feature/search.md)
