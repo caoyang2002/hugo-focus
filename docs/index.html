@@ -1,390 +1,466 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <meta name="description" content="Hugo Focus Theme Documentation" />
+        <meta
+            name="viewport"
+            content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+        />
+        <title>Hugo Focus</title>
 
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-  <meta name="description" content="Hugo Focus Theme Documentation">
-  <meta name="viewport"
-    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <title>Hugo Focus</title>
+        <!-- 浏览器图标 -->
+        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
 
-  <!-- 浏览器图标 -->
-  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+        <!-- 默认主题 -->
+        <link
+            rel="stylesheet"
+            href="//cdn.jsdelivr.net/npm/docsify/lib/themes/vue.css"
+        />
+    </head>
 
-  <!-- 默认主题 -->
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/lib/themes/vue.css">
-</head>
+    <body>
+        <div id="app">正在加载文档...</div>
 
-<body>
-  <div id="app">正在加载文档...</div>
-
-  <script>
-    // 获取当前语言
-    function getCurrentLanguage() {
-      const hash = window.location.hash;
-
-      // 方案1：更精确的匹配（推荐）
-      const match = hash.match(/^#\/(zh-cn|en|es)(\/|$)/);
-      if (match && match[1]) {
-        return match[1];
-      }
-
-      // 方案2：使用 includes 但更全面
-      if (hash.startsWith('#/en/') || hash === '#/en') return 'en';
-      if (hash.startsWith('#/es/') || hash === '#/es') return 'es';
-      if (hash.startsWith('#/zh-cn/') || hash === '#/zh-cn') return 'zh-cn';
-
-      // 默认值
-      return 'zh-cn';
-    }
-
-    window.$docsify = {
-      loadNavbar: true,  // 必须为 true
-      debug: true,
-      // 项目信息
-      name: 'Hugo Focus',
-      repo: 'https://github.com/caoyang2002/hugo-focus',
-
-      // 设置默认首页
-      // homepage: 'zh-cn/README.md',
-      homepage: '#',
-
-      // 不使用 basePath
-      basePath: '/',
-
-      // 别名配置
-      alias: {},
-
-      // 加载配置
-      loadSidebar: true,
-      loadNavbar: true,
-      coverpage: true,
-
-      // 搜索配置
-      search: {
-        maxAge: 86400000,
-        paths: 'auto',
-        placeholder: {
-          '/zh-cn/': '搜索',
-          '/en/': 'Search',
-          '/es/': 'Buscar'
-        },
-        noData: {
-          '/zh-cn/': '找不到结果',
-          '/en/': 'No results found',
-          '/es/': 'No se encontraron resultados'
-        },
-        depth: 3,
-        namespace: 'hugo-focus-docs'
-      },
-
-      // 其他配置
-      maxLevel: 5,
-      subMaxLevel: 4,
-      sidebarDisplayLevel: 1,    // 设置侧边栏初始展开的层级
-      mergeNavbar: true,
-      auto2top: true,
-      relativePath: false,
-
-      // 自定义插件
-      plugins: [
-        // 初始化和重定向
-        // 在 plugins 的第一个插件中
-        function (hook, vm) {
-          hook.init(function () {
-            // 延迟执行，确保 DOM 准备就绪
-            setTimeout(function () {
-              const hash = window.location.hash;
-              const browserLang = (navigator.language || navigator.userLanguage).toLowerCase();
-              const savedLang = localStorage.getItem('docsify-preferred-language');
-
-              let targetLang = savedLang || 'zh-cn';
-              if (!savedLang) {
-                if (browserLang.startsWith('en')) targetLang = 'en';
-                else if (browserLang.startsWith('es')) targetLang = 'es';
-              }
-
-              // 只有当完全没有hash或hash为空时才重定向
-              if (!hash || hash === '#/' || hash === '#') {
-                window.location.hash = '#/' + targetLang + '/';
-              } else if (!hash.includes('/zh-cn/') && !hash.includes('/en/') && !hash.includes('/es/')) {
-                // 如果hash中不包含任何语言前缀，添加检测到的语言
-                const cleanHash = hash.replace(/^#\/?/, '');
-                window.location.hash = '#/' + targetLang + '/' + cleanHash;
-              }
-            }, 0);
-          });
-        },
-
-        // 自动修正侧边栏链接 - 核心插件
-        function (hook, vm) {
-          console.group('[多语言插件] 开始执行');
-          const currentLang = getCurrentLanguage();
-          console.log('🌐 检测到当前语言:', currentLang);
-          console.log('📄 当前路由:', vm.route.path);
-          hook.doneEach(function () {
-            console.log('当前 DOM 中 .app-nav 数量:', document.querySelectorAll('.app-nav').length);
-            const currentLang = getCurrentLanguage();
-
-            // 修正侧边栏链接
-            const sidebar = document.querySelector('.sidebar-nav');
-            // if (sidebar) {
-            //   const links = sidebar.querySelectorAll('a[href]');
-
-            //   links.forEach(link => {
-            //     let href = link.getAttribute('href');
-
-            //     // 只处理相对路径的 markdown 链接
-            //     if (href && !href.startsWith('http') && !href.startsWith('#/')) {
-            //       // 移除开头的 # 或 /
-            //       href = href.replace(/^#?\/?/, '');
-
-            //       // 如果不包含语言前缀，添加当前语言前缀
-            //       if (!href.startsWith(currentLang + '/') &&
-            //         !href.startsWith('zh-cn/') &&
-            //         !href.startsWith('en/') &&
-            //         !href.startsWith('es/')) {
-            //         href = currentLang + '/' + href;
-            //       }
-
-            //       console.log('side bar href: ', href)
-            //       // 设置新的 href
-            //       link.setAttribute('href', '#/' + href);
-            //     }
-            //   });
-            // }
-
-            // 修正导航栏链接
-            // const sidebar = document.querySelector('.sidebar-nav');
-            if (sidebar) {
-              const links = sidebar.querySelectorAll('a[href]');
-              console.log(`找到 ${links.length} 个侧边栏链接`);
-
-              let fixedCount = 0;
-              let skippedCount = 0;
-
-              links.forEach((link, index) => {
-                const originalHref = link.getAttribute('href');
-                let href = originalHref;
-
-                // 跳过外部链接
-                if (!href || href.startsWith('http')) {
-                  console.log(`[${index}] 跳过: ${originalHref}`, {
-                    原因: '外部链接',
-                    语言: currentLang
-                  });
-                  skippedCount++;
-                  return;
+        <script>
+            // 获取当前完整url
+            const MAIN_URL = window.location.href;
+            const extractBaseUrl = (url) => {
+                const hashIndex = url.indexOf("#");
+                if (hashIndex !== -1) {
+                    return url.substring(0, hashIndex);
                 }
-                // 跳过已有语言的链接
-                if (!href || href.startsWith('#/en') || href.startsWith('#/es') || href.startsWith('#/zh-cn')) {
-                  console.log(`[${index}] 跳过: ${originalHref}`, {
-                    原因: '已有语言前缀',
-                    语言: currentLang
-                  });
-                  skippedCount++;
-                  return;
+                return url;
+            };
+
+            const BASE_URL_FOR_HASH_ROUTER = extractBaseUrl(MAIN_URL);
+            console.log("BASE_URL_FOR_HASH_ROUTER:", BASE_URL_FOR_HASH_ROUTER);
+
+            // 获取当前语言
+            function getCurrentLanguage() {
+                const hash = window.location.hash;
+
+                // 方案1：更精确的匹配（推荐）
+                const match = hash.match(/^#\/(zh-cn|en|es)(\/|$)/);
+                if (match && match[1]) {
+                    return match[1];
                 }
 
-                // 清理链接格式
-                href = href.replace(/^#?\/?/, '');
+                // 方案2：使用 includes 但更全面
+                if (hash.startsWith("#/en/") || hash === "#/en") return "en";
+                if (hash.startsWith("#/es/") || hash === "#/es") return "es";
+                if (hash.startsWith("#/zh-cn/") || hash === "#/zh-cn")
+                    return "zh-cn";
 
-                // 检查是否需要添加语言前缀
-                const needsLangPrefix = !href.startsWith(currentLang + '/') &&
-                  !href.startsWith('zh-cn/') &&
-                  !href.startsWith('en/') &&
-                  !href.startsWith('es/');
-
-                if (needsLangPrefix) {
-                  const newHref = currentLang + '/' + href;
-                  link.setAttribute('href', '#/' + newHref);
-                  fixedCount++;
-
-                  console.log(`[${index}] 修复完成:`, {
-                    '原始': originalHref,
-                    '处理后': '#/' + newHref,
-                    '语言': currentLang,
-                    '操作': '添加语言前缀'
-                  });
-
-                  // 调试标记（可选）
-                  // link.style.outline = '2px solid #42b983';
-                  link.title = `已修复: ${originalHref} → ${newHref}`;
-                } else {
-                  // 已有语言前缀但可能缺少 #/
-                  if (!originalHref.startsWith('#/')) {
-                    link.setAttribute('href', '#/' + href);
-                    fixedCount++;
-
-                    console.log(`[${index}] 修复格式:`, {
-                      '原始': originalHref,
-                      '处理后': '#/' + href,
-                      '语言': currentLang,
-                      '操作': '添加#/前缀'
-                    });
-                  } else {
-                    console.log(`[${index}] 无需修改: ${originalHref}`, {
-                      原因: '已包含正确语言前缀',
-                      语言: currentLang
-                    });
-                    skippedCount++;
-                  }
-                }
-              });
-
-              console.log(`侧边栏链接修复统计:`, {
-                '总链接数': links.length,
-                '已修复': fixedCount,
-                '已跳过': skippedCount,
-                '当前语言': currentLang
-              });
+                // 默认值
+                return "zh-cn";
             }
-          });
-        }
-      ]
-    }
 
-    // 语言切换器
-    function addLanguageSwitcher() {
-      if (document.querySelector('.language-switcher')) {
-        return;
-      }
+            window.$docsify = {
+                loadNavbar: true, // 必须为 true
+                debug: true,
+                // 项目信息
+                name: "Hugo Focus",
+                repo: "https://github.com/caoyang2002/hugo-focus",
 
-      const languages = [
-        { code: 'zh-cn', name: '🇨🇳 中文', path: '#/zh-cn/' },
-        { code: 'en', name: '🇺🇸 English', path: '#/en/' },
-        { code: 'es', name: '🇪🇸 Español', path: '#/es/' }
-      ];
+                // 设置默认首页
+                // homepage: 'zh-cn/README.md',
+                homepage: "#",
 
-      const currentLang = getCurrentLanguage();
+                // 不使用 basePath
+                basePath: "/",
 
-      const switcher = document.createElement('div');
-      switcher.className = 'language-switcher';
-      switcher.innerHTML = `
+                // 别名配置
+                alias: {},
+
+                // 加载配置
+                loadSidebar: true,
+                loadNavbar: true,
+                coverpage: true,
+
+                // 搜索配置
+                search: {
+                    maxAge: 86400000,
+                    paths: "auto",
+                    placeholder: {
+                        "/zh-cn/": "搜索",
+                        "/en/": "Search",
+                        "/es/": "Buscar",
+                    },
+                    noData: {
+                        "/zh-cn/": "找不到结果",
+                        "/en/": "No results found",
+                        "/es/": "No se encontraron resultados",
+                    },
+                    depth: 3,
+                    namespace: "hugo-focus-docs",
+                },
+
+                // 其他配置
+                maxLevel: 5,
+                subMaxLevel: 4,
+                sidebarDisplayLevel: 1, // 设置侧边栏初始展开的层级
+                mergeNavbar: true,
+                auto2top: true,
+                relativePath: false,
+
+                // 自定义插件
+                plugins: [
+                    // 初始化和重定向
+                    // 在 plugins 的第一个插件中
+                    function (hook, vm) {
+                        hook.init(function () {
+                            // 延迟执行，确保 DOM 准备就绪
+                            setTimeout(function () {
+                                const hash = window.location.hash;
+                                const browserLang = (
+                                    navigator.language || navigator.userLanguage
+                                ).toLowerCase();
+                                const savedLang = localStorage.getItem(
+                                    "docsify-preferred-language",
+                                );
+
+                                let targetLang = savedLang || "zh-cn";
+                                if (!savedLang) {
+                                    if (browserLang.startsWith("en"))
+                                        targetLang = "en";
+                                    else if (browserLang.startsWith("es"))
+                                        targetLang = "es";
+                                }
+
+                                // 只有当完全没有hash或hash为空时才重定向
+                                if (!hash || hash === "#/" || hash === "#") {
+                                    window.location.hash =
+                                        "#/" + targetLang + "/";
+                                } else if (
+                                    !hash.includes("/zh-cn/") &&
+                                    !hash.includes("/en/") &&
+                                    !hash.includes("/es/")
+                                ) {
+                                    // 如果hash中不包含任何语言前缀，添加检测到的语言
+                                    const cleanHash = hash.replace(/^#\/?/, "");
+                                    window.location.hash =
+                                        "#/" + targetLang + "/" + cleanHash;
+                                }
+                            }, 0);
+                        });
+                    },
+
+                    // 自动修正侧边栏链接 - 核心插件
+                    function (hook, vm) {
+                        console.group("[多语言插件] 开始执行");
+                        const currentLang = getCurrentLanguage();
+                        console.log("🌐 检测到当前语言:", currentLang);
+                        console.log("📄 当前路由:", vm.route.path);
+                        hook.doneEach(function () {
+                            console.log(
+                                "当前 DOM 中 .app-nav 数量:",
+                                document.querySelectorAll(".app-nav").length,
+                            );
+                            const currentLang = getCurrentLanguage();
+
+                            // 修正侧边栏链接
+                            const sidebar =
+                                document.querySelector(".sidebar-nav");
+                            // if (sidebar) {
+                            //   const links = sidebar.querySelectorAll('a[href]');
+
+                            //   links.forEach(link => {
+                            //     let href = link.getAttribute('href');
+
+                            //     // 只处理相对路径的 markdown 链接
+                            //     if (href && !href.startsWith('http') && !href.startsWith('#/')) {
+                            //       // 移除开头的 # 或 /
+                            //       href = href.replace(/^#?\/?/, '');
+
+                            //       // 如果不包含语言前缀，添加当前语言前缀
+                            //       if (!href.startsWith(currentLang + '/') &&
+                            //         !href.startsWith('zh-cn/') &&
+                            //         !href.startsWith('en/') &&
+                            //         !href.startsWith('es/')) {
+                            //         href = currentLang + '/' + href;
+                            //       }
+
+                            //       console.log('side bar href: ', href)
+                            //       // 设置新的 href
+                            //       link.setAttribute('href', '#/' + href);
+                            //     }
+                            //   });
+                            // }
+
+                            // 修正导航栏链接
+                            // const sidebar = document.querySelector('.sidebar-nav');
+                            if (sidebar) {
+                                const links =
+                                    sidebar.querySelectorAll("a[href]");
+                                console.log(
+                                    `找到 ${links.length} 个侧边栏链接`,
+                                );
+
+                                let fixedCount = 0;
+                                let skippedCount = 0;
+
+                                links.forEach((link, index) => {
+                                    const originalHref =
+                                        link.getAttribute("href");
+                                    let href = originalHref;
+
+                                    // 跳过外部链接
+                                    if (!href || href.startsWith("http")) {
+                                        console.log(
+                                            `[${index}] 跳过: ${originalHref}`,
+                                            {
+                                                原因: "外部链接",
+                                                语言: currentLang,
+                                            },
+                                        );
+                                        skippedCount++;
+                                        return;
+                                    }
+                                    // 跳过已有语言的链接
+                                    if (
+                                        !href ||
+                                        href.startsWith("#/en") ||
+                                        href.startsWith("#/es") ||
+                                        href.startsWith("#/zh-cn")
+                                    ) {
+                                        console.log(
+                                            `[${index}] 跳过: ${originalHref}`,
+                                            {
+                                                原因: "已有语言前缀",
+                                                语言: currentLang,
+                                            },
+                                        );
+                                        skippedCount++;
+                                        return;
+                                    }
+
+                                    // 清理链接格式
+                                    href = href.replace(/^#?\/?/, "");
+
+                                    // 检查是否需要添加语言前缀
+                                    const needsLangPrefix =
+                                        !href.startsWith(currentLang + "/") &&
+                                        !href.startsWith("zh-cn/") &&
+                                        !href.startsWith("en/") &&
+                                        !href.startsWith("es/");
+
+                                    if (needsLangPrefix) {
+                                        const newHref =
+                                            currentLang + "/" + href;
+                                        link.setAttribute(
+                                            "href",
+                                            "#/" + newHref,
+                                        );
+                                        fixedCount++;
+
+                                        console.log(`[${index}] 修复完成:`, {
+                                            原始: originalHref,
+                                            处理后: "#/" + newHref,
+                                            语言: currentLang,
+                                            操作: "添加语言前缀",
+                                        });
+
+                                        // 调试标记（可选）
+                                        // link.style.outline = '2px solid #42b983';
+                                        link.title = `已修复: ${originalHref} → ${newHref}`;
+                                    } else {
+                                        // 已有语言前缀但可能缺少 #/
+                                        if (!originalHref.startsWith("#/")) {
+                                            link.setAttribute(
+                                                "href",
+                                                "#/" + href,
+                                            );
+                                            fixedCount++;
+
+                                            console.log(
+                                                `[${index}] 修复格式:`,
+                                                {
+                                                    原始: originalHref,
+                                                    处理后: "#/" + href,
+                                                    语言: currentLang,
+                                                    操作: "添加#/前缀",
+                                                },
+                                            );
+                                        } else {
+                                            console.log(
+                                                `[${index}] 无需修改: ${originalHref}`,
+                                                {
+                                                    原因: "已包含正确语言前缀",
+                                                    语言: currentLang,
+                                                },
+                                            );
+                                            skippedCount++;
+                                        }
+                                    }
+                                });
+
+                                console.log(`侧边栏链接修复统计:`, {
+                                    总链接数: links.length,
+                                    已修复: fixedCount,
+                                    已跳过: skippedCount,
+                                    当前语言: currentLang,
+                                });
+                            }
+                        });
+                    },
+                ],
+            };
+
+            // 语言切换器
+            function addLanguageSwitcher() {
+                if (document.querySelector(".language-switcher")) {
+                    return;
+                }
+
+                const languages = [
+                    { code: "zh-cn", name: "🇨🇳 中文", path: "#/zh-cn/" },
+                    { code: "en", name: "🇺🇸 English", path: "#/en/" },
+                    { code: "es", name: "🇪🇸 Español", path: "#/es/" },
+                ];
+
+                const currentLang = getCurrentLanguage();
+
+                const switcher = document.createElement("div");
+                switcher.className = "language-switcher";
+                switcher.innerHTML = `
         <select class="lang-select">
-          ${languages.map(lang => `
-            <option value="${lang.path}" ${currentLang === lang.code ? 'selected' : ''}>
+          ${languages
+              .map(
+                  (lang) => `
+            <option value="${lang.path}" ${currentLang === lang.code ? "selected" : ""}>
               ${lang.name}
             </option>
-          `).join('')}
+          `,
+              )
+              .join("")}
         </select>
       `;
 
-      const select = switcher.querySelector('select');
-      select.addEventListener('change', function () {
-        const targetPath = this.value;
-        const selectedLang = languages.find(l => l.path === targetPath);
+                const select = switcher.querySelector("select");
+                select.addEventListener("change", function () {
+                    const targetPath = this.value;
+                    const selectedLang = languages.find(
+                        (l) => l.path === targetPath,
+                    );
 
-        if (selectedLang) {
-          localStorage.setItem('docsify-preferred-language', selectedLang.code);
-          window.location.href = targetPath;
-        }
-      });
+                    if (selectedLang) {
+                        localStorage.setItem(
+                            "docsify-preferred-language",
+                            selectedLang.code,
+                        );
+                        window.location.href = targetPath;
+                    }
+                });
 
-      const nav = document.querySelector('.app-nav');
-      if (nav) {
-        nav.appendChild(switcher);
-      }
-      console.log('current lang: ', currentLang)
-    }
-
-    // 拦截文件请求,自动添加语言前缀
-    // 替换原有的 XHR 拦截代码
-    (function () {
-      const originalOpen = XMLHttpRequest.prototype.open;
-
-      XMLHttpRequest.prototype.open = function (method, url) {
-        // 每次请求时实时获取当前语言
-        const currentLang = getCurrentLanguage();
-
-        if (url && typeof url === 'string' && url.includes('.md')) {
-          console.log('[XHR拦截]', {
-            '原始URL': url,
-            '当前语言': currentLang,
-            '时间': new Date().toISOString()
-          });
-          // 特殊文件处理
-          if (url === '/_sidebar.md' || url === '/_navbar.md' ||
-            url === '/_coverpage.md' || url === '/README.md') {
-            url = '/' + currentLang + url;
-            console.log(`特殊文件处理: ${url}`)
-          }
-          // 普通文件处理
-          else if (!url.startsWith('http')) {
-            // 如果是相对路径且不包含任何语言前缀
-            const hasAnyLangPrefix = url.includes('/zh-cn/') ||
-              url.includes('/en/') ||
-              url.includes('/es/');
-
-            if (!hasAnyLangPrefix) {
-              // 确保路径格式正确
-              if (url.startsWith('/')) {
-                url = '/' + currentLang + url;
-              } else {
-                url = '/' + currentLang + '/' + url;
-              }
+                const nav = document.querySelector(".app-nav");
+                if (nav) {
+                    nav.appendChild(switcher);
+                }
+                console.log("current lang: ", currentLang);
             }
-          }
-          console.log('[XHR拦截]', {
-            '处理后URL': url,
-            // '是否修改': originalUrl !== url
-          });
-        }
 
-        return originalOpen.call(this, method, url);
-      };
-    })();
-  </script>
+            // 拦截文件请求,自动添加语言前缀
+            // 替换原有的 XHR 拦截代码
+            (function () {
+                const originalOpen = XMLHttpRequest.prototype.open;
 
-  <!-- Docsify 核心 -->
-  <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
+                XMLHttpRequest.prototype.open = function (method, url) {
+                    // 每次请求时实时获取当前语言
+                    const currentLang = getCurrentLanguage();
 
-  <!-- 插件 -->
-  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/zoom-image.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code/dist/docsify-copy-code.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/docsify-sidebar-collapse.min.js"></script>
-  <!-- 样式 -->
-  <style>
-    .language-switcher {
-      display: inline-block;
-      margin-left: 20px;
-    }
+                    if (url && typeof url === "string" && url.includes(".md")) {
+                        console.log("[XHR拦截]", {
+                            原始URL: url,
+                            当前语言: currentLang,
+                            时间: new Date().toISOString(),
+                        });
+                        // 特殊文件处理
+                        if (
+                            url === "/_sidebar.md" ||
+                            url === "/_navbar.md" ||
+                            url === "/_coverpage.md" ||
+                            url === "/README.md"
+                        ) {
+                            url = "/" + currentLang + url;
+                            console.log(`特殊文件处理: ${url}`);
+                        }
+                        // 普通文件处理
+                        else if (!url.startsWith("http")) {
+                            // 如果是相对路径且不包含任何语言前缀
+                            const hasAnyLangPrefix =
+                                url.includes("/zh-cn/") ||
+                                url.includes("/en/") ||
+                                url.includes("/es/");
 
-    .lang-select {
-      padding: 6px 12px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      background: white;
-      color: #333;
-      font-size: 14px;
-      cursor: pointer;
-      outline: none;
-      transition: all 0.3s ease;
-    }
+                            if (!hasAnyLangPrefix) {
+                                // 确保路径格式正确
+                                if (url.startsWith("/")) {
+                                    url = "/" + currentLang + url;
+                                } else {
+                                    url = "/" + currentLang + "/" + url;
+                                }
+                            }
+                        }
+                        console.log("[XHR拦截]", {
+                            处理后URL: url,
+                            // '是否修改': originalUrl !== url
+                        });
+                    }
 
-    .lang-select:hover {
-      border-color: #42b983;
-    }
+                    return originalOpen.call(this, method, url);
+                };
+            })();
+        </script>
 
-    .lang-select:focus {
-      border-color: #42b983;
-      box-shadow: 0 0 0 2px rgba(66, 185, 131, 0.2);
-    }
+        <!-- Docsify 核心 -->
+        <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
 
-    @media (max-width: 768px) {
-      .language-switcher {
-        margin: 10px 0;
-        width: 100%;
-      }
+        <!-- 插件 -->
+        <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+        <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/zoom-image.min.js"></script>
+        <script src="//cdn.jsdelivr.net/npm/docsify-copy-code/dist/docsify-copy-code.min.js"></script>
+        <script src="//cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/docsify-sidebar-collapse.min.js"></script>
+        <!-- 样式 -->
+        <style>
+            .language-switcher {
+                display: inline-block;
+                margin-left: 20px;
+            }
 
-      .lang-select {
-        width: 100%;
-      }
-    }
-  </style>
-</body>
+            .lang-select {
+                padding: 6px 12px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                background: white;
+                color: #333;
+                font-size: 14px;
+                cursor: pointer;
+                outline: none;
+                transition: all 0.3s ease;
+            }
 
+            .lang-select:hover {
+                border-color: #42b983;
+            }
+
+            .lang-select:focus {
+                border-color: #42b983;
+                box-shadow: 0 0 0 2px rgba(66, 185, 131, 0.2);
+            }
+
+            @media (max-width: 768px) {
+                .language-switcher {
+                    margin: 10px 0;
+                    width: 100%;
+                }
+
+                .lang-select {
+                    width: 100%;
+                }
+            }
+        </style>
+    </body>
 </html>
