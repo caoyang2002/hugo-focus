@@ -1,84 +1,18 @@
 {{ define "main" }}
-<!-- 首页 -->
-<div class="mt-4">
-    <!-- {{ range .Pages }}
-    <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
-    {{ end }} -->
-    <!-- Tag Title -->
-    {{ if and .Title (eq .Type "tags") }}
-    <h1 class="mb-14">#{{ .Title }}</h1>
-    {{ end }}
+<!-- 调试信息（生产环境可删除） -->
+<!-- 页面类型: {{ .Type }}, 首页: {{ .IsHome }}, 布局: {{ .Params.listStyle }}, 文章数: {{ len .Pages }} -->
 
-    <!-- $pages -->
-    {{ $pages := union .RegularPages .Sections }}<!---->
-    {{ if .IsHome }}<!---->
-    {{ $pages = where site.RegularPages "Type" "in" site.Params.mainSections }}<!---->
-    {{ end }}
-
-    <!-- Articles -->
-    {{ $paginator := .Paginate $pages }}
-    <!--  -->
-    {{ range $index, $page := $paginator.Pages }}<!---->
-
-    <section class="relative my-10 first-of-type:mt-0 last-of-type:mb-0">
-        <!-- 置顶：文章的 weight 字段是否大于 0 -->
-        {{ if gt .Weight 0 }}
-        <span class="mb-1 inline-block text-xs tracking-wider text-orange-500">
-            Featured
-        </span>
-        {{ end }}
-        <!-- 普通文章 -->
-        <div>
-            <h2 class="!my-0 flex flex-row">
-                {{ .Title }}
-                <div class="flex flex-col ml-4">
-                    <span
-                        class="text-xs antialiased opacity-60"
-                        style="font-weight: 400; font-size: 0.6rem"
-                    >
-                        分类：{{ delimit (.Params.categories | default
-                        .Site.Params.defaults.categories) ", " }}
-                    </span>
-                    <span
-                        class="text-xs antialiased opacity-60"
-                        style="font-weight: 400; font-size: 0.6rem"
-                    >
-                        标签：{{ delimit (.Params.tags | default
-                        .Site.Params.defaults.tags) ", " }}
-                    </span>
-                </div>
-            </h2>
-            <p class="text-xs antialiased opacity-60 mb-1">
-                {{ .Description | default .Site.Params.defaults.description }}
-            </p>
-        </div>
-        <time class="text-xs antialiased opacity-60"
-            >{{ .Date | time.Format ":date_medium" }}</time
-        >
-        <!-- 保留 title， -->
-        <a
-            class="absolute inset-0"
-            href="{{ .Permalink }}"
-            aria-label="Read more about {{ .Title }}"
-        ></a>
-    </section>
-    {{ end }}
-
-    <!-- Main Nav -->
-    <!-- {{ if gt $paginator.TotalPages 1 }}
-    <nav class="pagination-nav">
-        {{ if $paginator.HasPrev }}
-        <a class="btn" href="{{ $paginator.Prev.URL }}"
-            >← {{ i18n "prev_page" }}</a
-        >
-        123456 {{ end }} {{ if $paginator.HasNext }}
-        <a class="btn" href="{{ $paginator.Next.URL }}"
-            >{{ i18n "next_page" }} →</a
-        >
-        {{ end }}
-    </nav>
-    {{ end }} -->
-
-    {{ partial "page_nav.html" . }}
-</div>
-{{ end }}
+{{- $pageType := .Type -}} {{- $isHome := .IsHome -}}
+<!---->
+{{- $layout := .Params.listStyle | default "default" -}}
+<!---->
+{{- if $isHome -}} {{/* 首页布局 */}}
+<!---->
+{{ partial "list/home-layout.html" . }} {{- else if eq $pageType "tags" -}} {{/*
+标签页布局 */}} {{ partial "list/tag-layout.html" . }} {{- else if eq $pageType
+"categories" -}} {{/* 分类页布局 */}}
+<!---->
+{{ partial "list/category-layout.html" . }} {{- else if eq $layout "docs" -}}
+{{/* 文档/专题布局 */}} {{ partial "list/section-layout.html" . }} {{- else -}}
+{{/* 默认列表布局 */}} {{ partial "list/default-layout.html" . }} {{- end -}} {{
+end }}

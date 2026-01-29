@@ -1,0 +1,17 @@
+{{- /* layouts/partials/list/default-layout.html */ -}}
+<div class="default-list">
+    {{- /* 页面标题 */ -}} {{- if .Title -}}
+
+    <h1 class="text-3xl font-bold mb-2">{{ .Title }}</h1>
+    {{- with .Description -}}
+    <p class="text-gray-600 dark:text-gray-400">{{ . }}</p>
+    {{- end -}} {{- end -}} {{- /* 获取页面列表 */ -}} {{- $pages := union
+    .RegularPages .Sections -}} {{- $paginator := .Paginate $pages -}} {{- /*
+    文章列表 */ -}}
+    <div class="space-y-6">
+        {{- range $paginator.Pages -}} {{ partial
+        "list/article-card-compact.html" . }} {{- end -}}
+    </div>
+
+    {{- /* 分页 */ -}} {{ partial "page_nav.html" . }}
+</div>

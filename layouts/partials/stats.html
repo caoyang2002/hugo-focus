@@ -55,17 +55,19 @@
 
         <!-- 内容部分 -->
         <div class="content-section">
-            <!-- 博客统计 -->
+            <!-- 博客统计：文章数 -->
             <div class="stats-grid">
                 <div class="stat-item">
-                    <!--<a href="{{ `posts` | relLangURL }}">-->
-                    <p class="stat-tag">{{ i18n "total_article_count" }}</p>
-                    <p class="stat-value">
-                        {{ len (where .Site.RegularPages "Section" "posts") }}
-                    </p>
-                    <!--</a>-->
+                    <a href="{{ `posts` | relLangURL }}">
+                        <p class="stat-tag">{{ i18n "total_article_count" }}</p>
+                        <p class="stat-value">
+                            {{ len (where .Site.RegularPages "Section" "posts")
+                            }}
+                        </p>
+                    </a>
                 </div>
 
+                <!-- 博客统计：字数-->
                 <div class="stat-item">
                     <!--<a href="{{ `posts` | relLangURL }}">-->
                     <p class="stat-tag">{{ i18n "total_word_count" }}</p>
@@ -77,27 +79,45 @@
                     <!--</a>-->
                 </div>
 
+                <!-- 博客统计：分类数-->
                 <div class="stat-item">
-                    <!--<a href="{{ `categories` | relLangURL }}">-->
-                    <p class="stat-tag">{{ i18n "total_class_count" }}</p>
-                    <p class="stat-value">
-                        {{ len .Site.Taxonomies.categories }}
-                    </p>
-                    <!--</a>-->
+                    <a href="{{ `categories` | relLangURL }}">
+                        <p class="stat-tag">{{ i18n "total_class_count" }}</p>
+                        <p class="stat-value">
+                            {{ len .Site.Taxonomies.categories }}
+                        </p>
+                    </a>
                 </div>
 
+                <!-- 标签数量-->
                 <div class="stat-item">
-                    <!--<a href="{{ `tags` | relLangURL }}">-->
-                    <p class="stat-tag">{{ i18n "total_tag_count" }}</p>
-                    <p class="stat-value">{{ len .Site.Taxonomies.tags }}</p>
-                    <!--</a>-->
+                    <a href="{{ `tags` | relLangURL }}">
+                        <p class="stat-tag">{{ i18n "total_tag_count" }}</p>
+                        <p class="stat-value">
+                            {{ len .Site.Taxonomies.tags }}
+                        </p>
+                    </a>
                 </div>
             </div>
 
             <!-- 所有分类 -->
+            <!-- 分类折叠组件 -->
             <div class="all-categories">
-                <h3 class="section-title">{{ i18n "all_categorites" }}</h3>
-                <div class="categories-list">
+                <div
+                    class="section-header"
+                    onclick="toggleSection('categories')"
+                    style="cursor: pointer"
+                >
+                    <h3 class="section-title">
+                        {{ i18n "all_categorites" }}
+                        <span class="toggle-icon" id="categories-icon">▼</span>
+                    </h3>
+                </div>
+                <div
+                    class="categories-list"
+                    id="categories-content"
+                    style="display: block"
+                >
                     {{ range $name, $taxonomy := .Site.Taxonomies.categories }}
                     <a
                         class="categories-link"
@@ -109,10 +129,19 @@
                 </div>
             </div>
 
-            <!-- 标签云 -->
+            <!-- 标签云折叠组件 -->
             <div class="tag-cloud">
-                <h3 class="section-title">{{ i18n "all_tags" }}</h3>
-                <div class="tag-list">
+                <div
+                    class="section-header"
+                    onclick="toggleSection('tags')"
+                    style="cursor: pointer"
+                >
+                    <h3 class="section-title">
+                        {{ i18n "all_tags" }}
+                        <span class="toggle-icon" id="tags-icon">▼</span>
+                    </h3>
+                </div>
+                <div class="tag-list" id="tags-content" style="display: block">
                     {{ range $name, $taxonomy := .Site.Taxonomies.tags }} {{
                     $count := .Count }}
                     <a
@@ -673,6 +702,71 @@
     .post-title:is(.dark *):hover {
         color: #fff;
     }
+    /*折叠框*/
+    .section-header {
+        display: flex;
+        align-items: center;
+        /*margin-bottom: 10px;*/
+    }
+    .section-title {
+        margin: 0 0.4rem;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .toggle-icon {
+        font-size: 0.8em;
+        margin-left: 10px;
+        transition: transform 0.2s ease;
+    }
+
+    .categories-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .categories-link {
+        display: inline-block;
+        padding: 4px 12px;
+        background: #f0f0f0;
+        border-radius: 16px;
+        text-decoration: none;
+        color: #333;
+        font-size: 0.9em;
+        transition: background 0.2s;
+    }
+
+    .categories-link:hover {
+        background: #e0e0e0;
+    }
+
+    .tag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .tag-link {
+        display: inline-block;
+        padding: 4px 12px;
+        background: #e3f2fd;
+        border-radius: 16px;
+        text-decoration: none;
+        color: #1976d2;
+        transition: background 0.2s;
+    }
+
+    .tag-link:hover {
+        background: #bbdefb;
+    }
 </style>
 
 <script>
@@ -742,4 +836,48 @@
             }
         }
     }
+
+    // 初始状态（可以设为localStorage记住用户选择）
+    let categoriesCollapsed = false;
+    let tagsCollapsed = false;
+
+    function toggleSection(sectionId) {
+        const content = document.getElementById(`${sectionId}-content`);
+        const icon = document.getElementById(`${sectionId}-icon`);
+
+        if (content.style.display === "none") {
+            // 展开
+            content.style.display = "block";
+            icon.textContent = "▼";
+            if (sectionId === "categories") categoriesCollapsed = false;
+            if (sectionId === "tags") tagsCollapsed = false;
+        } else {
+            // 折叠
+            content.style.display = "none";
+            icon.textContent = "▶";
+            if (sectionId === "categories") categoriesCollapsed = true;
+            if (sectionId === "tags") tagsCollapsed = true;
+        }
+
+        // 可选：保存到localStorage
+        localStorage.setItem("categoriesCollapsed", categoriesCollapsed);
+        localStorage.setItem("tagsCollapsed", tagsCollapsed);
+    }
+
+    // 可选：页面加载时恢复状态
+    document.addEventListener("DOMContentLoaded", function () {
+        categoriesCollapsed =
+            localStorage.getItem("categoriesCollapsed") === "true";
+        tagsCollapsed = localStorage.getItem("tagsCollapsed") === "true";
+
+        if (categoriesCollapsed) {
+            document.getElementById("categories-content").style.display =
+                "none";
+            document.getElementById("categories-icon").textContent = "▶";
+        }
+        if (tagsCollapsed) {
+            document.getElementById("tags-content").style.display = "none";
+            document.getElementById("tags-icon").textContent = "▶";
+        }
+    });
 </script>

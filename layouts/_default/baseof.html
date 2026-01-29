@@ -35,80 +35,89 @@
 {{ end }}<!---->
 {{ end }}<!---->
 
-<html class="not-ready lg:text-base close" style="--bg: {{ $bg_color }}"
+<html
+    class="not-ready lg:text-base close"
+    style="--bg: {{ $bg_color }}"
     lang="{{ or site.LanguageCode site.Language.Lang }}"
-    dir="{{ if site.Params.direction }}{{ site.Params.direction }}{{ else }}ltr{{ end }}">
-<!-- 元数据 -->
-{{ if .Site.Params.backgroundImage }}
-<style>
-    body {
-        background-image: url("{{ .Site.Params.backgroundImage }}");
-        background-repeat: no-repeat;
-        background-position: center center;
-        background-attachment: fixed;
-        background-size: cover;
-        min-height: 100vh;
-    }
+    dir="{{ if site.Params.direction }}{{ site.Params.direction }}{{ else }}ltr{{ end }}"
+>
+    <!-- 元数据 -->
+    {{ if .Site.Params.backgroundImage }}
+    <style>
+        body {
+            background-image: url("{{ .Site.Params.backgroundImage }}");
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
+            background-size: cover;
+            min-height: 100vh;
+        }
 
-    html,
-    body {
-        min-height: 100vh;
-    }
-</style>
-{{else}}
-<style>
-    body {
-        min-height: 100vh;
-        background-color: var(--bg);
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        -webkit-tap-highlight-color: transparent;
-    }
-</style>
+        html,
+        body {
+            min-height: 100vh;
+        }
+    </style>
+    {{else}}
+    <style>
+        body {
+            min-height: 100vh;
+            background-color: var(--bg);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
 
-{{ end }}
-<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-    LA.init({ id: "3L3XAvCJS5maI7j0", ck: "3L3XAvCJS5maI7j0" });
-</script>
-<!--  -->
-{{ partial "head.html" . }}
-
-<body class="text-black duration-200 ease-out dark:text-white">
+    {{ end }}
+    <script
+        charset="UTF-8"
+        id="LA_COLLECT"
+        src="//sdk.51.la/js-sdk-pro.min.js"
+    ></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        LA.init({ id: "3L3XAvCJS5maI7j0", ck: "3L3XAvCJS5maI7j0" });
+    </script>
     <!--  -->
-    {{ partial "header.html" . }}
+    {{ partial "head.html" . }}
 
-    <div class="relative flex justify-start max-w-[90vw] px-8">
-        <!-- <main
+    <body class="text-black duration-200 ease-out dark:text-white">
+        <!--  -->
+        {{ partial "header.html" . }}
+
+        <div class="relative flex justify-start max-w-[90vw] px-8">
+            <!-- <main
                 class="min-h-[calc(100vh-5rem)] py-12 prose prose-neutral flex-1 dark:prose-invert text-left"
             >  -->
-        <main
-            class="min-h-[calc(100vh-5rem)] py-12 prose prose-neutral flex-1 dark:prose-invert text-left max-w-full lg:max-w-4xl xl:max-w-6xl">
-            <!-- <main class="min-h-[calc(100vh-5rem)] py-12 flex-1 test-left bg-red-500"> -->
-            {{ block "main" . }} {{ end }}
-        </main>
-        {{ if .IsHome }}
-        <!-- <div class="hidden lg:block ml-8"> -->
-        <!-- <div class="hidden lg:block fixed right-0 top-0 h-full z-40">
-                {{ partial "homebar.html" . }}
+            <main
+                class="min-h-[calc(100vh-5rem)] py-12 prose prose-neutral flex-1 dark:prose-invert text-left max-w-full lg:max-w-4xl xl:max-w-6xl"
+            >
+                <!-- <main class="min-h-[calc(100vh-5rem)] py-12 flex-1 test-left bg-red-500"> -->
+                {{ block "main" . }} {{ end }}
+            </main>
+            {{ if .IsHome }}
+            <!-- <div class="hidden lg:block ml-8"> -->
+            <!-- <div class="hidden lg:block fixed right-0 top-0 h-full z-40">
+                {{ partial "stats.html" . }}
             </div> -->
 
-        <div class="hidden lg:block fixed right-0 top-0 h-screen w-128 pt-24 pb-24 pr-8 z-40">
-            <div class="h-full overflow-y-auto mt-4">
-                {{ partial "homebar.html" . }}
+            <div
+                class="hidden lg:block fixed right-0 top-0 h-screen w-128 pt-24 pb-24 pr-8 z-40"
+            >
+                <div class="h-full overflow-y-auto mt-4">
+                    {{ partial "stats.html" . }}
+                </div>
             </div>
+            {{else}}
+            <div class="ml-2 mr-4">{{ partial "tocbar.html" . }}</div>
+
+            {{end}}
         </div>
-        {{else}}
-        <div class="ml-2 mr-4">{{ partial "tocbar.html" . }}</div>
 
-        {{end}}
-    </div>
-
-    {{ partial "footer.html" . }}
-    <!-- 在底部引入 Python WASM 支持 -->
-    {{ if .Params.codeRunners }} {{ partial "code_runners.html" . }} {{ end
-    }}
-</body>
-
+        {{ partial "footer.html" . }}
+        <!-- 在底部引入 Python WASM 支持 -->
+        {{ if .Params.codeRunners }} {{ partial "code_runners.html" . }} {{ end
+        }}
+    </body>
 </html>
