@@ -1,0 +1,84 @@
+# 专门部署 Docsify 文档到 GitHub Pages
+name: Deploy Docsify Documentation
+
+on:
+  # 当推送代码到 main 分支且 docs 目录有变化时触发
+  push:
+    branches: ["main"]
+    paths:
+      - 'docs/**'
+      - '.github/workflows/deploy-docsify.yml'
+
+  # 允许手动触发
+  workflow_dispatch:
+
+# 设置权限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 并发控制
+concurrency:
+  group: "docsify-pages"
+  cancel-in-progress: false
+
+jobs:
+  # 构建 Docsify 文档
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Docsify CLI
+        run: npm install -g docsify-cli
+
+      - name: Validate Docsify setup
+        run: |
+          cd docs
+          if [ ! -f "index.html" ]; then
+            echo "Error: index.html not found in docs directory"
+            exit 1
+          fi
+          echo "Docsify setup validated successfully"
+
+      - name: Create deployment directory
+        run: |
+          mkdir -p public_docs
+          cp -r docs/* public_docs/
+          
+          # 添加必要的配置文件
+          echo '' > public_docs/.nojekyll
+          
+          # 如果有 media 目录，确保文件存在
+          if [ ! -d "public_docs/_media" ]; then
+            mkdir -p public_docs/_media
+            # 创建默认图片
+            curl -s -o public_docs/_media/logo.svg "https://via.placeholder.com/150x50/3F51B5/FFFFFF?text=Docsify" || true
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public_docs
+
+  # 部署到 GitHub Pages
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
