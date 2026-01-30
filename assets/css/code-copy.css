@@ -33,3 +33,20 @@ pre {
 .copy-button:hover {
     opacity: 1;
 }
+
+language-flag {
+    font-size: 12px;
+    line-height: 1.5;
+    color: #666;
+    padding: 4px 12px 4px 30px; /* 左侧留出图标空间 */
+    background-color: #f6f8fa;
+    border-radius: 4px 4px 0 0;
+    border: 1px solid #e1e4e8;
+    border-bottom: none;
+    font-weight: 600;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    min-width: 80px;
+    box-sizing: border-box;
+}
