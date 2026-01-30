@@ -1,0 +1,1126 @@
+<!doctype html>
+<!-- 广告营销企业服务 -->
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ .Title }}</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;600;700&display=swap"
+        rel="stylesheet" />
+
+    <style>
+        :root {
+            --primary: #0a0f17;
+            /* 深商务黑，替代原科技灰 */
+            --secondary: #121a29;
+            /* 商务次背景 */
+            --accent: #2563eb;
+            /* 高端商务蓝（主色调） */
+            --accent-warm: #f97316;
+            /* 活力橙（辅助色，用于突出转化） */
+            --accent-green: #10b981;
+            /* 成长绿（用于数据/成果） */
+            --text: #e2e8f0;
+            /* 主文本 */
+            --text-muted: #94a3b8;
+            /* 次文本 */
+            --border: #1e293b;
+            /* 边框色 */
+            --accent-glow: 0 0 15px rgba(37, 99, 235, 0.4);
+            /* 主色调辉光 */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background: var(--primary);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: "JetBrains Mono", monospace;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        /* 商务网格背景（替代原电路板，更贴合广告营销） */
+        .circuit-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background-image:
+                linear-gradient(90deg, rgba(37, 99, 235, 0.04) 1px, transparent 1px),
+                linear-gradient(rgba(37, 99, 235, 0.04) 1px, transparent 1px);
+            background-size: 60px 60px;
+            opacity: 0.6;
+        }
+
+        /* 脉冲点动画（优化为商务蓝，更柔和） */
+        .pulse-dots {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .pulse-dot {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 4s ease-in-out infinite;
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.2;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.8;
+                transform: scale(1.4);
+            }
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Hero区域（广告营销品牌展示，强化视觉冲击） */
+        .hero-section {
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            padding: 4rem 0;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 10vw, 7rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #60a5fa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.03em;
+            animation: fadeInUp 1s ease-out;
+            margin-bottom: 1.5rem;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .subtitle {
+            font-size: clamp(1.1rem, 3vw, 1.5rem);
+            color: var(--text);
+            font-weight: 400;
+            animation: fadeInUp 1.2s ease-out;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            letter-spacing: 0.02em;
+        }
+
+        .hero-desc {
+            font-size: clamp(0.95rem, 2vw, 1.1rem);
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 4rem;
+            animation: fadeInUp 1.4s ease-out;
+            text-align: center;
+        }
+
+        /* 导航按钮（广告营销专属，强化商务质感） */
+        .nav-btn {
+            position: relative;
+            padding: 1rem 2.25rem;
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: "JetBrains Mono", monospace;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .nav-btn::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .nav-btn:hover::after {
+            left: 100%;
+        }
+
+        .nav-btn:hover {
+            background: rgba(37, 99, 235, 0.08);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.2);
+            color: var(--accent);
+        }
+
+        .nav-btn.active {
+            background: rgba(37, 99, 235, 0.15);
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 25px var(--accent-glow);
+        }
+
+        /* 内容卡片（商务化优化，更厚重的质感） */
+        .content-card {
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 3rem;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+        }
+
+        .content-card:hover {
+            border-color: rgba(37, 99, 235, 0.4);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+            transform: translateY(-3px);
+        }
+
+        /* 核心服务网格（广告营销解决方案板块，强化卡片层级） */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .tech-card {
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 2rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .tech-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), #3b82f6, var(--accent));
+            transform: translateX(-100%);
+            transition: transform 0.7s ease;
+        }
+
+        .tech-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .tech-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 28px rgba(37, 99, 235, 0.18);
+            background: rgba(18, 26, 41, 0.95);
+        }
+
+        .tech-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            color: var(--accent);
+        }
+
+        /* 营销资源/案例卡片（广告营销专属，强化左侧标识） */
+        .resource-card {
+            background: var(--secondary);
+            border-left: 4px solid var(--accent);
+            padding: 1.75rem 2rem;
+            margin-bottom: 1.75rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .resource-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 40px;
+            height: 40px;
+            background: rgba(37, 99, 235, 0.05);
+            border-radius: 0 8px 0 100%;
+            transition: width 0.3s ease;
+        }
+
+        .resource-card:hover {
+            background: rgba(37, 99, 235, 0.06);
+            border-left-width: 6px;
+            transform: translateX(10px);
+            box-shadow: -10px 0 25px rgba(37, 99, 235, 0.15);
+        }
+
+        .resource-card:hover::before {
+            width: 100%;
+        }
+
+        .resource-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            cursor: pointer;
+            font-size: 1.05rem;
+        }
+
+        .resource-link:hover {
+            gap: 1rem;
+            color: #60a5fa;
+            text-shadow: 0 0 8px rgba(96, 165, 250, 0.3);
+        }
+
+        /* 标签样式（广告营销专属，分类型配色） */
+        .tag {
+            display: inline-block;
+            padding: 0.35rem 1rem;
+            background: rgba(37, 99, 235, 0.12);
+            color: var(--accent);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 0.75rem;
+            margin-bottom: 0.75rem;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            font-family: "JetBrains Mono", monospace;
+            transition: all 0.2s ease;
+        }
+
+        .tag:hover {
+            background: rgba(37, 99, 235, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .tag.warning {
+            background: rgba(249, 115, 22, 0.12);
+            color: var(--accent-warm);
+            border-color: rgba(249, 115, 22, 0.2);
+        }
+
+        .tag.warning:hover {
+            background: rgba(249, 115, 22, 0.2);
+        }
+
+        .tag.success {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--accent-green);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        .tag.success:hover {
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        /* 联系/咨询按钮（广告营销转化核心，强化视觉） */
+        .contact-info {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 2.5rem;
+            justify-content: center;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.85rem 1.75rem;
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.9rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .contact-item.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .contact-item:hover {
+            border-color: var(--accent);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .contact-item.primary:hover {
+            background: #1d4ed8;
+            box-shadow: 0 6px 25px rgba(37, 99, 235, 0.4);
+        }
+
+        /* 滚动指示器（优化为商务风格） */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2.5s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            50% {
+                transform: translateX(-50%) translateY(10px);
+            }
+        }
+
+        /* 动画（优化延迟，更贴合商务页面节奏） */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(25px);
+            animation: fadeIn 0.7s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stagger-1 {
+            animation-delay: 0.1s;
+        }
+
+        .stagger-2 {
+            animation-delay: 0.2s;
+        }
+
+        .stagger-3 {
+            animation-delay: 0.3s;
+        }
+
+        .stagger-4 {
+            animation-delay: 0.4s;
+        }
+
+        .stagger-5 {
+            animation-delay: 0.5s;
+        }
+
+        /* 响应式（适配广告营销页面多设备展示） */
+        @media (max-width: 768px) {
+            .tech-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .nav-btn {
+                padding: 0.85rem 1.5rem;
+                font-size: 0.85rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .content-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .tech-card {
+                padding: 1.5rem;
+            }
+
+            .contact-info {
+                gap: 1rem;
+            }
+
+            .contact-item {
+                padding: 0.75rem 1.25rem;
+                font-size: 0.85rem;
+            }
+
+            .hero-title {
+                font-size: clamp(2.5rem, 10vw, 4rem);
+            }
+        }
+
+        /* 内容区域切换（保留流畅体验） */
+        .content-section {
+            display: none;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* 强调文本（广告营销页面重点内容突出） */
+        .text-accent {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* 服务板块标题（强化层级） */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-title-icon {
+            font-size: 2.5rem;
+            color: var(--accent);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 商务网格背景层 -->
+    <div class="circuit-bg"></div>
+    <div class="pulse-dots" id="pulseDots"></div>
+
+    <!-- 主内容 -->
+    <div class="content-wrapper">
+        <!-- Hero品牌展示区域（广告营销核心定位） -->
+        <section class="hero-section">
+            <div class="text-center px-6">
+                <h1 class="hero-title">{{ .Title }}</h1>
+                {{ if .Params.bio }}
+                <p class="subtitle">{{ .Params.bio }}</p>
+                {{ end }}
+                {{ if .Params.brand_desc }}
+                <p class="hero-desc">{{ .Params.brand_desc }}</p>
+                {{ end }}
+
+                <!-- 核心转化按钮（广告营销页面重点） -->
+                <div class="contact-info justify-center mt-6">
+                    <a href="#consult" class="contact-item primary">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                                d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z">
+                            </path>
+                        </svg>
+                        <span>立即咨询</span>
+                    </a>
+                    <a href="#case" class="contact-item">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                            <path fill-rule="evenodd"
+                                d="M19 10a9 9 0 11-18 0 9 9 0 0118 0zm-9-3a3 3 0 100 6 3 3 0 000-6z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        <span>查看成功案例</span>
+                    </a>
+                </div>
+
+                <!-- 滚动指示器 -->
+                <div class="scroll-indicator">
+                    <svg class="w-7 h-7 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- 导航栏（广告营销六大核心板块，粘性定位） -->
+        <div class="sticky top-0 z-50 backdrop-blur-xl bg-primary/95 border-b border-border navbar">
+            <div class="max-w-7xl mx-auto px-6 py-4">
+                <div class="flex gap-2 md:gap-4 flex-wrap justify-center">
+                    <button class="nav-btn active" data-section="marketing">📈 企业营销</button>
+                    <button class="nav-btn" data-section="strategy">🎯 企业战略</button>
+                    <button class="nav-btn" data-section="position">📍 企业定位</button>
+                    <button class="nav-btn" data-section="business">⚔️ 商业竞争</button>
+                    <button class="nav-btn" data-section="capital">💹 资本竞争</button>
+                    <button class="nav-btn" data-section="equity">📜 股权设计</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 核心内容区域（六大板块，广告营销专属解决方案） -->
+        <div class="max-w-7xl mx-auto px-6 py-16">
+            <!-- 1. 企业营销板块 -->
+            <section id="marketing" class="content-section active">
+                <div class="content-card fade-in">
+                    <div class="section-title">
+                        <span class="section-title-icon">📈</span>
+                        <h2 class="text-3xl md:text-4xl">企业营销解决方案</h2>
+                    </div>
+                    <p class="text-text-muted mb-8 text-lg">以数据驱动为核心，打造全链路营销体系，实现品牌曝光、流量转化、客户沉淀的闭环增长，适配不同行业企业的营销需求。</p>
+
+                    <div class="tech-grid">
+                        {{ range .Params.marketing }}
+                        <div class="tech-card fade-in stagger-{{ .stagger }}">
+                            <div class="tech-icon">{{ .icon }}</div>
+                            <h3 class="text-xl font-bold mb-3">{{ .name }}</h3>
+                            <p class="text-text-muted mb-4 flex-grow">{{ .description }}</p>
+                            {{ if .core_points }}
+                            <ul class="space-y-2 text-sm mb-4">
+                                {{ range .core_points }}
+                                <li class="flex items-start gap-2">
+                                    <span class="text-accent mt-1">▸</span>
+                                    <span>{{ . }}</span>
+                                </li>
+                                {{ end }}
+                            </ul>
+                            {{ end }}
+                            {{ if .tools }}
+                            <div class="mt-auto pt-3">
+                                <h4 class="font-semibold mb-2 text-sm text-text-muted">核心工具/方法</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    {{ range .tools }}
+                                    <span class="tag">{{ . }}</span>
+                                    {{ end }}
+                                </div>
+                            </div>
+                            {{ end }}
+                        </div>
+                        {{ end }}
+                    </div>
+
+                    <!-- 营销成功案例 -->
+                    <div class="mt-12 fade-in stagger-5" id="case">
+                        <h3 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            营销经典案例
+                        </h3>
+                        {{ range .Params.marketing_cases }}
+                        <div class="resource-card fade-in">
+                            <h4 class="text-lg font-semibold mb-2">{{ .name }}</h4>
+                            <p class="text-text-muted mb-3">{{ .description }}</p>
+                            <div class="flex flex-wrap gap-2 mb-3">
+                                {{ range .tags }}
+                                <span class="tag success">{{ . }}</span>
+                                {{ end }}
+                            </div>
+                            <a href="{{ .url }}" class="resource-link" target="_blank" rel="noopener">
+                                查看案例详情
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                </svg>
+                            </a>
+                        </div>
+                        {{ end }}
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. 企业战略板块 -->
+            <section id="strategy" class="content-section">
+                <div class="content-card fade-in">
+                    <div class="section-title">
+                        <span class="section-title-icon">🎯</span>
+                        <h2 class="text-3xl md:text-4xl">企业战略规划服务</h2>
+                    </div>
+                    <p class="text-text-muted mb-8 text-lg">基于行业趋势与企业核心能力，制定从短期落地到长期发展的战略体系，明确发展方向、资源配置、执行路径，护航企业可持续增长。
+                    </p>
+
+                    <div class="tech-grid">
+                        {{ range .Params.strategy }}
+                        <div class="tech-card fade-in stagger-{{ .stagger }}">
+                            <div class="tech-icon">{{ .icon }}</div>
+                            <h3 class="text-xl font-bold mb-3">{{ .name }}</h3>
+                            <p class="text-text-muted mb-4 flex-grow">{{ .description }}</p>
+                            {{ if .core_points }}
+                            <ul class="space-y-2 text-sm mb-4">
+                                {{ range .core_points }}
+                                <li class="flex items-start gap-2">
+                                    <span class="text-accent mt-1">▸</span>
+                                    <span>{{ . }}</span>
+                                </li>
+                                {{ end }}
+                            </ul>
+                            {{ end }}
+                            {{ if .tools }}
+                            <div class="mt-auto pt-3">
+                                <h4 class="font-semibold mb-2 text-sm text-text-muted">战略工具模型</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    {{ range .tools }}
+                                    <span class="tag">{{ . }}</span>
+                                    {{ end }}
+                                </div>
+                            </div>
+                            {{ end }}
+                        </div>
+                        {{ end }}
+                    </div>
+
+                    <!-- 战略咨询服务 -->
+                    <div class="mt-12 fade-in stagger-5">
+                        <h3 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            专属战略咨询
+                        </h3>
+                        <div class="resource-card fade-in">
+                            <h4 class="text-lg font-semibold mb-3">企业战略定制化咨询服务</h4>
+                            <p class="text-text-muted mb-4">
+                                一对一深度沟通，结合企业现状、行业竞争格局、市场趋势，为企业量身定制战略规划方案，包含战略定位、目标拆解、执行计划、效果评估全流程。</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="tag warning">一对一服务</span>
+                                <span class="tag warning">定制化方案</span>
+                                <span class="tag warning">落地指导</span>
+                            </div>
+                            <a href="#consult" class="resource-link">
+                                预约战略咨询
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. 企业定位板块 -->
+            <section id="position" class="content-section">
+                <div class="content-card fade-in">
+                    <div class="section-title">
+                        <span class="section-title-icon">📍</span>
+                        <h2 class="text-3xl md:text-4xl">企业精准定位体系</h2>
+                    </div>
+                    <p class="text-text-muted mb-8 text-lg">摆脱同质化竞争，挖掘企业核心差异化价值，从品牌、产品、用户、市场四个维度实现精准定位，让企业在用户心智中占据独特位置。
+                    </p>
+
+                    <div class="tech-grid">
+                        {{ range .Params.position }}
+                        <div class="tech-card fade-in stagger-{{ .stagger }}">
+                            <div class="tech-icon">{{ .icon }}</div>
+                            <h3 class="text-xl font-bold mb-3">{{ .name }}</h3>
+                            <p class="text-text-muted mb-4 flex-grow">{{ .description }}</p>
+                            {{ if .core_points }}
+                            <ul class="space-y-2 text-sm mb-4">
+                                {{ range .core_points }}
+                                <li class="flex items-start gap-2">
+                                    <span class="text-accent mt-1">▸</span>
+                                    <span>{{ . }}</span>
+                                </li>
+                                {{ end }}
+                            </ul>
+                            {{ end }}
+                            {{ if .tools }}
+                            <div class="mt-auto pt-3">
+                                <h4 class="font-semibold mb-2 text-sm text-text-muted">定位方法工具</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    {{ range .tools }}
+                                    <span class="tag">{{ . }}</span>
+                                    {{ end }}
+                                </div>
+                            </div>
+                            {{ end }}
+                        </div>
+                        {{ end }}
+                    </div>
+
+                    <!-- 定位诊断工具 -->
+                    <div class="mt-12 fade-in stagger-5">
+                        <h3 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                </path>
+                            </svg>
+                            企业定位免费诊断
+                        </h3>
+                        <div class="resource-card fade-in">
+                            <h4 class="text-lg font-semibold mb-3">企业定位现状诊断与优化建议</h4>
+                            <p class="text-text-muted mb-4">填写企业基础信息，我们将从行业竞争、用户认知、品牌价值、产品特色四个维度进行免费定位诊断，输出诊断报告及初步优化建议。
+                            </p>
+                            <a href="#consult" class="resource-link">
+                                立即参与诊断
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. 商业竞争板块 -->
+            <section id="business" class="content-section">
+                <div class="content-card fade-in">
+                    <div class="section-title">
+                        <span class="section-title-icon">⚔️</span>
+                        <h2 class="text-3xl md:text-4xl">商业竞争破局策略</h2>
+                    </div>
+                    <p class="text-text-muted mb-8 text-lg">
+                        深度分析行业竞争格局与竞争对手优劣势，制定差异化竞争、低成本竞争、价值竞争等策略，帮助企业在红海中找到蓝海，构建核心竞争壁垒。</p>
+
+                    <div class="tech-grid">
+                        {{ range .Params.business }}
+                        <div class="tech-card fade-in stagger-{{ .stagger }}">
+                            <div class="tech-icon">{{ .icon }}</div>
+                            <h3 class="text-xl font-bold mb-3">{{ .name }}</h3>
+                            <p class="text-text-muted mb-4 flex-grow">{{ .description }}</p>
+                            {{ if .core_points }}
+                            <ul class="space-y-2 text-sm mb-4">
+                                {{ range .core_points }}
+                                <li class="flex items-start gap-2">
+                                    <span class="text-accent mt-1">▸</span>
+                                    <span>{{ . }}</span>
+                                </li>
+                                {{ end }}
+                            </ul>
+                            {{ end }}
+                            {{ if .tools }}
+                            <div class="mt-auto pt-3">
+                                <h4 class="font-semibold mb-2 text-sm text-text-muted">竞争分析工具</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    {{ range .tools }}
+                                    <span class="tag">{{ . }}</span>
+                                    {{ end }}
+                                </div>
+                            </div>
+                            {{ end }}
+                        </div>
+                        {{ end }}
+                    </div>
+
+                    <!-- 竞争壁垒构建 -->
+                    <div class="mt-12 fade-in stagger-5">
+                        <h3 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            核心竞争壁垒构建方案
+                        </h3>
+                        <div class="resource-card fade-in">
+                            <h4 class="text-lg font-semibold mb-3">企业专属竞争壁垒打造服务</h4>
+                            <p class="text-text-muted mb-4">
+                                结合企业自身资源与能力，从技术、品牌、渠道、用户、成本等维度，打造竞争对手难以复制的核心竞争壁垒，实现从“参与竞争”到“引领竞争”的升级。</p>
+                            <a href="#consult" class="resource-link">
+                                定制竞争方案
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. 资本竞争板块 -->
+            <section id="capital" class="content-section">
+                <div class="content-card fade-in">
+                    <div class="section-title">
+                        <span class="section-title-icon">💹</span>
+                        <h2 class="text-3xl md:text-4xl">资本竞争赋能体系</h2>
+                    </div>
+                    <p class="text-text-muted mb-8 text-lg">
+                        为企业提供资本层面的竞争策略，涵盖融资规划、估值提升、资本运作、产业链整合等服务，帮助企业借助资本力量实现快速扩张，提升行业话语权。</p>
+
+                    <div class="tech-grid">
+                        {{ range .Params.capital }}
+                        <div class="tech-card fade-in stagger-{{ .stagger }}">
+                            <div class="tech-icon">{{ .icon }}</div>
+                            <h3 class="text-xl font-bold mb-3">{{ .name }}</h3>
+                            <p class="text-text-muted mb-4 flex-grow">{{ .description }}</p>
+                            {{ if .core_points }}
+                            <ul class="space-y-2 text-sm mb-4">
+                                {{ range .core_points }}
+                                <li class="flex items-start gap-2">
+                                    <span class="text-accent mt-1">▸</span>
+                                    <span>{{ . }}</span>
+                                </li>
+                                {{ end }}
+                            </ul>
+                            {{ end }}
+                            {{ if .tools }}
+                            <div class="mt-auto pt-3">
+                                <h4 class="font-semibold mb-2 text-sm text-text-muted">资本工具/渠道</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    {{ range .tools }}
+                                    <span class="tag">{{ . }}</span>
+                                    {{ end }}
+                                </div>
+                            </div>
+                            {{ end }}
+                        </div>
+                        {{ end }}
+                    </div>
+
+                    <!-- 融资对接服务 -->
+                    <div class="mt-12 fade-in stagger-5">
+                        <h3 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
+                            </svg>
+                            资本对接专属服务
+                        </h3>
+                        <div class="resource-card fade-in">
+                            <h4 class="text-lg font-semibold mb-3">企业融资规划与投资方对接</h4>
+                            <p class="text-text-muted mb-4">
+                                拥有丰富的天使轮、A/B/C轮、Pre-IPO等各阶段投资方资源，为企业制定专业融资规划、优化商业计划书、对接匹配投资方，提升融资成功率。</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="tag warning">BP优化</span>
+                                <span class="tag warning">投资方对接</span>
+                                <span class="tag warning">估值辅导</span>
+                            </div>
+                            <a href="#consult" class="resource-link">
+                                对接资本资源
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z">
+                                    </path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. 股权设计板块 -->
+            <section id="equity" class="content-section">
+                <div class="content-card fade-in">
+                    <div class="section-title">
+                        <span class="section-title-icon">📜</span>
+                        <h2 class="text-3xl md:text-4xl">企业股权设计与激励</h2>
+                    </div>
+                    <p class="text-text-muted mb-8 text-lg">
+                        基于企业发展阶段与战略目标，设计科学合理的股权架构，制定核心团队股权激励方案，实现绑定核心人才、吸引外部投资、保障企业稳定发展的多重目标。</p>
+
+                    <div class="tech-grid">
+                        {{ range .Params.equity }}
+                        <div class="tech-card fade-in stagger-{{ .stagger }}">
+                            <div class="tech-icon">{{ .icon }}</div>
+                            <h3 class="text-xl font-bold mb-3">{{ .name }}</h3>
+                            <p class="text-text-muted mb-4 flex-grow">{{ .description }}</p>
+                            {{ if .core_points }}
+                            <ul class="space-y-2 text-sm mb-4">
+                                {{ range .core_points }}
+                                <li class="flex items-start gap-2">
+                                    <span class="text-accent mt-1">▸</span>
+                                    <span>{{ . }}</span>
+                                </li>
+                                {{ end }}
+                            </ul>
+                            {{ end }}
+                            {{ if .tools }}
+                            <div class="mt-auto pt-3">
+                                <h4 class="font-semibold mb-2 text-sm text-text-muted">设计工具/模式</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    {{ range .tools }}
+                                    <span class="tag">{{ . }}</span>
+                                    {{ end }}
+                                </div>
+                            </div>
+                            {{ end }}
+                        </div>
+                        {{ end }}
+                    </div>
+
+                    <!-- 免费咨询入口（页面核心转化点） -->
+                    <div class="mt-12 fade-in stagger-5" id="consult">
+                        <h3 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                            <svg class="w-6 h-6 text-accent-green" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            一对一专属咨询服务
+                        </h3>
+                        <div class="resource-card fade-in" style="border-left-color: var(--accent-green);">
+                            <h4 class="text-lg font-semibold mb-3 text-accent-green">企业营销/战略/股权一站式解决方案咨询</h4>
+                            <p class="text-text-muted mb-5">
+                                我们拥有10年以上企业服务经验的专业团队，为您提供企业营销、战略规划、定位布局、商业竞争、资本运作、股权设计的一站式咨询服务，助力企业突破发展瓶颈，实现跨越式增长。</p>
+                            <div
+                                class="contact-info justify-start p-4 bg-primary/50 border border-border rounded-8 gap-3 flex-wrap">
+                                <a href="tel:{{ .Params.phone }}" class="contact-item w-full md:w-auto">
+                                    <svg class="w-5 h-5 text-accent-green" fill="currentColor" viewBox="0 0 20 20">
+                                        <path
+                                            d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z">
+                                        </path>
+                                    </svg>
+                                    <span>电话咨询：{{ .Params.phone }}</span>
+                                </a>
+                                <a href="weixin://dl/chat?{{ .Params.wechat }}" class="contact-item w-full md:w-auto">
+                                    <svg class="w-5 h-5 text-accent-green" fill="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                            d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178A1.17 1.17 0 014.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178 1.17 1.17 0 01-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 01.598.082l1.584.926a.272.272 0 00.14.047c.134 0 .24-.111.24-.247 0-.06-.023-.12-.038-.177l-.327-1.233a.582.582 0 01.181-.556c1.543-1.102 2.587-2.76 2.587-4.67 0-3.305-3.247-6.071-7.15-6.071zm-2.39 3.057c.534 0 .967.432.967.964a.965.965 0 01-.967.964.965.965 0 01-.967-.964c0-.532.433-.964.967-.964zm4.78 0c.533 0 .966.432.966.964a.965.965 0 01-.967.964.965.965 0 01-.966-.964c0-.532.433-.964.966-.964z">
+                                        </path>
+                                    </svg>
+                                    <span>微信咨询：{{ .Params.wechat }}</span>
+                                </a>
+                                <a href="mailto:{{ .Params.email }}" class="contact-item w-full md:w-auto">
+                                    <svg class="w-5 h-5 text-accent-green" fill="currentColor" viewBox="0 0 20 20">
+                                        <path
+                                            d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z">
+                                        </path>
+                                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                                    </svg>
+                                    <span>邮件咨询：{{ .Params.email }}</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // 生成商务风格脉冲点
+        function createPulseDots() {
+            const container = document.getElementById('pulseDots');
+            const dotCount = 20; // 增加点数，强化商务科技感
+
+            for (let i = 0; i < dotCount; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'pulse-dot';
+                dot.style.left = Math.random() * 100 + '%';
+                dot.style.top = Math.random() * 100 + '%';
+                dot.style.animationDelay = Math.random() * 4 + 's';
+                container.appendChild(dot);
+            }
+        }
+
+        // 导航功能（广告营销板块切换，优化滚动体验）
+        document.addEventListener("DOMContentLoaded", function () {
+            createPulseDots();
+
+            const navButtons = document.querySelectorAll(".nav-btn");
+            const contentSections = document.querySelectorAll(".content-section");
+
+            navButtons.forEach((button) => {
+                button.addEventListener("click", function () {
+                    const targetSection = this.dataset.section;
+
+                    // 切换导航激活状态
+                    navButtons.forEach((btn) => btn.classList.remove("active"));
+                    this.classList.add("active");
+
+                    // 切换内容板块
+                    contentSections.forEach((section) => {
+                        if (section.id === targetSection) {
+                            section.classList.add("active");
+                        } else {
+                            section.classList.remove("active");
+                        }
+                    });
+
+                    // 平滑滚动到导航栏下方，保证内容完整展示
+                    window.scrollTo({
+                        top: document.querySelector(".navbar").offsetTop + document.querySelector(".navbar").offsetHeight + 20,
+                        behavior: "smooth",
+                    });
+                });
+            });
+
+            // 滚动动画观察器（优化触发时机，更贴合商务页面）
+            const observerOptions = {
+                threshold: 0.05,
+                rootMargin: "0px 0px -60px 0px",
+            };
+
+            const observer = new IntersectionObserver(function (entries) {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = "1";
+                        entry.target.style.transform = "translateY(0)";
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll(".fade-in").forEach((el) => observer.observe(el));
+
+            // 锚点平滑滚动（解决咨询/案例锚点跳转生硬问题）
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 100,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

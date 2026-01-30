@@ -1,0 +1,740 @@
+<!doctype html>
+<!-- 视觉创意 -->
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ .Title }}</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;600;700&display=swap"
+        rel="stylesheet" />
+
+    <style>
+        :root {
+            --primary: #0d1117;
+            --secondary: #161b22;
+            --accent: #58a6ff;
+            --accent-warm: #f85149;
+            --accent-green: #3fb950;
+            --text: #c9d1d9;
+            --text-muted: #8b949e;
+            --border: #30363d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background: var(--primary);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: "JetBrains Mono", monospace;
+        }
+
+        /* 电路板背景动画 */
+        .circuit-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background-image:
+                linear-gradient(90deg, rgba(88, 166, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(rgba(88, 166, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.5;
+        }
+
+        /* 脉冲点动画 */
+        .pulse-dots {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .pulse-dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 3s ease-in-out infinite;
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.5);
+            }
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Hero区域 */
+        .hero-section {
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 6rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #58a6ff 0%, #3fb950 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .subtitle {
+            font-size: clamp(0.9rem, 2vw, 1.2rem);
+            color: var(--text-muted);
+            font-weight: 300;
+            animation: fadeInUp 1.2s ease-out;
+            letter-spacing: 0.03em;
+        }
+
+        /* 按钮样式 */
+        .nav-btn {
+            position: relative;
+            padding: 0.875rem 2rem;
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            color: var(--accent);
+            font-family: "JetBrains Mono", monospace;
+            font-weight: 500;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+        }
+
+        .nav-btn:hover {
+            background: rgba(88, 166, 255, 0.1);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(88, 166, 255, 0.2);
+        }
+
+        .nav-btn.active {
+            background: rgba(88, 166, 255, 0.15);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(88, 166, 255, 0.3);
+        }
+
+        /* 内容卡片 */
+        .content-card {
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .content-card:hover {
+            border-color: rgba(88, 166, 255, 0.3);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 技术卡片网格 */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .tech-card {
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.75rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tech-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .tech-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .tech-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: 0 8px 24px rgba(88, 166, 255, 0.15);
+        }
+
+        .tech-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        /* 资源链接卡片 */
+        .resource-card {
+            background: var(--secondary);
+            border-left: 3px solid var(--accent);
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .resource-card:hover {
+            background: rgba(88, 166, 255, 0.05);
+            border-left-width: 5px;
+            transform: translateX(8px);
+            box-shadow: -8px 0 20px rgba(88, 166, 255, 0.15);
+        }
+
+        .resource-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .resource-link:hover {
+            gap: 0.875rem;
+            color: #79c0ff;
+        }
+
+        /* 标签样式 */
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: rgba(88, 166, 255, 0.1);
+            color: var(--accent);
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid rgba(88, 166, 255, 0.2);
+            font-family: "JetBrains Mono", monospace;
+        }
+
+        .tag.warning {
+            background: rgba(248, 81, 73, 0.1);
+            color: var(--accent-warm);
+            border-color: rgba(248, 81, 73, 0.2);
+        }
+
+        .tag.success {
+            background: rgba(63, 185, 80, 0.1);
+            color: var(--accent-green);
+            border-color: rgba(63, 185, 80, 0.2);
+        }
+
+        /* 联系信息 */
+        .contact-info {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            padding: 0.625rem 1.25rem;
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.85rem;
+        }
+
+        .contact-item:hover {
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(88, 166, 255, 0.15);
+        }
+
+        /* 滚动指示器 */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            50% {
+                transform: translateX(-50%) translateY(8px);
+            }
+        }
+
+        /* 动画 */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stagger-1 {
+            animation-delay: 0.1s;
+        }
+
+        .stagger-2 {
+            animation-delay: 0.2s;
+        }
+
+        .stagger-3 {
+            animation-delay: 0.3s;
+        }
+
+        .stagger-4 {
+            animation-delay: 0.4s;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .tech-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-btn {
+                padding: 0.75rem 1.25rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* 内容区域切换 */
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* 代码块样式 */
+        code {
+            font-family: "JetBrains Mono", monospace;
+            background: rgba(88, 166, 255, 0.1);
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-size: 0.9em;
+            color: var(--accent);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 背景层 -->
+    <div class="circuit-bg"></div>
+    <div class="pulse-dots" id="pulseDots"></div>
+
+    <!-- 主内容 -->
+    <div class="content-wrapper">
+        <!-- Hero区域 -->
+        <section class="hero-section">
+            <div class="text-center px-6">
+                <h1 class="hero-title">{{ .Title }}</h1>
+                {{ if .Params.bio }}
+                <p class="subtitle mt-6">{{ .Params.bio }}</p>
+                {{ end }}
+
+                <!-- 联系信息 -->
+                <div class="contact-info justify-center mt-8">
+                    {{ if .Params.email }}
+                    <div class="contact-item">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                        </svg>
+                        <span>{{ .Params.email }}</span>
+                    </div>
+                    {{ end }}
+                    {{ if .Params.wechat }}
+                    <div class="contact-item">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178A1.17 1.17 0 014.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178 1.17 1.17 0 01-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 01.598.082l1.584.926a.272.272 0 00.14.047c.134 0 .24-.111.24-.247 0-.06-.023-.12-.038-.177l-.327-1.233a.582.582 0 01.181-.556c1.543-1.102 2.587-2.76 2.587-4.67 0-3.305-3.247-6.071-7.15-6.071zm-2.39 3.057c.534 0 .967.432.967.964a.965.965 0 01-.967.964.965.965 0 01-.967-.964c0-.532.433-.964.967-.964zm4.78 0c.533 0 .966.432.966.964a.965.965 0 01-.967.964.965.965 0 01-.966-.964c0-.532.433-.964.966-.964z">
+                            </path>
+                        </svg>
+                        <span>{{ .Params.wechat }}</span>
+                    </div>
+                    {{ end }}
+                </div>
+
+                <!-- 动作按钮 -->
+                {{ if .Params.actions }}
+                <div class="contact-info justify-center mt-8">
+                    <div class="flex flex-wrap justify-center gap-4">
+                        {{ range .Params.actions }}
+                        <a href="{{ .url }}" target="{{ .target }}" class="contact-item">
+                            {{ if eq .name "查看专题" }}
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                </path>
+                            </svg>
+                            {{ else if eq .name "返回博客" }}
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z">
+                                </path>
+                            </svg>
+                            {{ else }}
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                            </svg>
+                            {{ end }}
+                            <span>{{ .name }}</span>
+                        </a>
+                        {{ end }}
+                    </div>
+                </div>
+                {{ end }}
+
+                <!-- 滚动指示器 -->
+                <div class="scroll-indicator">
+                    <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- 导航栏 -->
+        <div class="sticky top-0 z-50 backdrop-blur-xl bg-primary/90 border-b border-border navbar">
+            <div class="max-w-7xl mx-auto px-6 py-4">
+                <div class="flex gap-3 flex-wrap justify-center">
+                    <button class="nav-btn active" data-section="resources">📚 学习资源</button>
+                    <button class="nav-btn" data-section="hardware">🎨 核心领域</button>
+                    <button class="nav-btn" data-section="software">🛠️ 设计工具</button>
+                    <button class="nav-btn" data-section="tools">📊 技术应用</button>
+                    <button class="nav-btn" data-section="community">👥 赛事社区</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 内容区域 -->
+        <div class="max-w-7xl mx-auto px-6 py-16">
+            <!-- 学习资源区域 -->
+            <section id="resources" class="content-section active">
+                <div class="content-card fade-in">
+                    <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                        <span class="text-4xl">📚</span>
+                        <span>视觉创意领域学习资源</span>
+                    </h2>
+
+                    {{ range .Params.resources }}
+                    <div class="resource-card fade-in">
+                        <h3 class="text-xl font-semibold mb-2">
+                            <a href="{{ .url }}" class="resource-link" target="_blank" rel="noopener">
+                                {{ .name }}
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                </svg>
+                            </a>
+                        </h3>
+                        {{ if .description }}
+                        <p class="text-text-muted mb-3 text-sm">{{ .description }}</p>
+                        {{ end }}
+                        {{ if .tags }}
+                        <div class="flex flex-wrap gap-2">
+                            {{ range .tags }}
+                            <span class="tag">{{ . }}</span>
+                            {{ end }}
+                        </div>
+                        {{ end }}
+                    </div>
+                    {{ end }}
+                </div>
+            </section>
+
+            <!-- 核心领域区域（原硬件架构） -->
+            <section id="hardware" class="content-section">
+                <div class="content-card fade-in">
+                    <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                        <span class="text-4xl">🎨</span>
+                        <span>视觉创意核心领域</span>
+                    </h2>
+                    <div class="tech-grid">
+                        {{ range .Params.fields }}
+                        <div class="tech-card fade-in">
+                            <div class="tech-icon">{{ .icon }}</div>
+                            <h3 class="text-lg font-bold mb-2">{{ .name }}</h3>
+                            <p class="text-text-muted mb-4 text-sm">{{ .description }}</p>
+                            {{ if .details }}
+                            <ul class="space-y-2 text-sm mb-4">
+                                {{ range .details }}
+                                <li class="flex items-start gap-2">
+                                    <span class="text-accent mt-1">▸</span>
+                                    <span>{{ . }}</span>
+                                </li>
+                                {{ end }}
+                            </ul>
+                            {{ end }}
+                            {{ if .resources }}
+                            <div class="mt-4">
+                                <h4 class="font-semibold mb-2 text-sm">核心工具</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    {{ range .resources }}
+                                    <a href="{{ .url }}" class="tag success" target="_blank" rel="noopener">
+                                        {{ .name }}
+                                    </a>
+                                    {{ end }}
+                                </div>
+                            </div>
+                            {{ end }}
+                        </div>
+                        {{ end }}
+                    </div>
+                </div>
+            </section>
+
+            <!-- 设计工具区域（原软件系统） -->
+            <section id="software" class="content-section">
+                <div class="content-card fade-in">
+                    <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                        <span class="text-4xl">🛠️</span>
+                        <span>视觉创意设计工具链</span>
+                    </h2>
+                    <div class="tech-grid">
+                        {{ range .Params.tools }}
+                        <div class="tech-card fade-in">
+                            <div class="tech-icon">{{ .icon }}</div>
+                            <h3 class="text-lg font-bold mb-2">{{ .name }}</h3>
+                            <p class="text-text-muted mb-4 text-sm">{{ .description }}</p>
+                            {{ if .details }}
+                            <ul class="space-y-2 text-sm mb-4">
+                                {{ range .details }}
+                                <li class="flex items-start gap-2">
+                                    <span class="text-accent mt-1">▸</span>
+                                    <span>{{ . }}</span>
+                                </li>
+                                {{ end }}
+                            </ul>
+                            {{ end }}
+                            {{ if .examples }}
+                            <div class="mt-4">
+                                <h4 class="font-semibold mb-2 text-sm">适用场景</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    {{ range .examples }}
+                                    <span class="tag warning">{{ . }}</span>
+                                    {{ end }}
+                                </div>
+                            </div>
+                            {{ end }}
+                        </div>
+                        {{ end }}
+                    </div>
+                </div>
+            </section>
+
+            <!-- 技术应用区域（原开发工具） -->
+            <section id="tools" class="content-section">
+                <div class="content-card fade-in">
+                    <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                        <span class="text-4xl">📊</span>
+                        <span>视觉创意技术应用场景</span>
+                    </h2>
+                    <div class="tech-grid">
+                        {{ range .Params.applications }}
+                        <div class="tech-card fade-in">
+                            <div class="tech-icon">{{ .icon }}</div>
+                            <h3 class="text-lg font-bold mb-2">{{ .name }}</h3>
+                            <p class="text-text-muted mb-4 text-sm">{{ .description }}</p>
+                            {{ if .tools_list }}
+                            <ul class="space-y-2 text-sm">
+                                {{ range .tools_list }}
+                                <li class="flex items-start gap-2">
+                                    <span class="text-accent-green mt-1">✓</span>
+                                    <span>{{ . }}</span>
+                                </li>
+                                {{ end }}
+                            </ul>
+                            {{ end }}
+                        </div>
+                        {{ end }}
+                    </div>
+                </div>
+            </section>
+
+            <!-- 赛事社区区域（原技术社区） -->
+            <section id="community" class="content-section">
+                <div class="content-card fade-in">
+                    <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                        <span class="text-4xl">👥</span>
+                        <span>视觉创意赛事与交流社区</span>
+                    </h2>
+                    <div class="tech-grid">
+                        {{ range .Params.communities }}
+                        <div class="tech-card fade-in">
+                            <div class="tech-icon">{{ .icon }}</div>
+                            <h3 class="text-lg font-bold mb-2">{{ .name }}</h3>
+                            <p class="text-text-muted mb-4 text-sm">{{ .description }}</p>
+                            {{ if .url }}
+                            <a href="{{ .url }}" class="resource-link text-sm" target="_blank" rel="noopener">
+                                进入{{ if .is_competition }}赛事{{ else }}社区{{ end }}
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14">
+                                    </path>
+                                </svg>
+                            </a>
+                            {{ end }}
+                        </div>
+                        {{ end }}
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // 生成脉冲点
+        function createPulseDots() {
+            const container = document.getElementById('pulseDots');
+            const dotCount = 15;
+
+            for (let i = 0; i < dotCount; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'pulse-dot';
+                dot.style.left = Math.random() * 100 + '%';
+                dot.style.top = Math.random() * 100 + '%';
+                dot.style.animationDelay = Math.random() * 3 + 's';
+                container.appendChild(dot);
+            }
+        }
+
+        // 导航功能
+        document.addEventListener("DOMContentLoaded", function () {
+            createPulseDots();
+
+            const navButtons = document.querySelectorAll(".nav-btn");
+            const contentSections = document.querySelectorAll(".content-section");
+
+            navButtons.forEach((button) => {
+                button.addEventListener("click", function () {
+                    const targetSection = this.dataset.section;
+
+                    navButtons.forEach((btn) => btn.classList.remove("active"));
+                    this.classList.add("active");
+
+                    contentSections.forEach((section) => {
+                        if (section.id === targetSection) {
+                            section.classList.add("active");
+                        } else {
+                            section.classList.remove("active");
+                        }
+                    });
+
+                    window.scrollTo({
+                        top: document.querySelector(".navbar").offsetTop,
+                        behavior: "smooth",
+                    });
+                });
+            });
+
+            // 滚动动画观察器
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px",
+            };
+
+            const observer = new IntersectionObserver(function (entries) {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = "1";
+                        entry.target.style.transform = "translateY(0)";
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll(".fade-in").forEach((el) => observer.observe(el));
+        });
+    </script>
+</body>
+
+</html>
