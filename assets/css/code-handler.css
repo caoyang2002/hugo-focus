@@ -1,0 +1,61 @@
+pre {
+    position: relative;
+    padding-top: 40px;
+}
+
+.language-flag {
+    position: absolute;
+    left: 12px;
+    top: 12px;
+    font-size: 12px;
+    /*font-weight: 600;*/
+    padding: 4px 12px;
+    /*background: #f6f8fa;*/
+    /*border: 1px solid #e1e4e8;*/
+    /*border-radius: 4px;*/
+    /*color: #666;*/
+    z-index: 10;
+    display: flex;
+    align-items: center;
+}
+
+.copy-button {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    font-size: 12px;
+    padding: 4px 12px;
+    background: #f6f8fa;
+    border: 1px solid #d1d9e0;
+    border-radius: 4px;
+    color: #24292e;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.2s ease;
+}
+
+.copy-button:hover {
+    background: #eaeef2;
+}
+
+.copy-button.copied {
+    background: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+
+.copy-button.error {
+    background: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+
+.copy-button:is(.dark *) {
+    color: white;
+    background: black;
+    opacity: 0.8;
+}
+
+.copy-button:is(.dark *):hover {
+    opacity: 1;
+}

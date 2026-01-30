@@ -29,10 +29,10 @@
     {{ end }}
 
     <!-- css & js -->
-    <script src="{{ `js/code-copy.js` | relURL }}" defer></script>
+    <script src="{{ `js/code-handler.js` | relURL }}" defer></script>
     {{ $main := resources.Get "css/main.css" }} {{ $custom := resources.Get
     "css/custom.css" }} {{ $syntax := resources.Get "css/syntax.css" }} {{
-    $code_copy := resources.Get "css/code-copy.css" }} {{ $prose :=
+    $code_copy := resources.Get "css/code-handler.css" }} {{ $prose :=
     resources.Get "css/prose.css" }}
 
     <!-- 安全合并版本 -->
