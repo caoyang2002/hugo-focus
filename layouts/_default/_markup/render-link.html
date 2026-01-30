@@ -1,13 +1,412 @@
 {{/* layouts/_default/_markup/render-link.html */}}
-<a href="{{ .Destination | safeURL }}"
-   {{ with .Title}} title="{{ . }}"{{ end }}
-   {{ if strings.HasPrefix .Destination "http" }}
-     target="_blank"
-     rel="noopener noreferrer"
-     class="external-link"
-   {{ end }}>
-   {{ .Text }}
-   {{ if strings.HasPrefix .Destination "http" }}
-     <span class="external-icon">↗</span>
-   {{ end }}
+{{ $isExternal := strings.HasPrefix .Destination "http" }}
+<a href="{{ .Destination | safeURL }}" {{ with .Title }}title="{{ . }}" {{ end }} {{ if $isExternal }} target="_blank"
+  rel="noopener noreferrer" class="external-link" data-preview-url="{{ .Destination }}" data-preview-enabled="true" {{
+  end }}>
+  {{ .Text | safeHTML }}
+  {{ if $isExternal }}
+  <span class="external-icon">
+    {{ $iconPath := "icon/action/link.svg" }}
+    {{ if fileExists (printf "static/%s" $iconPath) }}
+    {{ $svgContent := readFile (printf "static/%s" $iconPath) }}
+    {{ $styledSvg := replace $svgContent "<svg" `<svg
+      style="display:inline-block;width:0.85em;height:0.85em;vertical-align:middle;fill:currentColor" ` }} {{ $styledSvg
+      | safeHTML }} {{ else }} <span>↗</span>
+  {{ end }}
+  </span>
+  {{ end }}
 </a>
+
+{{/* 添加预览容器到页面底部（每个页面只添加一次） */}}
+{{ if $isExternal }}
+{{ if not (.Page.Scratch.Get "preview_container_added") }}
+{{ .Page.Scratch.Set "preview_container_added" true }}
+<template id="preview-template">
+  <div class="link-preview">
+    <div class="preview-loading">加载预览中...</div>
+    <div class="preview-content hidden">
+      <div class="preview-header">
+        <img class="preview-favicon" src="" alt="">
+        <div class="preview-title"></div>
+        <button class="preview-close">×</button>
+      </div>
+      <div class="preview-description"></div>
+      <div class="preview-image"></div>
+      <div class="preview-footer">
+        <a class="preview-link" href="" target="_blank">访问网站 →</a>
+      </div>
+    </div>
+    <div class="preview-error hidden">无法加载预览</div>
+  </div>
+</template>
+<div id="preview-overlay" class="preview-overlay hidden"></div>
+{{ end }}
+{{ end }}
+
+<style>
+  /* 链接预览样式 */
+  .link-preview {
+    position: absolute;
+    z-index: 9999;
+    width: 320px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e5e7eb;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+  }
+
+  .link-preview.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .preview-header {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #f3f4f6;
+    gap: 10px;
+  }
+
+  .preview-favicon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .preview-title {
+    flex: 1;
+    font-weight: 600;
+    font-size: 14px;
+    color: #1f2937;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .preview-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #9ca3af;
+    line-height: 1;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+  }
+
+  .preview-close:hover {
+    background: #f3f4f6;
+    color: #374151;
+  }
+
+  .preview-description {
+    padding: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #4b5563;
+    max-height: 120px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+  }
+
+  .preview-image {
+    height: 180px;
+    overflow: hidden;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .preview-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .preview-footer {
+    padding: 12px 16px;
+    text-align: right;
+    border-top: 1px solid #f3f4f6;
+  }
+
+  .preview-link {
+    color: #3b82f6;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .preview-link:hover {
+    text-decoration: underline;
+  }
+
+  .preview-loading {
+    padding: 40px 20px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 14px;
+  }
+
+  .preview-error {
+    padding: 40px 20px;
+    text-align: center;
+    color: #ef4444;
+    font-size: 14px;
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  .preview-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9998;
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  /* 暗色模式支持 */
+  @media (prefers-color-scheme: dark) {
+    .link-preview {
+      background: #1f2937;
+      border-color: #374151;
+      color: #f9fafb;
+    }
+
+    .preview-header {
+      border-color: #374151;
+    }
+
+    .preview-title {
+      color: #f9fafb;
+    }
+
+    .preview-description {
+      color: #d1d5db;
+    }
+
+    .preview-close {
+      color: #9ca3af;
+    }
+
+    .preview-close:hover {
+      background: #374151;
+      color: #f9fafb;
+    }
+
+    .preview-footer {
+      border-color: #374151;
+    }
+
+    .preview-link {
+      color: #60a5fa;
+    }
+  }
+</style>
+
+<script>
+  class LinkPreview {
+    constructor() {
+      this.preview = null;
+      this.timer = null;
+      this.currentUrl = null;
+      this.cache = new Map();
+      this.init();
+    }
+
+    init() {
+      // 创建预览元素
+      const template = document.getElementById('preview-template');
+      if (!template) return;
+
+      this.preview = template.content.cloneNode(true).firstElementChild;
+      document.body.appendChild(this.preview);
+
+      // 事件监听
+      document.addEventListener('mouseover', this.handleMouseOver.bind(this));
+      document.addEventListener('mouseout', this.handleMouseOut.bind(this));
+
+      // 关闭按钮
+      this.preview.querySelector('.preview-close').addEventListener('click', () => {
+        this.hidePreview();
+      });
+
+      // 点击遮罩关闭
+      const overlay = document.getElementById('preview-overlay');
+      if (overlay) {
+        overlay.addEventListener('click', () => this.hidePreview());
+      }
+    }
+
+    handleMouseOver(e) {
+      const link = e.target.closest('a[data-preview-enabled="true"]');
+      if (!link) return;
+
+      clearTimeout(this.timer);
+      this.timer = setTimeout(() => {
+        this.showPreview(link);
+      }, 500); // 500ms 延迟显示
+    }
+
+    handleMouseOut(e) {
+      const link = e.target.closest('a[data-preview-enabled="true"]');
+      if (!link) return;
+
+      clearTimeout(this.timer);
+      this.timer = setTimeout(() => {
+        if (!this.isMouseOverPreview()) {
+          this.hidePreview();
+        }
+      }, 300);
+    }
+
+    isMouseOverPreview() {
+      return this.preview && this.preview.matches(':hover');
+    }
+
+    async showPreview(link) {
+      const url = link.getAttribute('data-preview-url');
+      if (!url || url === this.currentUrl) return;
+
+      this.currentUrl = url;
+
+      // 定位预览框
+      const rect = link.getBoundingClientRect();
+      this.positionPreview(rect);
+
+      // 显示加载状态
+      this.showLoading();
+
+      try {
+        const data = await this.fetchPreviewData(url);
+        this.renderPreview(data);
+      } catch (error) {
+        this.showError();
+      }
+    }
+
+    positionPreview(linkRect) {
+      const viewport = {
+        width: window.innerWidth,
+        height: window.innerHeight
+      };
+
+      let top = linkRect.bottom + 10;
+      let left = linkRect.left;
+
+      // 确保不超出视口
+      if (top + 350 > viewport.height) {
+        top = linkRect.top - 350 - 10;
+      }
+      if (left + 320 > viewport.width) {
+        left = viewport.width - 320 - 10;
+      }
+      if (left < 10) left = 10;
+
+      this.preview.style.top = `${top + window.scrollY}px`;
+      this.preview.style.left = `${left}px`;
+      this.preview.classList.add('visible');
+
+      // 显示遮罩
+      const overlay = document.getElementById('preview-overlay');
+      if (overlay) overlay.classList.remove('hidden');
+    }
+
+    async fetchPreviewData(url) {
+      // 检查缓存
+      if (this.cache.has(url)) {
+        return this.cache.get(url);
+      }
+
+      // 使用 LinkPreview API（需要后端支持或第三方服务）
+      // 这里使用一个简单的 fetch 获取页面信息
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+
+      const response = await fetch(proxyUrl);
+      const data = await response.json();
+
+      // 解析 HTML 获取元数据
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(data.contents, 'text/html');
+
+      const previewData = {
+        title: doc.querySelector('title')?.textContent || '无标题',
+        description: doc.querySelector('meta[name="description"]')?.getAttribute('content') || '',
+        image: doc.querySelector('meta[property="og:image"]')?.getAttribute('content') || '',
+        favicon: `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=32`,
+        url: url
+      };
+
+      // 缓存结果
+      this.cache.set(url, previewData);
+      return previewData;
+    }
+
+    renderPreview(data) {
+      this.preview.querySelector('.preview-loading').classList.add('hidden');
+      this.preview.querySelector('.preview-error').classList.add('hidden');
+
+      const content = this.preview.querySelector('.preview-content');
+      content.classList.remove('hidden');
+
+      // 填充数据
+      this.preview.querySelector('.preview-favicon').src = data.favicon;
+      this.preview.querySelector('.preview-title').textContent = data.title;
+      this.preview.querySelector('.preview-description').textContent = data.description;
+      this.preview.querySelector('.preview-link').href = data.url;
+
+      // 处理图片
+      const imageContainer = this.preview.querySelector('.preview-image');
+      if (data.image) {
+        const img = document.createElement('img');
+        img.src = data.image;
+        img.alt = data.title;
+        imageContainer.innerHTML = '';
+        imageContainer.appendChild(img);
+      } else {
+        imageContainer.innerHTML = '<div class="no-image">暂无预览图</div>';
+      }
+    }
+
+    showLoading() {
+      this.preview.querySelector('.preview-content').classList.add('hidden');
+      this.preview.querySelector('.preview-error').classList.add('hidden');
+      this.preview.querySelector('.preview-loading').classList.remove('hidden');
+    }
+
+    showError() {
+      this.preview.querySelector('.preview-content').classList.add('hidden');
+      this.preview.querySelector('.preview-loading').classList.add('hidden');
+      this.preview.querySelector('.preview-error').classList.remove('hidden');
+    }
+
+    hidePreview() {
+      if (this.preview) {
+        this.preview.classList.remove('visible');
+        this.currentUrl = null;
+
+        const overlay = document.getElementById('preview-overlay');
+        if (overlay) overlay.classList.add('hidden');
+      }
+    }
+  }
+
+  // 初始化
+  document.addEventListener('DOMContentLoaded', () => {
+    new LinkPreview();
+  });
+</script>
