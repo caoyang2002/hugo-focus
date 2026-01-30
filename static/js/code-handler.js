@@ -41,8 +41,8 @@ document.addEventListener("DOMContentLoaded", () => {
       icon.src = `/icon/flag/${language}.svg`;
       icon.alt = language;
       icon.style.color = "white";
-      // icon.style.width = "16px";
-      // icon.style.height = "16px";
+      icon.style.width = "16px";
+      icon.style.height = "16px";
       // icon.style.marginRight = "6px";
       // icon.style.verticalAlign = "middle";
 
