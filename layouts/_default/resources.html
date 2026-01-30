@@ -1,6 +1,834 @@
-{{ define "main" }}
-<div class="mt-4">
-    <h1>资源列表</h1>
-    {{ .Content }}
-</div>
-{{ end }}
+<!doctype html>
+<html lang="{{ .Site.Language.Lang }}">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{{ .Title }} | {{ .Site.Title }}</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+        <style>
+            /* 现代化设计变量 - 简约时尚 */
+            :root {
+                --primary: #3b82f6;
+                --primary-dark: #2563eb;
+                --primary-light: #60a5fa;
+                --surface: #ffffff;
+                --surface-elevated: #f8fafc;
+                --background: #ffffff;
+                --text-primary: #111827;
+                --text-secondary: #6b7280;
+                --text-tertiary: #9ca3af;
+                --border: #e5e7eb;
+                --border-light: #f3f4f6;
+                --hover: #f9fafb;
+                --card-shadow:
+                    0 1px 3px 0 rgba(0, 0, 0, 0.05),
+                    0 1px 2px 0 rgba(0, 0, 0, 0.03);
+                --card-shadow-hover:
+                    0 10px 25px -5px rgba(0, 0, 0, 0.08),
+                    0 8px 10px -6px rgba(0, 0, 0, 0.04);
+                --sidebar-shadow: 1px 0 0 0 var(--border);
+                --transition: all 0.2s ease;
+                --radius: 12px;
+                --radius-sm: 8px;
+                --radius-lg: 16px;
+                --spacing-xs: 4px;
+                --spacing-sm: 8px;
+                --spacing-md: 16px;
+                --spacing-lg: 24px;
+                --spacing-xl: 32px;
+            }
+
+            /* 暗色主题 */
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --primary: #60a5fa;
+                    --primary-dark: #3b82f6;
+                    --surface: #1f2937;
+                    --surface-elevated: #374151;
+                    --background: #111827;
+                    --text-primary: #f9fafb;
+                    --text-secondary: #d1d5db;
+                    --text-tertiary: #9ca3af;
+                    --border: #374151;
+                    --border-light: #4b5563;
+                    --hover: #2d3748;
+                    --card-shadow:
+                        0 1px 3px 0 rgba(0, 0, 0, 0.2),
+                        0 1px 2px 0 rgba(0, 0, 0, 0.15);
+                    --card-shadow-hover:
+                        0 10px 25px -5px rgba(0, 0, 0, 0.3),
+                        0 8px 10px -6px rgba(0, 0, 0, 0.2);
+                }
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+            }
+
+            body {
+                font-family:
+                    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                    "Helvetica Neue", Arial, sans-serif;
+                line-height: 1.6;
+                color: var(--text-primary);
+                background-color: var(--background);
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            .app-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            /* 现代化侧边栏 - 简约时尚 */
+            .sidebar {
+                width: 260px;
+                background-color: var(--surface);
+                padding: var(--spacing-xl) var(--spacing-lg);
+                position: sticky;
+                top: 0;
+                height: 100vh;
+                overflow-y: auto;
+                border-right: var(--sidebar-shadow);
+                flex-shrink: 0;
+            }
+
+            .sidebar-header {
+                padding-bottom: var(--spacing-lg);
+                margin-bottom: var(--spacing-lg);
+                border-bottom: 1px solid var(--border-light);
+            }
+
+            .sidebar-title {
+                font-size: 20px;
+                font-weight: 600;
+                color: var(--text-primary);
+                margin-bottom: var(--spacing-xs);
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-sm);
+            }
+
+            .sidebar-title i {
+                color: var(--primary);
+                font-size: 22px;
+            }
+
+            .sidebar-subtitle {
+                font-size: 13px;
+                color: var(--text-tertiary);
+                line-height: 1.4;
+            }
+
+            .categories-section {
+                margin-bottom: var(--spacing-xl);
+            }
+
+            .section-title {
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--text-tertiary);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: var(--spacing-md);
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-sm);
+            }
+
+            .categories-list {
+                display: flex;
+                flex-direction: column;
+                gap: var(--spacing-xs);
+            }
+
+            .category-item {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: var(--spacing-sm) var(--spacing-md);
+                border-radius: var(--radius-sm);
+                cursor: pointer;
+                transition: var(--transition);
+                text-decoration: none;
+                color: var(--text-secondary);
+                background: transparent;
+                border: none;
+                font-size: 14px;
+                font-family: inherit;
+                text-align: left;
+            }
+
+            .category-item:hover {
+                background-color: var(--hover);
+                color: var(--text-primary);
+            }
+
+            .category-item.active {
+                background-color: var(--primary);
+                color: white;
+            }
+
+            .category-name {
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-sm);
+                font-weight: 500;
+            }
+
+            .category-count {
+                font-size: 11px;
+                font-weight: 500;
+                color: var(--text-tertiary);
+                background-color: var(--hover);
+                padding: 2px 8px;
+                border-radius: 10px;
+                min-width: 24px;
+                text-align: center;
+            }
+
+            .category-item.active .category-count {
+                background-color: rgba(255, 255, 255, 0.2);
+                color: white;
+            }
+
+            /* 主内容区 - 现代设计 */
+            .main-content {
+                flex: 1;
+                padding: var(--spacing-xl);
+                max-width: calc(100vw - 260px);
+                background-color: var(--background);
+            }
+
+            .content-header {
+                margin-bottom: var(--spacing-xl);
+            }
+
+            .page-title {
+                font-size: 28px;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin-bottom: var(--spacing-xs);
+                line-height: 1.3;
+            }
+
+            .page-description {
+                font-size: 15px;
+                color: var(--text-secondary);
+                max-width: 640px;
+            }
+
+            /* 资源网格布局 */
+            .resources-container {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+                gap: var(--spacing-lg);
+            }
+
+            /* 现代化资源卡片 */
+            .resource-card {
+                background-color: var(--surface);
+                border-radius: var(--radius);
+                overflow: hidden;
+                box-shadow: var(--card-shadow);
+                transition: var(--transition);
+                border: 1px solid var(--border);
+                height: fit-content;
+                animation: cardEntrance 0.3s ease-out;
+                animation-fill-mode: both;
+            }
+
+            .resource-card:hover {
+                transform: translateY(-2px);
+                box-shadow: var(--card-shadow-hover);
+                border-color: var(--primary-light);
+            }
+
+            .card-main {
+                padding: var(--spacing-lg);
+                cursor: pointer;
+            }
+
+            .card-header {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                margin-bottom: var(--spacing-md);
+            }
+
+            .resource-icon {
+                width: 40px;
+                height: 40px;
+                border-radius: var(--radius-sm);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: var(--primary);
+                color: white;
+                font-size: 18px;
+                flex-shrink: 0;
+            }
+
+            .category-badge {
+                padding: 4px 10px;
+                background-color: var(--hover);
+                color: var(--text-secondary);
+                font-size: 11px;
+                font-weight: 500;
+                border-radius: 20px;
+                text-transform: uppercase;
+                letter-spacing: 0.3px;
+            }
+
+            .resource-title {
+                font-size: 17px;
+                font-weight: 600;
+                color: var(--text-primary);
+                margin-bottom: var(--spacing-sm);
+                line-height: 1.4;
+            }
+
+            .resource-description {
+                color: var(--text-secondary);
+                font-size: 14px;
+                line-height: 1.5;
+                margin-bottom: var(--spacing-md);
+            }
+
+            /* 标签区域 */
+            .tags-container {
+                display: flex;
+                flex-wrap: wrap;
+                gap: var(--spacing-xs);
+                margin-top: var(--spacing-md);
+            }
+
+            .tag {
+                padding: 4px 10px;
+                background-color: var(--hover);
+                color: var(--text-secondary);
+                font-size: 12px;
+                font-weight: 500;
+                border-radius: 12px;
+                transition: var(--transition);
+            }
+
+            .tag:hover {
+                background-color: var(--primary-light);
+                color: white;
+            }
+
+            /* 展开的详情区域 */
+            .card-details {
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease-out;
+                background-color: var(--surface-elevated);
+                border-top: 1px solid var(--border-light);
+            }
+
+            .card-details.expanded {
+                max-height: 1000px;
+            }
+
+            .details-content {
+                padding: var(--spacing-lg);
+            }
+
+            .details-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: var(--spacing-md);
+            }
+
+            .detail-item {
+                display: flex;
+                flex-direction: column;
+                gap: var(--spacing-xs);
+            }
+
+            .detail-label {
+                font-size: 12px;
+                font-weight: 500;
+                color: var(--text-tertiary);
+                text-transform: uppercase;
+                letter-spacing: 0.3px;
+            }
+
+            .detail-value {
+                font-size: 14px;
+                color: var(--text-primary);
+                word-break: break-word;
+            }
+
+            .detail-value a {
+                color: var(--primary);
+                text-decoration: none;
+                transition: var(--transition);
+                display: inline-flex;
+                align-items: center;
+                gap: var(--spacing-xs);
+            }
+
+            .detail-value a:hover {
+                color: var(--primary-dark);
+                text-decoration: underline;
+            }
+
+            /* 空状态 */
+            .empty-state {
+                grid-column: 1 / -1;
+                text-align: center;
+                padding: var(--spacing-xl);
+                background-color: var(--surface);
+                border-radius: var(--radius);
+                border: 1px solid var(--border);
+            }
+
+            .empty-icon {
+                font-size: 48px;
+                color: var(--border);
+                margin-bottom: var(--spacing-md);
+                opacity: 0.6;
+            }
+
+            .empty-title {
+                font-size: 18px;
+                font-weight: 600;
+                color: var(--text-primary);
+                margin-bottom: var(--spacing-xs);
+            }
+
+            .empty-description {
+                color: var(--text-secondary);
+                font-size: 14px;
+                max-width: 320px;
+                margin: 0 auto;
+            }
+
+            /* 响应式设计 */
+            @media (max-width: 1024px) {
+                .resources-container {
+                    grid-template-columns: repeat(
+                        auto-fill,
+                        minmax(300px, 1fr)
+                    );
+                }
+            }
+
+            @media (max-width: 768px) {
+                .app-container {
+                    flex-direction: column;
+                }
+
+                .sidebar {
+                    width: 100%;
+                    height: auto;
+                    position: static;
+                    padding: var(--spacing-lg);
+                    border-right: none;
+                    border-bottom: var(--sidebar-shadow);
+                }
+
+                .main-content {
+                    max-width: 100%;
+                    padding: var(--spacing-lg);
+                }
+
+                .resources-container {
+                    grid-template-columns: 1fr;
+                }
+
+                .details-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .main-content {
+                    padding: var(--spacing-md);
+                }
+
+                .page-title {
+                    font-size: 24px;
+                }
+
+                .card-main,
+                .details-content {
+                    padding: var(--spacing-md);
+                }
+            }
+
+            /* 动画效果 */
+            @keyframes cardEntrance {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px) scale(0.98);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+            }
+
+            /* 滚动条美化 */
+            .sidebar::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .sidebar::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .sidebar::-webkit-scrollbar-thumb {
+                background: var(--border);
+                border-radius: 3px;
+            }
+
+            .sidebar::-webkit-scrollbar-thumb:hover {
+                background: var(--text-tertiary);
+            }
+
+            /* 工具类 */
+            .sr-only {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border: 0;
+            }
+
+            .text-sm {
+                font-size: 13px;
+            }
+
+            .text-xs {
+                font-size: 11px;
+            }
+
+            .font-medium {
+                font-weight: 500;
+            }
+
+            .font-semibold {
+                font-weight: 600;
+            }
+
+            /* 交互状态 */
+            .resource-card:focus-visible {
+                outline: 2px solid var(--primary);
+                outline-offset: 2px;
+            }
+
+            /* 加载状态 */
+            .loading {
+                opacity: 0.6;
+                pointer-events: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="app-container">
+            <!-- 简约侧边导航 -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h1 class="sidebar-title">
+                        <i class="fas fa-boxes"></i>
+                        {{ .Title }}
+                    </h1>
+                    <p class="sidebar-subtitle">
+                        {{ .Params.description | default "精选资源集合" }}
+                    </p>
+                </div>
+
+                <div class="categories-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-folder"></i>
+                        分类
+                    </h2>
+                    <div class="categories-list" id="categoriesList">
+                        <!-- 分类动态生成 -->
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 主要内容区 -->
+            <main class="main-content">
+                <header class="content-header">
+                    <h1 class="page-title" id="pageTitle">所有资源</h1>
+                    <p class="page-description">点击卡片查看详细信息</p>
+                </header>
+
+                <div class="resources-container" id="resourcesContainer">
+                    <!-- 资源卡片动态生成 -->
+                    <div class="empty-state" id="emptyState">
+                        <div class="empty-icon">
+                            <i class="fas fa-inbox"></i>
+                        </div>
+                        <h3 class="empty-title">无可用资源</h3>
+                        <p class="empty-description">
+                            当前分类下暂无资源，请尝试其他分类
+                        </p>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <script>
+            // 资源数据 - 从Hugo模板中获取
+            const resources = [
+                {{ range $index, $resource := .Params.resources }}
+                {
+                    // 使用索引作为ID，确保唯一性
+                    id: {{ $index }},
+                    name: "{{ $resource.name }}",
+                    url: "{{ $resource.url }}",
+                    description: "{{ $resource.description }}",
+                    category: "{{ $resource.category }}",
+                    subcategory: "{{ $resource.subcategory }}",
+                    tags: [
+                        {{ range $resource.tags }}
+                        "{{ . }}",
+                        {{ end }}
+                    ],
+                    icon: "{{ $resource.icon | default "fas fa-link" }}"
+                },
+                {{ end }}
+            ];
+
+            // DOM加载完成后初始化
+            document.addEventListener('DOMContentLoaded', () => {
+                const categoriesList = document.getElementById('categoriesList');
+                const resourcesContainer = document.getElementById('resourcesContainer');
+                const emptyState = document.getElementById('emptyState');
+                const pageTitle = document.getElementById('pageTitle');
+
+                let activeCategory = 'all';
+
+                // 生成分类列表
+                function generateCategories() {
+                    // 获取所有唯一分类
+                    const categories = [...new Set(resources.map(r => r.category))];
+
+                    // 清空现有分类列表
+                    categoriesList.innerHTML = '';
+
+                    // 添加"全部"选项
+                    const allCategoryItem = document.createElement('button');
+                    allCategoryItem.className = 'category-item active';
+                    allCategoryItem.dataset.category = 'all';
+                    allCategoryItem.innerHTML = `
+                        <div class="category-name">
+                            <i class="fas fa-th-large"></i>
+                            <span>全部</span>
+                        </div>
+                        <span class="category-count">${resources.length}</span>
+                    `;
+                    categoriesList.appendChild(allCategoryItem);
+
+                    // 添加各个分类
+                    categories.forEach(category => {
+                        const count = resources.filter(r => r.category === category).length;
+                        const categoryItem = document.createElement('button');
+                        categoryItem.className = 'category-item';
+                        categoryItem.dataset.category = category;
+                        categoryItem.innerHTML = `
+                            <div class="category-name">
+                                <i class="fas fa-folder"></i>
+                                <span>${category}</span>
+                            </div>
+                            <span class="category-count">${count}</span>
+                        `;
+                        categoriesList.appendChild(categoryItem);
+                    });
+
+                    // 添加分类点击事件
+                    document.querySelectorAll('.category-item').forEach(item => {
+                        item.addEventListener('click', () => {
+                            // 更新活动状态
+                            document.querySelectorAll('.category-item').forEach(i =>
+                                i.classList.remove('active')
+                            );
+                            item.classList.add('active');
+
+                            // 更新当前分类
+                            activeCategory = item.dataset.category;
+
+                            // 更新页面标题
+                            pageTitle.textContent = activeCategory === 'all'
+                                ? '所有资源'
+                                : `${activeCategory}`;
+
+                            // 重新生成资源卡片
+                            generateResources();
+                        });
+                    });
+                }
+
+                // 生成资源卡片
+                function generateResources() {
+                    // 清空资源容器
+                    resourcesContainer.innerHTML = '';
+
+                    // 根据当前分类筛选资源
+                    const filteredResources = activeCategory === 'all'
+                        ? resources
+                        : resources.filter(r => r.category === activeCategory);
+
+                    // 如果没有资源，显示空状态
+                    if (filteredResources.length === 0) {
+                        emptyState.style.display = 'block';
+                        resourcesContainer.appendChild(emptyState);
+                        return;
+                    }
+
+                    // 隐藏空状态
+                    emptyState.style.display = 'none';
+
+                    // 生成资源卡片
+                    filteredResources.forEach((resource, index) => {
+                        const card = createResourceCard(resource, index);
+                        resourcesContainer.appendChild(card);
+                    });
+
+                    // 添加卡片点击事件
+                    document.querySelectorAll('.resource-card').forEach(card => {
+                        const details = card.querySelector('.card-details');
+                        const main = card.querySelector('.card-main');
+
+                        main.addEventListener('click', () => {
+                            // 获取所有展开的卡片
+                            const expandedCards = document.querySelectorAll('.card-details.expanded');
+
+                            // 收起所有其他卡片（除当前点击的）
+                            expandedCards.forEach(expandedDetail => {
+                                if (expandedDetail !== details) {
+                                    expandedDetail.classList.remove('expanded');
+                                }
+                            });
+
+                            // 切换当前卡片的展开状态
+                            details.classList.toggle('expanded');
+                        });
+                    });
+                }
+
+                // 创建单个资源卡片
+                function createResourceCard(resource, index) {
+                    const card = document.createElement('article');
+                    card.className = 'resource-card';
+                    card.style.animationDelay = `${index * 0.05}s`;
+
+                    // 创建标签HTML
+                    const tagsHTML = resource.tags
+                        .map(tag => `<span class="tag">${tag}</span>`)
+                        .join('');
+
+                    card.innerHTML = `
+                        <div class="card-main">
+                            <div class="card-header">
+                                <div class="resource-icon">
+                                    <i class="${resource.icon}"></i>
+                                </div>
+                                <span class="category-badge">${resource.category}</span>
+                            </div>
+
+                            <h3 class="resource-title">${resource.name}</h3>
+                            <p class="resource-description">${resource.description}</p>
+
+                            <div class="tags-container">
+                                ${tagsHTML}
+                                <span class="tag">${resource.subcategory}</span>
+                            </div>
+                        </div>
+
+                        <div class="card-details">
+                            <div class="details-content">
+                                <div class="details-grid">
+                                    <div class="detail-item">
+                                        <span class="detail-label">网站</span>
+                                        <div class="detail-value">
+                                            <a href="${resource.url}" target="_blank" rel="noopener noreferrer">
+                                                <i class="fas fa-external-link-alt"></i>
+                                                ${resource.url}
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div class="detail-item">
+                                        <span class="detail-label">主分类</span>
+                                        <div class="detail-value">${resource.category}</div>
+                                    </div>
+
+                                    <div class="detail-item">
+                                        <span class="detail-label">子分类</span>
+                                        <div class="detail-value">${resource.subcategory}</div>
+                                    </div>
+
+                                    <div class="detail-item">
+                                        <span class="detail-label">标签</span>
+                                        <div class="detail-value">
+                                            <div class="tags-container">
+                                                ${resource.tags.map(tag =>
+                                                    `<span class="tag text-sm">${tag}</span>`
+                                                ).join('')}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    return card;
+                }
+
+                // 初始化
+                generateCategories();
+                generateResources();
+
+                // 添加键盘导航支持
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        // ESC键收起所有展开的卡片
+                        document.querySelectorAll('.card-details.expanded').forEach(details => {
+                            details.classList.remove('expanded');
+                        });
+                    }
+
+                    // Tab键导航支持
+                    if (e.key === 'Tab') {
+                        const focusedElement = document.activeElement;
+                        if (focusedElement.classList.contains('category-item')) {
+                            // 确保焦点在侧边栏时的样式
+                            focusedElement.classList.add('active');
+                        }
+                    }
+                });
+
+                // 点击页面其他区域收起卡片
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.resource-card') && !e.target.closest('.category-item')) {
+                        document.querySelectorAll('.card-details.expanded').forEach(details => {
+                            details.classList.remove('expanded');
+                        });
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>
