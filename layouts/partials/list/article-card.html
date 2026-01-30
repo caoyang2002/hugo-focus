@@ -1,22 +1,25 @@
 {{- /* layouts/partials/list/article-card.html */ -}}
-{{- /* 完整的卡片式文章展示，适合首页精选和分类页 */ -}}
-<!---->
-<article class="article-card group">
-  <a href="{{ .RelPermalink }}"
-    class="block bg-white dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
+<article class="article-card shadow-sm backdrop-blur-[8px] bg-white/10 dark:bg-gray-900/60 h-full">
+  <a href="{{ .RelPermalink }}" class="group block border-2 border-gray-200 dark:border-gray-700 
+            rounded-lg overflow-hidden
+            hover:shadow-lg hover:border-blue-300 dark:hover:border-blue-600
+            hover:scale-[1.01]
+            transition-all duration-300
+            flex flex-col h-full" aria-label="阅读 {{ .Title }}">
 
-    {{- /* 特色图片 */ -}}
+    {{- /* 1. 图片区域（固定高度） */ -}}
     {{- with .Params.image -}}
-    <div class="aspect-video overflow-hidden bg-gray-100 dark:bg-gray-700">
+    <div class="aspect-video overflow-hidden bg-gray-100 dark:bg-gray-700 flex-shrink-0">
       <img src="{{ . | relURL }}" alt="{{ $.Title }}"
         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
     </div>
     {{- end -}}
 
-    <div class="p-6">
-      {{- /* 标签 */ -}}
+    {{- /* 2. 内容区域（填充剩余空间） */ -}}
+    <div class="p-5 flex flex-col flex-1 min-h-0">
+
+      {{- /* 2.1 顶部：标签区域 */ -}}
       <div class="flex flex-wrap gap-2 mb-3">
-        {{- /* 置顶标记 */ -}}
         {{- if gt .Weight 0 -}}
         <span
           class="inline-flex items-center px-2 py-1 text-xs font-medium bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300 rounded">
@@ -29,7 +32,6 @@
         </span>
         {{- end -}}
 
-        {{- /* 分类 */ -}}
         {{- if isset .Params "categories" -}}
         {{- if .Params.categories -}}
         {{- range first 1 .Params.categories -}}
@@ -42,34 +44,40 @@
         {{- end -}}
       </div>
 
-      {{- /* 标题 */ -}}
-      <h3 class="text-xl font-bold mb-2 group-hover:text-blue-500 transition-colors line-clamp-2">
-        {{ .Title }}
-      </h3>
+      {{- /* 2.2 中部：标题和描述（可伸缩） */ -}}
+      <div class="flex-1 min-h-0">
+        <h3 class="text-xl font-bold mb-3 group-hover:text-blue-500 transition-colors line-clamp-2">
+          {{ .Title }}
+        </h3>
 
-      {{- /* 描述 */ -}}
-      {{- with (.Description | default .Summary) -}}
-      <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">
-        {{ . | plainify | truncate 120 }}
-      </p>
-      {{- end -}}
-
-      {{- /* 元信息 */ -}}
-      <div class="flex items-center text-xs text-gray-500 dark:text-gray-400">
-        <time datetime="{{ .Date.Format " 2006-01-02" }}">
-          {{ .Date | time.Format ":date_medium" }}
-        </time>
-        {{- if .ReadingTime -}}
-        <span class="mx-2">·</span>
-        <span>{{ .ReadingTime }} min read</span>
-        {{- end -}}
-        {{- if .Params.tags -}}
-        <span class="mx-2">·</span>
-        <span class="line-clamp-1">
-          {{ delimit (first 2 .Params.tags) ", " }}
-        </span>
+        {{- with (.Description | default .Summary) -}}
+        <div class="overflow-hidden">
+          <p class="text-gray-600 dark:text-gray-400 text-sm line-clamp-3">
+            {{ . | plainify | truncate 120 }}
+          </p>
+        </div>
         {{- end -}}
       </div>
+
+      {{- /* 2.3 底部：元信息（固定位置） */ -}}
+      <div class="pt-4 mt-4 border-t border-gray-100 dark:border-gray-800">
+        <div class="flex items-center text-xs text-gray-500 dark:text-gray-400">
+          <time datetime="{{ .Date.Format " 2006-01-02" }}" class="truncate">
+            {{ .Date | time.Format ":date_medium" }}
+          </time>
+          {{- if .ReadingTime -}}
+          <span class="mx-2">·</span>
+          <span>{{ .ReadingTime }} min read</span>
+          {{- end -}}
+          {{- if .Params.tags -}}
+          <span class="mx-2">·</span>
+          <span class="truncate line-clamp-1 flex-1 min-w-0">
+            {{ delimit (first 2 .Params.tags) ", " }}
+          </span>
+          {{- end -}}
+        </div>
+      </div>
+
     </div>
   </a>
 </article>
