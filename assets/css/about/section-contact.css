@@ -1,0 +1,190 @@
+/* ========================================
+   联系方式板块 - 第三屏
+   ======================================== */
+
+.section-contact {
+    z-index: calc(var(--z-content) + 200);
+    background: var(--primary);
+    color: var(--text-white);
+    position: relative;
+    overflow: hidden;
+}
+
+/* 背景装饰效果 */
+.section-contact::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+    animation: contact-glow 10s linear infinite;
+}
+
+@keyframes contact-glow {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.section-contact::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+}
+
+/* ========================================
+   联系标题
+   ======================================== */
+.contact-title {
+    font-size: 10vw;
+    font-weight: 900;
+    margin-bottom: 50px;
+    transform: translateZ(60px);
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+/* ========================================
+   联系方式容器
+   ======================================== */
+.contact-container {
+    display: flex;
+    gap: var(--spacing-xl);
+    flex-wrap: wrap;
+    justify-content: center;
+    transform: translateZ(50px);
+    position: relative;
+    z-index: 1;
+}
+
+/* ========================================
+   联系方式项
+   ======================================== */
+.contact-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    color: var(--text-white);
+    text-decoration: none;
+    transition: var(--transition-strong);
+    transform: translateZ(30px);
+    position: relative;
+}
+
+.contact-item::before {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: var(--text-white);
+    transition: var(--transition-strong);
+}
+
+.contact-item:hover::before {
+    width: 100%;
+}
+
+.contact-item:hover {
+    transform: translateZ(60px) translateY(-15px);
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+/* ========================================
+   联系图标
+   ======================================== */
+.contact-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--text-white);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+    transition: var(--transition-strong);
+    position: relative;
+    overflow: hidden;
+}
+
+.contact-icon::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    opacity: 0;
+    transition: var(--transition-strong);
+}
+
+.contact-icon i {
+    position: relative;
+    z-index: 1;
+    transition: var(--transition-smooth);
+}
+
+.contact-item:hover .contact-icon {
+    box-shadow: 0 0 50px rgba(255, 255, 255, 0.6);
+    transform: rotate(360deg) scale(1.1);
+}
+
+.contact-item:hover .contact-icon::before {
+    opacity: 1;
+}
+
+.contact-item:hover .contact-icon i {
+    color: var(--text-white);
+    transform: scale(1.2);
+}
+
+/* ========================================
+   联系值
+   ======================================== */
+.contact-value {
+    font-size: 16px;
+    font-weight: 600;
+    transition: var(--transition-smooth);
+}
+
+.contact-item:hover .contact-value {
+    font-size: 17px;
+    letter-spacing: 0.5px;
+}
+
+/* ========================================
+   响应式 - 移动端
+   ======================================== */
+@media (max-width: 768px) {
+    .contact-container {
+        gap: var(--spacing-lg);
+    }
+
+    .contact-icon {
+        width: 65px;
+        height: 65px;
+        font-size: 28px;
+    }
+
+    .contact-title {
+        font-size: 15vw;
+        margin-bottom: 30px;
+    }
+
+    .contact-value {
+        font-size: 14px;
+    }
+}

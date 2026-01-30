@@ -4,676 +4,66 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="{{ .Params.bio }}" />
     <title>{{ .Title }} | {{ .Site.Title }}</title>
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" />
-    <style>
-        :root {
-            --primary: #0042da;
-            --primary-dark: #0034b0;
-            --primary-light: rgba(0, 66, 218, 0.1);
-            --primary-glow: rgba(0, 66, 218, 0.4);
-            --bg: #0a0a0a;
-            --text-white: #ffffff;
-            --text-gray: #cccccc;
-            --text-light: #999999;
-            --z-deep-bg: -800;
-            --z-grid: -400;
-            --z-line: -200;
-            --z-content: 0;
-            --z-nav: 99999;
-            /* 提升导航层级，确保不被遮挡 */
-            --transition-base: 0.05s linear;
-            --transition-strong: 0.6s cubic-bezier(0.2, 0.85, 0.3, 1);
-        }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        }
-
-        html {
-            overflow-x: hidden;
-            scroll-behavior: smooth;
-            scrollbar-width: thin;
-            scrollbar-color: var(--primary) var(--bg);
-            height: 100%;
-            /* 基础高度，避免滚动异常 */
-        }
-
-        html::-webkit-scrollbar {
-            width: 3px;
-        }
-
-        html::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 3px;
-        }
-
-        html::-webkit-scrollbar-track {
-            background: var(--bg);
-        }
-
-        body {
-            background: var(--bg);
-            color: var(--text-white);
-            position: relative;
-            perspective: 2000px;
-            perspective-origin: center 30%;
-            min-height: 300vh;
-            /* 匹配内容层高度，消除滚动空白 */
-            overflow-x: hidden;
-        }
-
-        /* 3D层基础样式：修复类名+统一变换逻辑 */
-        .layer-3d {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            pointer-events: none;
-            transform-style: preserve-3d;
-            backface-visibility: hidden;
-            transition: transform var(--transition-base);
-        }
-
-        /* 所有3D层统一高度：100vh * 3 = 300vh，支撑三部分内容 */
-        .layer-deep-bg,
-        .layer-grid,
-        .layer-line {
-            height: 300vh;
-        }
-
-        /* 深层背景层：反向极慢偏移，最远层 */
-        .layer-deep-bg {
-            z-index: var(--z-deep-bg);
-            background: var(--bg);
-        }
-
-        /* 网格装饰层：反向慢偏移，次远层 */
-        .layer-grid {
-            z-index: var(--z-grid);
-        }
-
-        .grid-svg {
-            width: 100%;
-            height: 100%;
-            stroke: rgba(0, 66, 218, 0.05);
-            stroke-width: 1;
-            fill: none;
-        }
-
-        /* 线条装饰层：反向中速偏移，中远层 */
-        .layer-line {
-            z-index: var(--z-line);
-        }
-
-        .line-svg {
-            position: absolute;
-            top: 15%;
-            left: 15%;
-            width: 70%;
-            height: 70%;
-            stroke: rgba(0, 66, 218, 0.2);
-            stroke-width: 1;
-            fill: none;
-        }
-
-        /* 主内容层：核心修复 - 设实际高度300vh+相对定位，消除空白 */
-        .layer-content {
-            z-index: var(--z-content);
-            pointer-events: all;
-            padding: 0 5vw;
-            transform-style: preserve-3d;
-            position: relative;
-            /* 替代absolute，支撑实际高度 */
-            width: 100%;
-            min-height: 300vh;
-            /* 三部分内容：各100vh，无空白 */
-        }
-
-        /* 导航层：核心修复 - fixed固定+满屏，确保全程悬浮 */
-        .layer-nav {
-            z-index: var(--z-nav);
-            pointer-events: all;
-            position: fixed;
-            /* 固定定位，脱离文档流，不随滚动偏移 */
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            /* 满屏，确保侧边导航垂直居中 */
-            transform: none !important;
-        }
-
-        /* 侧边导航（桌面端）：保留样式，优化居中 */
-        .nav-desktop {
-            position: absolute;
-            top: 50%;
-            right: 4vw;
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-            align-items: flex-end;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--text-gray);
-            text-decoration: none;
-            font-size: 15px;
-            font-weight: 500;
-            transition: var(--transition-strong);
-            cursor: pointer;
-            opacity: 0.7;
-        }
-
-        .nav-item i {
-            font-size: 20px;
-            width: 28px;
-            text-align: center;
-        }
-
-        /* 导航激活态：强化视觉 */
-        .nav-item.active {
-            color: var(--primary);
-            font-weight: 700;
-            opacity: 1;
-            text-shadow: 0 0 8px var(--primary-glow);
-            transform: translateX(-4px);
-        }
-
-        .nav-divider {
-            width: 28px;
-            height: 1px;
-            background: #333;
-            margin-right: 12px;
-            margin-top: 10px;
-            margin-bottom: 10px;
-        }
-
-        /* 导航Action按钮：保留力量感交互 */
-        .nav-action {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--text-white);
-            background: var(--primary);
-            border: none;
-            padding: 12px 20px;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition-strong);
-            text-decoration: none;
-            margin-right: 12px;
-            box-shadow: 0 0 0 transparent;
-        }
-
-        .nav-action:hover {
-            background: var(--primary-dark);
-            transform: translateX(-8px);
-            box-shadow: 0 0 25px var(--primary-glow);
-        }
-
-        .nav-action i {
-            font-size: 18px;
-        }
-
-        /* 移动端导航：固定顶部，不随滚动偏移 */
-        .nav-mobile {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: none;
-            gap: 25px;
-            background: rgba(10, 10, 10, 0.9);
-            backdrop-filter: blur(15px);
-            padding: 12px 30px;
-            border-radius: 35px;
-            border: 1px solid var(--primary-light);
-            z-index: var(--z-nav);
-        }
-
-        .nav-mobile .nav-item {
-            gap: 8px;
-            font-size: 13px;
-        }
-
-        .nav-mobile .nav-item i {
-            font-size: 17px;
-        }
-
-        /* 内容板块通用样式：相对定位+100vh高度，连续排布无空白 */
-        .section {
-            position: relative;
-            /* 替代absolute，随内容层自然排布 */
-            width: 100%;
-            height: 100vh;
-            /* 每个板块占一屏，三部分共300vh */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            transform-style: preserve-3d;
-        }
-
-        /* 1. 个人介绍板块：第一屏（0~100vh） */
-        .section-about {
-            z-index: calc(var(--z-content) + 50);
-        }
-
-        .avatar {
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            background: var(--primary);
-            border: 5px solid var(--text-white);
-            overflow: hidden;
-            margin-bottom: 40px;
-            transform: translateZ(60px) scale(1.02);
-            box-shadow: 0 0 40px var(--primary-glow);
-        }
-
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .about-title {
-            font-size: 8vw;
-            font-weight: 900;
-            color: var(--primary);
-            line-height: 1.2;
-            margin-bottom: 25px;
-            transform: translateZ(50px);
-        }
-
-        .about-bio {
-            font-size: 1.3vw;
-            color: var(--text-gray);
-            max-width: 750px;
-            line-height: 1.8;
-            padding: 0 2vw;
-            margin-bottom: 60px;
-            transform: translateZ(40px);
-        }
-
-        /* 技能模块：极简大色块，3D悬浮 */
-        .skills-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-            max-width: 900px;
-            margin-bottom: 80px;
-            transform: translateZ(30px);
-        }
-
-        .skill-item {
-            background: var(--primary-light);
-            border: 1px solid rgba(0, 66, 218, 0.2);
-            border-radius: 8px;
-            padding: 30px 20px;
-            transform: translateZ(10px);
-            transition: var(--transition-strong);
-        }
-
-        .skill-item:hover {
-            transform: translateZ(30px) translateY(-8px);
-            border-color: var(--primary);
-            box-shadow: 0 0 20px var(--primary-glow);
-        }
-
-        .skill-icon {
-            font-size: 32px;
-            color: var(--primary);
-            margin-bottom: 15px;
-            transform: translateZ(15px);
-        }
-
-        .skill-name {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            transform: translateZ(12px);
-        }
-
-        .skill-desc {
-            font-size: 14px;
-            color: var(--text-gray);
-            line-height: 1.6;
-            margin-bottom: 20px;
-            transform: translateZ(10px);
-        }
-
-        .skill-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-            transform: translateZ(8px);
-        }
-
-        /* 经历模块：极简列表，3D层级 */
-        .experiences-container {
-            max-width: 1000px;
-            width: 90%;
-            transform: translateZ(20px);
-        }
-
-        .exp-title {
-            font-size: 2vw;
-            color: var(--primary);
-            margin-bottom: 40px;
-            transform: translateZ(15px);
-        }
-
-        .exp-item {
-            text-align: left;
-            border-left: 2px solid var(--primary);
-            padding-left: 30px;
-            margin-bottom: 40px;
-            transform: translateZ(10px);
-            margin-left: 20px;
-        }
-
-        .exp-company {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-
-        .exp-period {
-            font-size: 14px;
-            color: var(--text-light);
-            margin-bottom: 15px;
-        }
-
-        .exp-details {
-            list-style: none;
-        }
-
-        .exp-details li {
-            font-size: 14px;
-            color: var(--text-gray);
-            line-height: 1.8;
-            margin-bottom: 10px;
-            position: relative;
-            padding-left: 20px;
-        }
-
-        .exp-details li::before {
-            content: "•";
-            color: var(--primary);
-            position: absolute;
-            left: 0;
-            top: 0;
-        }
-
-        /* 2. 作品文字触发板块：第二屏（100~200vh） */
-        .section-works-trigger {
-            z-index: calc(var(--z-content) + 100);
-        }
-
-        .works-text {
-            font-size: 30vw;
-            font-weight: 900;
-            color: var(--primary);
-            line-height: 1;
-            transform-origin: center center;
-            transform: translateZ(100px);
-            position: relative;
-            z-index: inherit;
-        }
-
-        /* 3. 作品视错觉板块：与文字板块同屏（100~200vh），滚动触发显示 */
-        .section-works-illusion {
-            z-index: calc(var(--z-content) + 150);
-            position: absolute;
-            /* 覆盖在文字板块上方 */
-            top: 100vh;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity var(--transition-strong);
-            background: rgba(10, 10, 10, 0.8);
-            /* 轻微遮罩，突出作品 */
-        }
-
-        .works-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 60px;
-            width: 80%;
-            max-width: 1000px;
-            perspective: 1500px;
-        }
-
-        .work-item {
-            background: rgba(10, 10, 10, 0.9);
-            border: 1px solid var(--primary-light);
-            border-radius: 8px;
-            padding: 30px 20px;
-            height: 320px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            text-align: center;
-            transform-style: preserve-3d;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
-            transition: var(--transition-strong);
-        }
-
-        /* 4个作品项3D错落排布，视错觉核心 */
-        .work-item:nth-child(1) {
-            transform: rotateX(10deg) rotateY(-8deg) translateZ(20px) translateY(20px);
-            z-index: 2;
-        }
-
-        .work-item:nth-child(2) {
-            transform: rotateX(12deg) rotateY(10deg) translateZ(50px) translateY(-25px);
-            z-index: 3;
-            border-color: rgba(0, 66, 218, 0.3);
-        }
-
-        .work-item:nth-child(3) {
-            transform: rotateX(12deg) rotateY(-10deg) translateZ(40px) translateY(-20px);
-            z-index: 3;
-            border-color: rgba(0, 66, 218, 0.3);
-        }
-
-        .work-item:nth-child(4) {
-            transform: rotateX(10deg) rotateY(8deg) translateZ(20px) translateY(25px);
-            z-index: 2;
-        }
-
-        /* 作品项hover：3D悬浮+光晕，力量感交互 */
-        .work-item:hover {
-            transform: rotateX(0) rotateY(0) translateZ(80px) translateY(-15px);
-            z-index: 10;
-            border-color: var(--primary);
-            box-shadow: 0 0 40px var(--primary-glow);
-        }
-
-        .work-svg {
-            width: 90px;
-            height: 90px;
-            color: var(--primary);
-            margin-bottom: 15px;
-            transform: translateZ(30px);
-        }
-
-        .work-name {
-            font-size: 19px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            transform: translateZ(20px);
-        }
-
-        .work-desc {
-            font-size: 14px;
-            color: var(--text-light);
-            line-height: 1.6;
-            margin-bottom: 20px;
-            padding: 0 10px;
-            transform: translateZ(15px);
-        }
-
-        .tag {
-            padding: 5px 14px;
-            background: var(--primary-light);
-            color: var(--primary);
-            font-size: 12px;
-            border-radius: 20px;
-        }
-
-        /* 4. 联系方式板块：第三屏（200~300vh），全屏深蓝色 */
-        .section-contact {
-            z-index: calc(var(--z-content) + 200);
-            background: var(--primary);
-            color: var(--text-white);
-        }
-
-        .contact-title {
-            font-size: 10vw;
-            font-weight: 900;
-            margin-bottom: 50px;
-            transform: translateZ(60px);
-        }
-
-        .contact-container {
-            display: flex;
-            gap: 50px;
-            flex-wrap: wrap;
-            justify-content: center;
-            transform: translateZ(50px);
-        }
-
-        .contact-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            color: var(--text-white);
-            text-decoration: none;
-            transition: var(--transition-strong);
-            transform: translateZ(30px);
-        }
-
-        .contact-item:hover {
-            transform: translateZ(60px) translateY(-15px);
-            text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-        }
-
-        .contact-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: var(--text-white);
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
-        }
-
-        .contact-value {
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        /* 响应式适配：768px以下移动端 */
-        @media (max-width: 768px) {
-            .nav-desktop {
-                display: none;
-            }
-
-            .nav-mobile {
-                display: flex;
-            }
-
-            .about-title {
-                font-size: 15vw;
-            }
-
-            .about-bio {
-                font-size: 3.5vw;
-                margin-bottom: 40px;
-            }
-
-            .skills-container {
-                grid-template-columns: 1fr;
-                gap: 20px;
-                width: 90%;
-            }
-
-            .exp-title {
-                font-size: 5vw;
-            }
-
-            .works-container {
-                grid-template-columns: 1fr;
-                gap: 40px;
-                width: 90%;
-            }
-
-            .work-item {
-                height: 300px;
-                padding: 25px 15px;
-            }
-
-            .work-svg {
-                width: 70px;
-                height: 70px;
-            }
-
-            .contact-container {
-                gap: 30px;
-            }
-
-            .contact-icon {
-                width: 65px;
-                height: 65px;
-                font-size: 28px;
-            }
-
-            .contact-title {
-                font-size: 15vw;
-                margin-bottom: 30px;
-            }
-        }
-    </style>
+    <!-- 模块化CSS -->
+    {{/* 先获取所有资源对象 */}}
+    {{ $variables := resources.Get "css/about/varibales.css" }}
+    {{ $base := resources.Get "css/about/base.css" }}
+    {{ $layer := resources.Get "css/about/layer.css" }}
+    {{ $navigation := resources.Get "css/about/navigation.css" }}
+    {{ $section := resources.Get "css/about/section.css" }}
+    {{ $sectionAbout := resources.Get "css/about/section-about.css" }}
+    {{ $sectionWorks := resources.Get "css/about/section-works.css" }}
+    {{ $sectionContact := resources.Get "css/about/section-contact.css" }}
+
+    {{/* 合并所有资源 */}}
+    {{ $css := slice
+    $variables
+    $base
+    $layer
+    $navigation
+    $section
+    $sectionAbout
+    $sectionWorks
+    $sectionContact
+    | resources.Concat "css/about-bundle.css"
+    | minify
+    | fingerprint
+    }}
+
+    <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+
+
+    <!-- 预加载关键资源 -->
+    {{ if .Params.avatar }}
+    <link rel="preload" href="{{ .Params.avatar | relURL }}" as="image" />
+    {{ end }}
 </head>
 
 <body>
-    <!-- 3D背景层：统一反向偏移，方向一致 -->
+    <!-- ========================================
+         3D背景层 - 统一反向偏移
+         ======================================== -->
     <div class="layer-3d layer-deep-bg"></div>
+
     <div class="layer-3d layer-grid">
-        <svg class="grid-svg" viewBox="0 0 1000 1000">
-            <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
-                <path d="M 60 0 L 0 0 0 60" fill="none" stroke="currentColor" stroke-width="1" />
-            </pattern>
-            <rect width="1000" height="1000" fill="url(#grid)" />
+        <svg class="grid-svg" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+            <defs>
+                <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+                    <path d="M 60 0 L 0 0 0 60" fill="none" stroke="currentColor" stroke-width="1" />
+                </pattern>
+            </defs>
+            <rect width="1000" height="1000" fill="url(#grid)" class="grid-pattern" />
         </svg>
     </div>
+
     <div class="layer-3d layer-line">
-        <svg class="line-svg" viewBox="0 0 1000 800">
+        <svg class="line-svg" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid meet">
             <path d="M0,400 L1000,400" stroke-linecap="round" />
             <path d="M500,0 L500,800" stroke-linecap="round" />
             <path d="M100,200 L900,600" stroke-linecap="round" />
@@ -681,23 +71,35 @@
         </svg>
     </div>
 
-    <!-- 主内容层：300vh实际高度，三屏连续排布无空白 -->
+    <!-- ========================================
+         主内容层 - 300vh实际高度
+         ======================================== -->
     <div class="layer-3d layer-content">
-        <!-- 第一屏：个人介绍（对接Hugo Front Matter） -->
-        <section class="section section-about">
-            <div class="avatar">
-                {{ $avatar := .Params.avatar | relURL }}
-                <img src="{{ $avatar }}" alt="个人头像">
+        <!-- ====================================
+             第一屏：个人介绍
+             ==================================== -->
+        <section class="section section-about" id="about">
+            <!-- 头像 -->
+            {{ if .Params.avatar }}
+            <div class="avatar" style="margin-top: 1000px;">
+                <img src="{{ .Params.avatar | relURL }}" alt="{{ .Title }}的头像" loading="eager" />
             </div>
-            <h1 class="about-title">{{ .Title }}</h1>
-            <p class="about-bio">{{ .Params.bio }}</p>
+            {{ end }}
 
-            <!-- 技能模块：循环渲染 -->
+            <!-- 标题和简介 -->
+            <h1 class="about-title">{{ .Title }}</h1>
+            {{ if .Params.bio }}
+            <p class="about-bio">{{ .Params.bio }}</p>
+            {{ end }}
+
+            <!-- 技能模块 -->
             {{ if .Params.skills }}
             <div class="skills-container">
                 {{ range .Params.skills }}
-                <div class="skill-item">
-                    <div class="skill-icon"><i class="fa {{ .icon }}"></i></div>
+                <div class="skill-item" data-scroll-animate>
+                    <div class="skill-icon">
+                        <i class="fa {{ .icon }}"></i>
+                    </div>
                     <h3 class="skill-name">{{ .name }}</h3>
                     <p class="skill-desc">{{ .description }}</p>
                     <div class="skill-tags">
@@ -710,12 +112,12 @@
             </div>
             {{ end }}
 
-            <!-- 经历模块：循环渲染 -->
+            <!-- 经历模块 -->
             {{ if .Params.experiences }}
             <div class="experiences-container">
                 <h2 class="exp-title">经历 / 项目</h2>
                 {{ range .Params.experiences }}
-                <div class="exp-item">
+                <div class="exp-item" data-scroll-animate>
                     <h3 class="exp-company">
                         {{ .title }}
                         {{ if .company }}| {{ .company }}{{ end }}
@@ -732,17 +134,21 @@
             {{ end }}
         </section>
 
-        <!-- 第二屏：作品文字触发 -->
+        <!-- ====================================
+             第二屏：作品文字触发
+             ==================================== -->
         <section class="section section-works-trigger">
             <div class="works-text">作品</div>
         </section>
 
-        <!-- 第二屏覆盖层：作品视错觉展示（核心修复：滚动触发） -->
+        <!-- ====================================
+             第二屏覆盖层：作品视错觉展示
+             ==================================== -->
         <section class="section-works-illusion" id="works">
             <div class="works-container">
                 {{ range .Params.projects }}
                 <div class="work-item">
-                    <div class="work-svg">
+                    <div class="work-svg icon-wrapper">
                         {{ .svg | safeHTML }}
                     </div>
                     <h3 class="work-name">{{ .name }}</h3>
@@ -757,14 +163,18 @@
             </div>
         </section>
 
-        <!-- 第三屏：联系方式（对接Hugo Front Matter） -->
+        <!-- ====================================
+             第三屏：联系方式
+             ==================================== -->
         <section class="section section-contact" id="contact">
             <h2 class="contact-title">联系我</h2>
             <div class="contact-container">
                 {{ range .Params.contacts }}
-                <a href="{{ .url }}" {{ if strings.HasPrefix .url "http" }}target="_blank" {{ end }}
-                    class="contact-item">
-                    <div class="contact-icon"><i class="fa {{ .icon }}"></i></div>
+                <a href="{{ .url }}" {{ if strings.HasPrefix .url "http" }}target="_blank" rel="noopener noreferrer" {{
+                    end }} class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fa {{ .icon }}"></i>
+                    </div>
                     <span class="contact-value">{{ .value }}</span>
                 </a>
                 {{ end }}
@@ -772,181 +182,57 @@
         </section>
     </div>
 
-    <!-- 导航层：核心修复 - fixed固定，全程悬浮不偏移 -->
+    <!-- ========================================
+         导航层 - Fixed固定悬浮
+         ======================================== -->
     <div class="layer-nav">
-        <!-- 桌面端侧边导航：固定右侧，激活态高亮 -->
-        <nav class="nav-desktop">
-            <a href="#about" class="nav-item active" data-section="about">
-                <i class="fa fa-user"></i>
+        <!-- 桌面端侧边导航 -->
+        <nav class="nav-desktop" aria-label="主导航">
+            <a href="#about" class="nav-item active" data-section="about" aria-label="关于我">
+                <i class="fa fa-user" aria-hidden="true"></i>
                 <span>关于我</span>
             </a>
-            <a href="#works" class="nav-item" data-section="works">
-                <i class="fa fa-picture-o"></i>
+            <a href="#works" class="nav-item" data-section="works" aria-label="我的作品">
+                <i class="fa fa-picture-o" aria-hidden="true"></i>
                 <span>我的作品</span>
             </a>
-            <a href="#contact" class="nav-item" data-section="contact">
-                <i class="fa fa-envelope"></i>
+            <a href="#contact" class="nav-item" data-section="contact" aria-label="联系我">
+                <i class="fa fa-envelope" aria-hidden="true"></i>
                 <span>联系我</span>
             </a>
-            <div class="nav-divider"></div>
-            <!-- 导航末尾Action按钮：浏览作品+返回主页 -->
-            <a href="#works" class="nav-action">
-                <i class="fa fa-eye"></i>
+
+            <div class="nav-divider" role="separator"></div>
+
+            <!-- Action按钮 -->
+            <a href="#works" class="nav-action" aria-label="浏览作品">
+                <i class="fa fa-eye" aria-hidden="true"></i>
                 <span>浏览作品</span>
             </a>
-            <a href="{{ .Site.BaseURL }}" class="nav-action">
-                <i class="fa fa-home"></i>
+            <a href="{{ .Site.BaseURL }}" class="nav-action" aria-label="返回主页">
+                <i class="fa fa-home" aria-hidden="true"></i>
                 <span>返回主页</span>
             </a>
         </nav>
 
-        <!-- 移动端顶部导航：固定顶部，简洁样式 -->
-        <nav class="nav-mobile">
-            <a href="#about" class="nav-item active" data-section="about">
-                <i class="fa fa-user"></i>
+        <!-- 移动端顶部导航 -->
+        <nav class="nav-mobile" aria-label="主导航">
+            <a href="#about" class="nav-item active" data-section="about" aria-label="关于我">
+                <i class="fa fa-user" aria-hidden="true"></i>
                 <span>关于我</span>
             </a>
-            <a href="#works" class="nav-item" data-section="works">
-                <i class="fa fa-picture-o"></i>
+            <a href="#works" class="nav-item" data-section="works" aria-label="作品">
+                <i class="fa fa-picture-o" aria-hidden="true"></i>
                 <span>作品</span>
             </a>
-            <a href="#contact" class="nav-item" data-section="contact">
-                <i class="fa fa-envelope"></i>
+            <a href="#contact" class="nav-item" data-section="contact" aria-label="联系">
+                <i class="fa fa-envelope" aria-hidden="true"></i>
                 <span>联系</span>
             </a>
         </nav>
     </div>
 
-    <script>
-        // 全局元素获取
-        const layerDeepBg = document.querySelector('.layer-deep-bg');
-        const layerGrid = document.querySelector('.layer-grid');
-        const layerLine = document.querySelector('.layer-line');
-        const worksText = document.querySelector('.works-text');
-        const worksIllusion = document.querySelector('.section-works-illusion');
-        const navItems = document.querySelectorAll('.nav-item');
-        const sections = {
-            about: document.querySelector('.section-about'),
-            works: document.querySelector('.section-works-illusion'),
-            contact: document.querySelector('.section-contact')
-        };
-
-        // 核心配置：视差系数（远层小，近层大，方向统一）
-        // 所有背景层：反向偏移（负号），内容相关：正向偏移（正号）
-        const PARALLAX = {
-            deepBg: 0.05,  // 最深层：反向极慢
-            grid: 0.15,    // 网格层：反向慢
-            line: 0.3,     // 线条层：反向中速
-            worksText: 1.2 // 作品文字：正向快速
-        };
-
-        // 滚动阈值：精准控制各阶段交互（0~1，基于300vh总高度）
-        const THRESHOLD = {
-            worksStart: 0.2,   // 1/5处开始放大作品文字
-            worksFull: 0.4,    // 2/5处作品文字出屏，显示作品项
-            contactStart: 0.7, // 7/10处开始过渡到联系方式
-            contactFull: 0.9   // 9/10处完全显示联系方式
-        };
-
-        // 核心函数：滚动处理（修复方向+空白+作品展示）
-        function handleScroll() {
-            // 获取滚动距离和总滚动高度（300vh - 视口高度）
-            const scrollTop = window.scrollY;
-            const windowHeight = window.innerHeight;
-            const totalScroll = document.body.scrollHeight - windowHeight;
-            // 滚动进度（0~1），限制边界，避免过度滚动导致空白
-            const scrollProgress = Math.max(0, Math.min(1, scrollTop / totalScroll));
-
-            // 基础偏移量：基于滚动进度计算，统一基准
-            const baseOffset = scrollTop * 0.6;
-
-            // ********** 修复1：所有3D层方向统一 - 背景层反向偏移，无旋转干扰 **********
-            layerDeepBg.style.transform = `translate3d(0, ${-baseOffset * PARALLAX.deepBg}px, var(--z-deep-bg))`;
-            layerGrid.style.transform = `translate3d(0, ${-baseOffset * PARALLAX.grid}px, var(--z-grid))`;
-            layerLine.style.transform = `translate3d(0, ${-baseOffset * PARALLAX.line}px, var(--z-line))`;
-
-            // ********** 修复2：作品展示功能完全实现 - 精准阈值触发 **********
-            // 阶段1：0 ~ 0.2 滚动进度 → 显示个人介绍，重置作品
-            if (scrollProgress <= THRESHOLD.worksStart) {
-                updateNav('about');
-                resetWorks();
-                worksText.style.transform = `translateZ(100px) scale(1)`;
-            }
-            // 阶段2：0.2 ~ 0.4 → 作品文字从1倍放大到35倍（超出屏幕）
-            else if (scrollProgress > THRESHOLD.worksStart && scrollProgress <= THRESHOLD.worksFull) {
-                updateNav('works');
-                const progress = (scrollProgress - THRESHOLD.worksStart) / (THRESHOLD.worksFull - THRESHOLD.worksStart);
-                const scale = 1 + progress * 34; // 1 → 35
-                worksText.style.transform = `translateZ(100px) scale(${scale})`;
-                worksText.style.opacity = 1 - progress * 0.3;
-                worksIllusion.style.opacity = 0;
-                worksIllusion.style.pointerEvents = 'none';
-            }
-            // 阶段3：0.4 ~ 0.7 → 作品文字出屏，显示3D作品项（核心：开启交互）
-            else if (scrollProgress > THRESHOLD.worksFull && scrollProgress <= THRESHOLD.contactStart) {
-                updateNav('works');
-                worksText.style.transform = `translateZ(100px) scale(35)`; // 保持出屏
-                worksText.style.opacity = 0;
-                worksIllusion.style.opacity = 1; // 作品项显隐
-                worksIllusion.style.pointerEvents = 'all'; // 开启hover交互
-            }
-            // 阶段4：0.7 ~ 0.9 → 作品项渐隐，过渡到联系方式
-            else if (scrollProgress > THRESHOLD.contactStart && scrollProgress <= THRESHOLD.contactFull) {
-                updateNav('contact');
-                const progress = (scrollProgress - THRESHOLD.contactStart) / (THRESHOLD.contactFull - THRESHOLD.contactStart);
-                worksIllusion.style.opacity = 1 - progress;
-                worksIllusion.style.pointerEvents = 'none';
-            }
-            // 阶段5：0.9 ~ 1 → 完全显示联系方式
-            else if (scrollProgress > THRESHOLD.contactFull) {
-                updateNav('contact');
-                worksIllusion.style.opacity = 0;
-            }
-        }
-
-        // ********** 修复3：导航高亮更新 - 精准匹配滚动阶段 **********
-        function updateNav(activeSection) {
-            navItems.forEach(item => {
-                item.classList.remove('active');
-                if (item.dataset.section === activeSection) {
-                    item.classList.add('active');
-                }
-            });
-        }
-
-        // ********** 修复4：导航锚点点击 - 平滑滚动，精准定位 **********
-        navItems.forEach(item => {
-            item.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = this.dataset.section;
-                const targetElement = document.getElementById(target) || sections[target];
-                if (targetElement) {
-                    // 平滑滚动到目标板块，适配移动端/桌面端
-                    targetElement.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                    // 强制更新导航和滚动状态
-                    setTimeout(() => handleScroll(), 100);
-                }
-            });
-        });
-
-        // 辅助函数：重置作品相关元素到初始状态
-        function resetWorks() {
-            worksText.style.transform = `translateZ(100px) scale(1)`;
-            worksText.style.opacity = 1;
-            worksIllusion.style.opacity = 0;
-            worksIllusion.style.pointerEvents = 'none';
-        }
-
-        // 窗口大小变化：重新计算滚动参数，适配所有屏幕
-        window.addEventListener('resize', handleScroll);
-        // 滚动监听：实时驱动3D视差和交互
-        window.addEventListener('scroll', handleScroll);
-        // 页面初始化：触发一次滚动，初始化所有状态
-        document.addEventListener('DOMContentLoaded', handleScroll);
-    </script>
+    <!-- 模块化JavaScript -->
+    <script type="module" src="{{ `js/about/main.js` | relURL }}"></script>
 </body>
 
 </html>

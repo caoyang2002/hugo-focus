@@ -1,0 +1,253 @@
+/* ========================================
+   作品展示板块 - 第二屏
+   ======================================== */
+
+/* ========================================
+   作品文字触发区域
+   ======================================== */
+.section-works-trigger {
+    z-index: calc(var(--z-content) + 100);
+}
+
+.works-text {
+    font-size: 30vw;
+    font-weight: 900;
+    color: var(--primary);
+    line-height: 1;
+    transform-origin: center center;
+    transform: translateZ(100px);
+    position: relative;
+    z-index: inherit;
+    background: linear-gradient(135deg, var(--primary) 0%, #0066ff 50%, #00aaff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 80px var(--primary-glow);
+    filter: drop-shadow(0 0 40px var(--primary-glow));
+    transition: var(--transition-base);
+}
+
+/* ========================================
+   作品视错觉展示区域
+   ======================================== */
+.section-works-illusion {
+    z-index: calc(var(--z-content) + 150);
+    position: absolute;
+    top: 100vh;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-strong);
+    background: var(--bg-overlay);
+    backdrop-filter: blur(10px);
+}
+
+.works-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 60px;
+    width: 80%;
+    max-width: 1000px;
+    perspective: 1500px;
+    transform-style: preserve-3d;
+}
+
+/* ========================================
+   作品卡片样式
+   ======================================== */
+.work-item {
+    background: var(--bg-transparent);
+    border: 1px solid var(--primary-light);
+    border-radius: var(--radius-md);
+    padding: 30px 20px;
+    height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    transform-style: preserve-3d;
+    box-shadow: var(--shadow-lg);
+    transition: var(--transition-strong);
+    position: relative;
+    overflow: hidden;
+}
+
+/* 卡片光效背景 */
+.work-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, var(--primary-light) 0%, transparent 70%);
+    opacity: 0;
+    transition: var(--transition-strong);
+}
+
+.work-item:hover::before {
+    opacity: 1;
+}
+
+/* 4个作品项3D错落排布 - 视错觉核心 */
+.work-item:nth-child(1) {
+    transform: rotateX(10deg) rotateY(-8deg) translateZ(20px) translateY(20px);
+    z-index: 2;
+    animation: work-float-1 4s ease-in-out infinite;
+}
+
+.work-item:nth-child(2) {
+    transform: rotateX(12deg) rotateY(10deg) translateZ(50px) translateY(-25px);
+    z-index: 3;
+    border-color: rgba(0, 66, 218, 0.3);
+    animation: work-float-2 4.5s ease-in-out infinite;
+}
+
+.work-item:nth-child(3) {
+    transform: rotateX(12deg) rotateY(-10deg) translateZ(40px) translateY(-20px);
+    z-index: 3;
+    border-color: rgba(0, 66, 218, 0.3);
+    animation: work-float-3 5s ease-in-out infinite;
+}
+
+.work-item:nth-child(4) {
+    transform: rotateX(10deg) rotateY(8deg) translateZ(20px) translateY(25px);
+    z-index: 2;
+    animation: work-float-4 4.2s ease-in-out infinite;
+}
+
+/* 悬浮动画 */
+@keyframes work-float-1 {
+    0%, 100% {
+        transform: rotateX(10deg) rotateY(-8deg) translateZ(20px) translateY(20px);
+    }
+    50% {
+        transform: rotateX(10deg) rotateY(-8deg) translateZ(25px) translateY(15px);
+    }
+}
+
+@keyframes work-float-2 {
+    0%, 100% {
+        transform: rotateX(12deg) rotateY(10deg) translateZ(50px) translateY(-25px);
+    }
+    50% {
+        transform: rotateX(12deg) rotateY(10deg) translateZ(55px) translateY(-30px);
+    }
+}
+
+@keyframes work-float-3 {
+    0%, 100% {
+        transform: rotateX(12deg) rotateY(-10deg) translateZ(40px) translateY(-20px);
+    }
+    50% {
+        transform: rotateX(12deg) rotateY(-10deg) translateZ(45px) translateY(-25px);
+    }
+}
+
+@keyframes work-float-4 {
+    0%, 100% {
+        transform: rotateX(10deg) rotateY(8deg) translateZ(20px) translateY(25px);
+    }
+    50% {
+        transform: rotateX(10deg) rotateY(8deg) translateZ(25px) translateY(20px);
+    }
+}
+
+/* Hover效果 - 3D悬浮 */
+.work-item:hover {
+    transform: rotateX(0) rotateY(0) translateZ(80px) translateY(-15px);
+    z-index: 10;
+    border-color: var(--primary);
+    box-shadow: 0 0 40px var(--primary-glow);
+    animation: none;
+}
+
+/* ========================================
+   作品卡片内容
+   ======================================== */
+.work-svg {
+    width: 90px;
+    height: 90px;
+    color: var(--primary);
+    margin-bottom: 15px;
+    transform: translateZ(30px);
+    transition: var(--transition-strong);
+    filter: drop-shadow(0 0 10px var(--primary-glow));
+}
+
+.work-item:hover .work-svg {
+    transform: translateZ(40px) scale(1.1) rotate(5deg);
+    filter: drop-shadow(0 0 20px var(--primary-glow));
+}
+
+.work-name {
+    font-size: 19px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    transform: translateZ(20px);
+    transition: var(--transition-smooth);
+}
+
+.work-item:hover .work-name {
+    color: var(--primary);
+    transform: translateZ(25px);
+}
+
+.work-desc {
+    font-size: 14px;
+    color: var(--text-light);
+    line-height: 1.6;
+    margin-bottom: 20px;
+    padding: 0 10px;
+    transform: translateZ(15px);
+    transition: var(--transition-smooth);
+}
+
+.work-item:hover .work-desc {
+    color: var(--text-gray);
+    transform: translateZ(20px);
+}
+
+.work-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    justify-content: center;
+}
+
+/* ========================================
+   响应式 - 移动端
+   ======================================== */
+@media (max-width: 768px) {
+    .works-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        width: 90%;
+    }
+
+    .work-item {
+        height: 300px;
+        padding: 25px 15px;
+    }
+
+    .work-svg {
+        width: 70px;
+        height: 70px;
+    }
+
+    /* 移动端简化3D效果 */
+    .work-item:nth-child(1),
+    .work-item:nth-child(2),
+    .work-item:nth-child(3),
+    .work-item:nth-child(4) {
+        transform: translateZ(10px);
+        animation: none;
+    }
+
+    .work-item:hover {
+        transform: translateZ(30px) translateY(-10px);
+    }
+}

@@ -1,0 +1,323 @@
+/* ========================================
+   个人介绍板块 - 第一屏
+   ======================================== */
+
+.section-about {
+    z-index: calc(var(--z-content) + 50);
+}
+
+/* ========================================
+   头像样式
+   ======================================== */
+.avatar {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 5px solid var(--text-white);
+    overflow: hidden;
+    margin-bottom: 40px;
+    transform: translateZ(60px) scale(1.02);
+    box-shadow: var(--shadow-glow);
+    position: relative;
+    animation: avatar-float 3s ease-in-out infinite;
+}
+
+@keyframes avatar-float {
+    0%, 100% {
+        transform: translateZ(60px) scale(1.02) translateY(0);
+    }
+    50% {
+        transform: translateZ(60px) scale(1.02) translateY(-10px);
+    }
+}
+
+.avatar::before {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+    z-index: -1;
+    opacity: 0;
+    transition: opacity var(--transition-smooth);
+}
+
+.avatar:hover::before {
+    opacity: 1;
+    animation: avatar-glow 1.5s ease-in-out infinite;
+}
+
+@keyframes avatar-glow {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition-smooth);
+}
+
+.avatar:hover img {
+    transform: scale(1.05);
+}
+
+/* ========================================
+   标题和简介
+   ======================================== */
+.about-title {
+    font-size: 8vw;
+    font-weight: 900;
+    color: var(--primary);
+    line-height: 1.2;
+    margin-bottom: 25px;
+    transform: translateZ(50px);
+    background: linear-gradient(135deg, var(--primary) 0%, #0066ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: title-shine 3s ease-in-out infinite;
+}
+
+@keyframes title-shine {
+    0%, 100% {
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(1.2);
+    }
+}
+
+.about-bio {
+    font-size: 1.3vw;
+    color: var(--text-gray);
+    max-width: 750px;
+    line-height: 1.8;
+    padding: 0 2vw;
+    margin-bottom: 60px;
+    transform: translateZ(40px);
+}
+
+/* ========================================
+   技能模块
+   ======================================== */
+.skills-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-lg);
+    max-width: 900px;
+    margin-bottom: 80px;
+    transform: translateZ(30px);
+}
+
+.skill-item {
+    background: var(--primary-light);
+    border: 1px solid rgba(0, 66, 218, 0.2);
+    border-radius: var(--radius-md);
+    padding: 30px 20px;
+    transform: translateZ(10px);
+    transition: var(--transition-strong);
+    position: relative;
+    overflow: hidden;
+}
+
+.skill-item::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(0, 66, 218, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: var(--transition-strong);
+}
+
+.skill-item:hover::before {
+    opacity: 1;
+    animation: skill-ripple 1.5s ease-out;
+}
+
+@keyframes skill-ripple {
+    from {
+        transform: scale(0);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+.skill-item:hover {
+    transform: translateZ(30px) translateY(-8px);
+    border-color: var(--primary);
+    box-shadow: 0 0 20px var(--primary-glow);
+}
+
+.skill-icon {
+    font-size: 32px;
+    color: var(--primary);
+    margin-bottom: 15px;
+    transform: translateZ(15px);
+    transition: var(--transition-smooth);
+}
+
+.skill-item:hover .skill-icon {
+    transform: translateZ(15px) scale(1.1) rotate(5deg);
+}
+
+.skill-name {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    transform: translateZ(12px);
+}
+
+.skill-desc {
+    font-size: 14px;
+    color: var(--text-gray);
+    line-height: 1.6;
+    margin-bottom: 20px;
+    transform: translateZ(10px);
+}
+
+.skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    justify-content: center;
+    transform: translateZ(8px);
+}
+
+/* ========================================
+   经历模块
+   ======================================== */
+.experiences-container {
+    max-width: 1000px;
+    width: 90%;
+    transform: translateZ(20px);
+}
+
+.exp-title {
+    font-size: 2vw;
+    color: var(--primary);
+    margin-bottom: 40px;
+    transform: translateZ(15px);
+    font-weight: 900;
+}
+
+.exp-item {
+    text-align: left;
+    border-left: 2px solid var(--primary);
+    padding-left: 30px;
+    margin-bottom: 40px;
+    transform: translateZ(10px);
+    margin-left: 20px;
+    position: relative;
+    transition: var(--transition-smooth);
+}
+
+.exp-item::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--primary);
+    box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--primary);
+    transition: var(--transition-smooth);
+}
+
+.exp-item:hover {
+    border-color: var(--text-white);
+    transform: translateZ(20px) translateX(5px);
+}
+
+.exp-item:hover::before {
+    background: var(--text-white);
+    box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--text-white), 0 0 15px var(--primary-glow);
+}
+
+.exp-company {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 5px;
+    transition: var(--transition-smooth);
+}
+
+.exp-item:hover .exp-company {
+    color: var(--text-white);
+}
+
+.exp-period {
+    font-size: 14px;
+    color: var(--text-light);
+    margin-bottom: 15px;
+}
+
+.exp-details {
+    list-style: none;
+}
+
+.exp-details li {
+    font-size: 14px;
+    color: var(--text-gray);
+    line-height: 1.8;
+    margin-bottom: 10px;
+    position: relative;
+    padding-left: 20px;
+    transition: var(--transition-smooth);
+}
+
+.exp-details li::before {
+    content: "•";
+    color: var(--primary);
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 1.2em;
+    transition: var(--transition-smooth);
+}
+
+.exp-item:hover .exp-details li {
+    color: var(--text-white);
+}
+
+.exp-item:hover .exp-details li::before {
+    color: var(--text-white);
+    transform: scale(1.3);
+}
+
+/* ========================================
+   响应式 - 移动端
+   ======================================== */
+@media (max-width: 768px) {
+    .about-title {
+        font-size: 15vw;
+    }
+
+    .about-bio {
+        font-size: 3.5vw;
+        margin-bottom: 40px;
+    }
+
+    .skills-container {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+        width: 90%;
+    }
+
+    .exp-title {
+        font-size: 5vw;
+    }
+}
