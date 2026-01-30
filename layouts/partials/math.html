@@ -31,9 +31,15 @@
       delimiters: [
         { left: '$$', right: '$$', display: true },
         { left: '$', right: '$', display: false },
+        { left: '\\(', right: '\\)', display: false },  // 添加更多分隔符
+           { left: '\\[', right: '\\]', display: true }
       ],
       // • rendering keys, e.g.:
       throwOnError: false,
+      errorCallback: (error, macro) => {
+          console.warn('KaTeX 渲染错误:', error);
+          // 可选：显示用户友好的错误信息
+        }
     }),
   );
 </script>
