@@ -1,37 +1,55 @@
 <aside class="sticky w-64">
+    {{ $site := .Site }}
     <!-- 个人信息容器 -->
     <div class="sidebar-card">
         <!-- 个人信息部分 -->
         <div class="profile-section">
-            {{ with $.Scratch.Get "avatar_url" }}
+            {{ $avatar := $site.Params.avatar | default "/about/avatar.jpg" }}
+
+            <!---->
+            <!--{{ with $.Scratch.Get "avatar_url" }}-->
             <div class="avatar-container">
                 <a href="{{ site.BaseURL }}" class="avatar-link">
-                    <img src="{{ . }}" class="avatar" alt="avatar" />
+                    <img src="{{ $avatar }}" class="avatar" alt="avatar" />
                     <div class="avatar-overlay"></div>
                 </a>
             </div>
-            {{ end }} {{ with site.Params.name }}
+            <!--{{ end }}-->
+            <!-- 名称-->
+            {{ with site.Params.name }}
             <h2 class="profile-name">{{ . }}</h2>
             {{ end }} {{ with site.Params.bio }}
             <p class="profile-bio">{{ . }}</p>
             {{ end }}
 
-            <!-- 社交媒体 - 修正版 -->
+            <!-- 社交媒体 -->
             {{ with $.Scratch.Get "social_list" }}
             <div class="social-links">
                 {{ range . }} {{ $platform := . }} {{ $socialURL := "" }}
 
                 <!-- 构建社交媒体 URL -->
-                {{ if eq . "rss" }} {{ $socialURL = "index.xml" | absURL }} {{
-                else if eq . "mastodon" }} {{ $socialURL = index site.Params .
-                }} {{ else if eq . "threads" }} {{ $socialURL = printf
-                "https://threads.net/%s" (index site.Params .) }} {{ else if eq
-                . "bluesky" }} {{ $socialURL = printf
-                "https://bsky.app/profile/%s" (index site.Params .) }} {{ else
-                if eq . "linkedin" }} {{ $socialURL = printf
-                "https://linkedin.com/in/%s" (index site.Params .) }} {{ else }}
-                {{ $socialURL = printf "https://%s.com/%s" . (index site.Params
-                .) }} {{ end }}
+                {{ if eq . "rss" }}
+                <!---->
+                {{ $socialURL = "index.xml" | absURL }} {{ else if eq .
+                "mastodon" }} {{ $socialURL = index site.Params . }}
+                <!---->
+                {{ else if eq . "threads" }} {{ $socialURL = printf
+                "https://threads.net/%s" (index site.Params .) }}
+                <!---->
+                {{ else if eq . "bluesky" }}
+                <!---->
+                {{ $socialURL = printf "https://bsky.app/profile/%s" (index
+                site.Params .) }}
+                <!---->
+                {{ else if eq . "linkedin" }}
+                <!---->
+                {{ $socialURL = printf "https://linkedin.com/in/%s" (index
+                site.Params .) }}
+                <!---->
+                {{ else }} {{ $socialURL = printf "https://%s.com/%s" . (index
+                site.Params .) }}
+                <!---->
+                {{ end }}
 
                 <a
                     href="{{ $socialURL }}"

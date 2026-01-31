@@ -1,20 +1,44 @@
-{{/* layouts/partials/article-share.html - 优化版本 */}} {{ $page := . }} {{
-$site := .Site }} {{ $author := $site.Params.author | default "作者" }} {{
-$avatar := $site.Params.avatar | default "/images/avatar.jpg" }} {{ $logo :=
-$site.Params.logo | default "/images/logo.png" }} {{ $title := $page.Title }} {{
-$description := $site.Params.description | default (truncate 120 $page.Summary)
-| default "网站描述" }} {{ $url := $page.Permalink | absURL }} {{ $date :=
-$page.Date.Format "2006-01-02" }} {{ $lastmod := $page.Lastmod.Format
-"2006-01-02" }} {{ $readingTime := $page.ReadingTime }} {{ $wordCount :=
-$page.WordCount }} {{ $tags := $page.Params.tags }} {{ $totalPosts := len (where
-$site.RegularPages "Section" "posts") }} {{ $featuredImage := "" }} {{ if
-$page.Params.featuredImage }} {{ $featuredImage = $page.Params.featuredImage }}
-{{ else if $page.Params.images }} {{ $featuredImage = index $page.Params.images
-0 }} {{ end }} {{ $categories := $page.Params.categories | default slice }} {{
-$postsByDate := dict }} {{ range where $site.RegularPages "Section" "posts" }}
-{{ $postDate := .Date.Format "2006-01-02" }} {{ $postsByDate = merge
-$postsByDate (dict $postDate (add (index $postsByDate $postDate | default 0) 1))
-}} {{ end }}
+{{/* layouts/partials/article-share.html - 优化版本 */}}
+<!---->
+{{ $page := . }} {{ $site := .Site }}
+<!-- 作者名称 -->
+{{ $author := $site.Params.author | default "作者" }}
+<!--头像-->
+{{ $avatar := $site.Params.avatar | default "/about/avatar.jpg" }}
+<!-- 网站 logo -->
+{{ $logo := $site.Params.logo | default "/images/logo.png" }}
+<!-- 网站标题 -->
+{{ $title := $page.Title }}
+<!---->
+{{ $description := $site.Params.description | default (truncate 120
+$page.Summary) | default "网站描述" }}
+<!---->
+{{ $url := $page.Permalink | absURL }}
+<!---->
+{{ $date := $page.Date.Format "2006-01-02" }}
+<!---->
+{{ $lastmod := $page.Lastmod.Format "2006-01-02" }}
+<!---->
+{{ $readingTime := $page.ReadingTime }}
+<!---->
+{{ $wordCount := $page.WordCount }}
+<!---->
+{{ $tags := $page.Params.tags }}
+<!---->
+{{ $totalPosts := len (where $site.RegularPages "Section" "posts") }}
+<!--封面图片-->
+{{ $featuredImage := "" }}
+<!---->
+{{ if $page.Params.featuredImage }}
+<!---->
+{{ $featuredImage = $page.Params.featuredImage }} {{ else if $page.Params.images
+}}
+<!---->
+{{ $featuredImage = index $page.Params.images 0 }} {{ end }} {{ $categories :=
+$page.Params.categories | default slice }} {{ $postsByDate := dict }} {{ range
+where $site.RegularPages "Section" "posts" }} {{ $postDate := .Date.Format
+"2006-01-02" }} {{ $postsByDate = merge $postsByDate (dict $postDate (add (index
+$postsByDate $postDate | default 0) 1)) }} {{ end }}
 
 <!-- 分享按钮 -->
 <button class="share-trigger-btn" aria-label="分享文章">
@@ -265,6 +289,7 @@ $postsByDate (dict $postDate (add (index $postsByDate $postDate | default 0) 1))
                             {{ end }}
                             <div class="author-info">
                                 <p class="author-name">{{ $author }}</p>
+                                <!-- 统计信息 -->
                                 <p class="author-stats">
                                     <span class="stat-item">
                                         <svg
@@ -690,22 +715,22 @@ $postsByDate (dict $postDate (add (index $postsByDate $postDate | default 0) 1))
 <style>
     /* 分享触发按钮 */
     .share-trigger-btn {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.75rem 1.5rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 0.5rem 1.25rem;
+        background-color: #0053e0;
         color: white;
         border: none;
-        border-radius: 12px;
-        font-weight: 600;
+        border-radius: 1rem;
         cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        transition: all 0.2s ease;
+        font-size: 1rem;
+
+        display: inline-flex;
+        align-items: center;
     }
 
     .share-trigger-btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        box-shadow: 0 6px 20px rgba(225, 123, 123, 0.5);
     }
 
     .share-trigger-btn:active {
@@ -1028,14 +1053,14 @@ $postsByDate (dict $postDate (add (index $postsByDate $postDate | default 0) 1))
 
     .author-avatar-ring {
         position: absolute;
-        top: -3px;
+        /*top: -3px;
         left: -3px;
         right: -3px;
-        bottom: -3px;
+        bottom: -3px;*/
         border-radius: 50%;
         border: 2px solid #667eea;
         opacity: 0;
-        animation: ring-pulse 2s ease-in-out infinite;
+        /*animation: ring-pulse 2s ease-in-out infinite;*/
     }
 
     @keyframes ring-pulse {

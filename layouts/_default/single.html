@@ -73,13 +73,15 @@
     </div>
 
     <section>{{ .Content }}</section>
+    <div class="flex flex-row items-center justify-center space-x-4">
+        <!-- 支持 -->
+        {{ if site.Params.Reward | default true }} {{ partial "reward.html" . }}
+        {{end}}
+        <!--分享按钮-->
+        {{ if .Params.showShare | default true }} {{ partial
+        "article-share.html" . }} {{ end }}
+    </div>
 
-    <!-- 支持 -->
-    {{ if site.Params.Reward | default true }} {{ partial "reward.html" . }}
-    {{end}}
-    <!--分享按钮-->
-    {{ if .Params.showShare | default true }} {{ partial "article-share.html" .
-    }} {{ end }}
     <!-- Post Tags -->
     <!-- {{ if .Params.tags }}
     <footer class="mt-12 flex flex-wrap">
