@@ -7,7 +7,8 @@
   * [基本配置](content/quick_start/install.md)
   * [基本配置](content/quick_start/config.md)
   * [启动](content/quick_start/run.md)
-
+* 配置
+  * [文章配置](content/config/artical.md)
 * 特性
   * [开发](content/feature/)
   * [Mermaid](content/feature/mermaid.md)
