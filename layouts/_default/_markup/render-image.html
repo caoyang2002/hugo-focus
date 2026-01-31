@@ -1,0 +1,76 @@
+{{/* layouts/_default/_markup/render-image.html */}} {{/* 获取图片信息 */}} {{-
+$img := .Page.Resources.GetMatch .Destination -}} {{- $alt := .PlainText |
+safeHTML -}} {{- $title := .Title | safeHTML -}} {{/* 设置默认样式类 */}} {{-
+$figureClass := "my-8 text-center" -}} {{- $imgClass := "mx-auto" -}} {{- if
+$img -}}
+
+<!---->
+{{/* 本地图片处理 - 生成响应式图片 */}}
+<!---->
+{{- $small := $img.Resize "480x webp" -}}
+<!---->
+{{- $medium := $img.Resize "768x webp" -}}
+<!---->
+{{- $large := $img.Resize "1024x webp" -}}
+
+<figure class="{{ $figureClass }}">
+    <picture>
+        <source
+            type="image/webp"
+            srcset="{{ $small.RelPermalink }} 480w, {{ $medium.RelPermalink }} 768w, {{ $large.RelPermalink }} 1024w"
+            sizes="(max-width: 480px) 100vw, (max-width: 768px) 100vw, 1024px"
+        />
+        <img
+            src="{{ $large.RelPermalink }}"
+            srcset="{{ $small.RelPermalink }} 480w, {{ $medium.RelPermalink }} 768w, {{ $large.RelPermalink }} 1024w"
+            sizes="(max-width: 480px) 100vw, (max-width: 768px) 100vw, 1024px"
+            alt="{{ $alt }}"
+            class="{{ $imgClass }}"
+            loading="lazy"
+            decoding="async"
+            {{-
+            if
+            $title
+            }}title="{{ $title }}"
+            {{
+            end
+            -}}
+        />
+    </picture>
+
+    {{/* 图片描述 */}} {{- $caption := $alt -}} {{- if not $caption -}} {{-
+    $caption = "图片无描述" -}} {{- end -}}
+
+    <figcaption class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+        {{- $caption -}} {{- if and $title (ne $title $alt) -}}
+        <span class="ml-2 text-gray-500">({{ $title }})</span>
+        {{- end -}}
+    </figcaption>
+</figure>
+
+{{- else -}} {{/* 外部图片回退方案 */}}
+<figure class="{{ $figureClass }}">
+    <img
+        src="{{ .Destination | safeURL }}"
+        alt="{{ $alt }}"
+        class="{{ $imgClass }} max-w-full h-auto"
+        {{-
+        if
+        $title
+        }}title="{{ $title }}"
+        {{
+        end
+        -}}
+        loading="lazy"
+    />
+
+    {{/* 图片描述 */}} {{- $caption := $alt -}} {{- if not $caption -}} {{-
+    $caption = "图片无描述" -}} {{- end -}}
+
+    <figcaption class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+        {{- $caption -}} {{- if and $title (ne $title $alt) -}}
+        <span class="ml-2 text-gray-500">({{ $title }})</span>
+        {{- end -}}
+    </figcaption>
+</figure>
+{{- end -}}
