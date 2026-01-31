@@ -43,12 +43,13 @@
     {{ if .Params.avatar }}
     <link rel="preload" href="{{ .Params.avatar | relURL }}" as="image" />
     {{ end }}
+
 </head>
 
 <body>
     <!-- ========================================
          3D背景层 - 统一反向偏移
-         ======================================== -->
+         ===========================    ============= -->
     <div class="layer-3d layer-deep-bg"></div>
 
     <div class="layer-3d layer-grid">
@@ -233,6 +234,7 @@
 
     <!-- 模块化JavaScript -->
     <script type="module" src="{{ `js/about/main.js` | relURL }}"></script>
+
 </body>
 
 </html>

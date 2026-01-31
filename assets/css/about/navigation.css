@@ -18,6 +18,17 @@
     animation: nav-fade-in 0.8s ease-out 0.5s forwards;
 }
 
+.fixed-right-center {
+    position: fixed !important;
+    right: 1rem !important;
+    top: 50vh !important; /* 使用视窗高度单位 */
+    transform: translateY(-50%) !important;
+    z-index: 999999 !important;
+    background: red !important;
+    color: white !important;
+    padding: 10px !important;
+}
+
 @keyframes nav-fade-in {
     from {
         opacity: 0;

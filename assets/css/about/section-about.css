@@ -15,7 +15,7 @@
     border-radius: 50%;
     background: var(--primary);
     border: 5px solid var(--text-white);
-    overflow: hidden;
+    overflow: clip;
     margin-bottom: 40px;
     transform: translateZ(60px) scale(1.02);
     box-shadow: var(--shadow-glow);
