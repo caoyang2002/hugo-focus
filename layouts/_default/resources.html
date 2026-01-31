@@ -546,15 +546,102 @@
             <!-- 简约侧边导航 -->
             <aside class="sidebar">
                 <div class="sidebar-header">
-                    <h1 class="sidebar-title">
-                        <i class="fas fa-boxes"></i>
-                        {{ .Title }}
-                    </h1>
-                    <p class="sidebar-subtitle">
-                        {{ .Params.description | default "精选资源集合" }}
-                    </p>
+                    <div class="header-container">
+                        <div class="title-container">
+                            <h1 class="sidebar-title">
+                                <i class="fas fa-boxes"></i>
+                                {{ .Title }}
+                            </h1>
+                            <p class="sidebar-subtitle">
+                                {{ .Params.description | default "精选资源集合"
+                                }}
+                            </p>
+                        </div>
+
+                        <button
+                            class="home-button"
+                            onclick="window.location.href='/'"
+                        >
+                            <i class="fas fa-home"></i>
+                        </button>
+                    </div>
+
+                    <style>
+                        .header-container {
+                            display: flex;
+                            align-items: flex-start;
+                            justify-content: space-between;
+                            padding: 1rem;
+                            gap: 1rem;
+                        }
+
+                        .title-container {
+                            flex: 1;
+                        }
+
+                        .sidebar-title {
+                            font-size: 1.4rem;
+                            font-weight: 600;
+                            color: #333;
+                            margin: 0 0 0.3rem 0;
+                            display: flex;
+                            align-items: center;
+                            gap: 0.6rem;
+                        }
+
+                        .sidebar-title i {
+                            color: #667eea;
+                        }
+
+                        .sidebar-subtitle {
+                            font-size: 0.9rem;
+                            color: #666;
+                            margin: 0;
+                            line-height: 1.4;
+                        }
+
+                        /* 紧凑型图标按钮 */
+                        .home-button {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            width: 36px;
+                            height: 36px;
+                            background: linear-gradient(
+                                135deg,
+                                #667eea 0%,
+                                #764ba2 0%
+                            );
+                            color: white;
+                            border: none;
+                            border-radius: 10px;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.2);
+                            flex-shrink: 0;
+                        }
+
+                        .home-button:hover {
+                            transform: translateY(-2px);
+                            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+                            background: linear-gradient(
+                                135deg,
+                                #764ba2 0%,
+                                #667eea 0%
+                            );
+                        }
+
+                        .home-button:active {
+                            transform: translateY(0);
+                        }
+
+                        .home-button i {
+                            font-size: 1.1rem;
+                        }
+                    </style>
                 </div>
 
+                <!-- 其余部分保持不变 -->
                 <div class="categories-section">
                     <h2 class="section-title">
                         <i class="fas fa-folder"></i>

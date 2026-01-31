@@ -222,7 +222,7 @@
             },
         },
         ts: {
-            cdn: "https://cdn.jsdelivr.net/npm/typescript@latest/lib/typescript.min.js",
+            cdn: null,
             init: async () => {
                 return runners.typescript.init();
             },
@@ -231,11 +231,62 @@
             },
         },
 
-        // 原生
+        // 原生 JavaScript - 修复了 execute 方法
         javascript: {
             cdn: null,
             init: async () => {
                 return window;
+            },
+            execute: async (code) => {
+                try {
+                    let output = [];
+                    const originalConsoleLog = console.log;
+                    const originalConsoleError = console.error;
+                    const originalConsoleWarn = console.warn;
+
+                    // 捕获控制台输出
+                    console.log = (...args) => {
+                        output.push(args.join(" "));
+                        originalConsoleLog.apply(console, args);
+                    };
+
+                    console.error = (...args) => {
+                        output.push("错误: " + args.join(" "));
+                        originalConsoleError.apply(console, args);
+                    };
+
+                    console.warn = (...args) => {
+                        output.push("警告: " + args.join(" "));
+                        originalConsoleWarn.apply(console, args);
+                    };
+
+                    // 执行 JavaScript 代码
+                    let result;
+                    try {
+                        // 使用 Function 构造函数安全执行
+                        const func = new Function(code);
+                        result = func();
+
+                        // 如果有返回值但不是 undefined，添加到输出
+                        if (result !== undefined) {
+                            output.push("返回值: " + result);
+                        }
+                    } catch (e) {
+                        output.push("执行错误: " + e.message);
+                        throw e;
+                    } finally {
+                        // 恢复原始控制台方法
+                        console.log = originalConsoleLog;
+                        console.error = originalConsoleError;
+                        console.warn = originalConsoleWarn;
+                    }
+
+                    return output.join("\n") || "(无输出)";
+                } catch (error) {
+                    throw new Error(
+                        `JavaScript execution error: ${error.message}`,
+                    );
+                }
             },
         },
         js: {
@@ -248,12 +299,30 @@
             },
         },
 
-        //  JavaScript 实现的 Common Lisp (JSCL) 解释器
+        // JavaScript 实现的 Common Lisp (JSCL) 解释器
+        // Common Lisp (JSCL) 运行时 - 使用稳定版本 1.1.1
         lisp: {
             cdn: "https://unpkg.com/jscl@0.8.2/jscl.js",
             init: async () => {
                 try {
                     await loadScript("https://unpkg.com/jscl@0.8.2/jscl.js");
+
+                    // 调试：检查 JSCL 对象结构
+                    console.log(
+                        "JSCL 加载成功，对象结构:",
+                        Object.keys(window.jscl),
+                    );
+                    console.log("JSCL 版本:", window.jscl.version);
+
+                    // 测试是否工作
+                    try {
+                        const testResult =
+                            window.jscl.evaluateString("(+ 1 2)");
+                        console.log("JSCL 测试 (+ 1 2) =", testResult);
+                    } catch (e) {
+                        console.warn("JSCL 测试失败:", e);
+                    }
+
                     return window.jscl;
                 } catch (error) {
                     throw new Error(
@@ -264,63 +333,104 @@
             execute: async (code) => {
                 try {
                     const lisp = runtimeInstances.lisp;
-                    const output = [];
-                    const result = lisp.evaluateString(code, {
-                        output: (str) => output.push(str),
-                    });
+                    const outputLines = [];
 
-                    console.log("结果：", result);
-                    return output.join("\n") || String(result);
+                    // 创建一个专门的输出函数
+                    const captureOutput = (message) => {
+                        // 过滤掉调试信息
+                        if (typeof message === "string" && message.trim()) {
+                            // 不捕获 jscl.js 的内部日志
+                            if (
+                                !message.includes("jscl.js:") &&
+                                !message.includes("loading") &&
+                                !message.includes("elapsed time")
+                            ) {
+                                outputLines.push(message.trim());
+                            }
+                        }
+                    };
+
+                    // 保存并替换 console.log
+                    const originalConsoleLog = console.log;
+                    console.log = (...args) => {
+                        captureOutput(args.join(" "));
+                        originalConsoleLog.apply(console, args);
+                    };
+
+                    // 保存并替换 console.info（JSCL 可能使用这个）
+                    const originalConsoleInfo = console.info;
+                    console.info = (...args) => {
+                        captureOutput(args.join(" "));
+                        originalConsoleInfo.apply(console, args);
+                    };
+
+                    try {
+                        // 执行代码
+                        const result = lisp.evaluateString(code);
+
+                        // 处理结果
+                        let output = outputLines.join("\n").trim();
+
+                        if (output) {
+                            return output;
+                        } else if (result !== undefined && result !== null) {
+                            if (result === false) {
+                                // Lisp 的 NIL 返回为 false
+                                return "NIL";
+                            } else {
+                                return String(result);
+                            }
+                        } else {
+                            return "(无输出)";
+                        }
+                    } finally {
+                        // 恢复原始控制台函数
+                        console.log = originalConsoleLog;
+                        console.info = originalConsoleInfo;
+                    }
                 } catch (error) {
                     throw new Error(`Lisp execution error: ${error.message}`);
                 }
             },
         },
-
-        // error
+        // Ruby WASM 运行时
         ruby: {
-            cdn: "https://cdn.jsdelivr.net/npm/@ruby/wasm-wasi@latest/dist/browser.esm.js",
+            cdn: "https://cdn.jsdelivr.net/npm/@ruby/wasm-wasi@latest/dist/browser.umd.js",
             init: async () => {
                 try {
-                    // First load the Ruby runtime script
-                    const rubyScript = document.createElement("script");
-                    rubyScript.type = "text/javascript";
-                    rubyScript.src =
-                        "https://cdn.jsdelivr.net/npm/@ruby/wasm-wasi@latest/dist/browser.umd.js";
-
-                    // Wait for the script to load
-                    await new Promise((resolve, reject) => {
-                        rubyScript.onload = resolve;
-                        rubyScript.onerror = () =>
-                            reject(new Error("Failed to load Ruby runtime"));
-                        document.head.appendChild(rubyScript);
-                    });
-
-                    // Load and instantiate the WASM module
-                    const wasmUrl =
-                        "https://cdn.jsdelivr.net/npm/@ruby/wasm-wasi@latest/dist/ruby.wasm";
-                    const wasmResponse = await fetch(wasmUrl);
-
-                    if (!wasmResponse.ok) {
-                        throw new Error(
-                            `Failed to fetch WASM module: ${wasmResponse.statusText}`,
-                        );
-                    }
-
-                    const wasmBinary = await wasmResponse.arrayBuffer();
-
-                    // Initialize Ruby runtime with the WASM binary
-                    const rubyVM = await RubyVM.load({
-                        wasmBinary: wasmBinary,
-                        printVersion: false,
-                    });
-
-                    // Test that the VM is working
-                    await rubyVM.eval(
-                        'puts "Ruby VM initialized successfully"',
+                    // 加载 Ruby WASM 运行时
+                    await loadScript(
+                        "https://cdn.jsdelivr.net/npm/@ruby/wasm-wasi@latest/dist/browser.umd.js",
                     );
 
-                    return rubyVM;
+                    // 加载 WASM 模块
+                    const wasmUrl =
+                        "https://cdn.jsdelivr.net/npm/@ruby/wasm-wasi@latest/dist/ruby.wasm";
+
+                    // 初始化 Ruby VM
+                    const { RubyVM } = window;
+                    const response = await fetch(wasmUrl);
+                    const buffer = await response.arrayBuffer();
+
+                    const vm = new RubyVM();
+                    await vm.initialize({
+                        wasi: new window.WASI({
+                            version: "preview1",
+                            env: {},
+                            args: [],
+                        }),
+                    });
+
+                    // 设置输出捕获
+                    let output = [];
+                    vm.print = (str) => {
+                        output.push(str);
+                    };
+
+                    // 保存输出捕获函数
+                    vm._output = output;
+
+                    return vm;
                 } catch (error) {
                     console.error("Detailed Ruby init error:", error);
                     throw new Error(
@@ -330,22 +440,18 @@
             },
             execute: async (code) => {
                 try {
-                    let output = [];
                     const vm = runtimeInstances.ruby;
 
-                    // Configure output capture
-                    const originalPuts = vm.eval("method(:puts)");
-                    vm.setPrintFunction((text) => output.push(text));
-
-                    // Execute the code
-                    await vm.eval(code);
-
-                    // Restore original puts if needed
-                    if (originalPuts) {
-                        vm.eval("define_method(:puts, method(:puts))");
+                    // 清空之前的输出
+                    if (vm._output) {
+                        vm._output.length = 0;
                     }
 
-                    // Return captured output
+                    // 执行代码
+                    await vm.eval(code);
+
+                    // 获取输出
+                    const output = vm._output || [];
                     return output.join("\n") || "(No output)";
                 } catch (error) {
                     console.error("Ruby execution error details:", error);
@@ -354,23 +460,20 @@
             },
         },
 
-        // error
+        // Swift WASM 运行时
         swift: {
-            cdn: "https://cdn.jsdelivr.net/npm/@swiftwasm/swift-webpack-plugin@1.0.9/plugin.min.js",
+            cdn: "https://cdn.jsdelivr.net/npm/swiftwasm@5.9.2/dist/index.js",
             init: async () => {
                 try {
                     await loadScript(
-                        "https://cdn.jsdelivr.net/npm/@swiftwasm/swift-webpack-plugin@1.0.9/plugin.min.js",
+                        "https://cdn.jsdelivr.net/npm/swiftwasm@5.9.2/dist/index.js",
                     );
 
                     // 初始化 Swift WASM 运行时
-                    const swift = await window.SwiftWeb.init({
-                        // 配置 WASM 模块路径
-                        wasmUrl:
-                            "https://cdn.jsdelivr.net/npm/@swiftwasm/swift-web@latest/dist/swift-web.wasm",
-                        // 标准输出和错误处理
-                        stdout: (text) => console.log("Swift output:", text),
-                        stderr: (text) => console.error("Swift error:", text),
+                    const swift = await window.SwiftWasm.initialize({
+                        stdio: {
+                            write: (text) => console.log("Swift output:", text),
+                        },
                     });
 
                     return swift;
@@ -385,24 +488,16 @@
                 try {
                     const swift = runtimeInstances.swift;
                     let output = "";
-                    let error = "";
 
-                    // 执行代码
-                    const result = await swift.run(code, {
-                        stdout: (text) => {
-                            output += text + "\n";
-                        },
-                        stderr: (text) => {
-                            error += text + "\n";
-                        },
+                    // 重定向输出
+                    swift.setStdout((text) => {
+                        output += text;
                     });
 
-                    return {
-                        success: true,
-                        stdout: output.trim(),
-                        stderr: error.trim(),
-                        result: result,
-                    };
+                    // 执行代码
+                    await swift.run(code);
+
+                    return output.trim() || "(No output)";
                 } catch (error) {
                     console.error("Swift execution error:", error);
                     throw new Error(`Swift execution error: ${error.message}`);
@@ -412,6 +507,7 @@
 
         // playground
         cpp: {
+            cdn: null,
             init: async () => {
                 return true;
             },
@@ -463,25 +559,40 @@
                     console.log(data);
 
                     return data;
-                    // {
-                    //     output: result.stdout || "",
-                    //     error: result.stderr || "",
-                    //     exitCode: result.code,
-                    // };
                 } catch (error) {
                     throw new Error(`C++ execution error: ${error.message}`);
                 }
             },
         },
-        // error
+
+        // Java (TeaVM) 运行时
         java: {
             cdn: "https://teavm.org/js/teavm.js",
             init: async () => {
                 try {
                     await loadScript("https://teavm.org/js/teavm.js");
-                    const java = await window.TeaVM.init();
+
+                    // 等待 TeaVM 加载完成
+                    await new Promise((resolve) => {
+                        const checkTeaVM = () => {
+                            if (window.TeaVM) {
+                                resolve();
+                            } else {
+                                setTimeout(checkTeaVM, 100);
+                            }
+                        };
+                        checkTeaVM();
+                    });
+
+                    // 初始化 TeaVM
+                    const java = await window.TeaVM.init({
+                        classpath: [],
+                        mainClass: null,
+                    });
+
                     return java;
                 } catch (error) {
+                    console.error("Java initialization error:", error);
                     throw new Error(
                         `Java runtime initialization error: ${error.message}`,
                     );
@@ -490,8 +601,39 @@
             execute: async (code) => {
                 try {
                     const java = runtimeInstances.java;
-                    return await java.run(code);
+
+                    // 创建一个简单的 Java 类
+                    const javaCode = `
+                    import java.io.*;
+
+                    public class Runner {
+                        public static void main(String[] args) {
+                            try {
+                                // 重定向 System.out
+                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                PrintStream ps = new PrintStream(baos);
+                                PrintStream old = System.out;
+                                System.setOut(ps);
+
+                                // 执行用户代码
+                                ${code}
+
+                                // 恢复 System.out
+                                System.out.flush();
+                                System.setOut(old);
+                                System.out.println(baos.toString());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                    `;
+
+                    // 编译并执行 Java 代码
+                    const result = await java.compileAndRun(javaCode, "Runner");
+                    return result || "(No output)";
                 } catch (error) {
+                    console.error("Java execution error:", error);
                     throw new Error(`Java execution error: ${error.message}`);
                 }
             },
@@ -545,7 +687,7 @@
     let runtimeInstances = {};
 
     async function initRuntime(language) {
-        console.log("初始化运行时");
+        console.log("初始化运行时:", language);
         if (!runners[language]) {
             throw new Error(`不支持的语言: ${language}`);
         }
@@ -553,8 +695,8 @@
         try {
             if (!runtimeInstances[language]) {
                 const runner = runners[language];
-                if (runners[language].cdn) {
-                    await loadScript(runners[language].cdn);
+                if (runner.cdn) {
+                    await loadScript(runner.cdn);
                 }
                 runtimeInstances[language] = await runner.init();
             }
@@ -628,12 +770,6 @@
         border-radius: 0.5em;
         overflow: hidden;
     }
-
-    /* .code-playground .code-wrapper {
-        margin: 0;
-        padding: 1em;
-        background: var(--bg-code, #f8f9fa);
-    } */
 
     .code-playground .controls {
         border: 1px solid #ddd;

@@ -29,7 +29,7 @@
     {{ end }}
 
     <!-- css & js -->
-    <script src="{{ `js/code-handler.js` | relURL }}" defer></script>
+    <script src="{{ `js/code-flag-handler.js` | relURL }}" defer></script>
     {{ $main := resources.Get "css/main.css" }} {{ $custom := resources.Get
     "css/custom.css" }} {{ $syntax := resources.Get "css/syntax.css" }} {{
     $code_copy := resources.Get "css/code-handler.css" }} {{ $prose :=
@@ -82,7 +82,7 @@
     <script
         defer
         src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"
-        onload="hljs.highlightAll();"
+        onload="hljs.highlightAll()"
     ></script>
 
     <!-- 额外的语言支持 -->
