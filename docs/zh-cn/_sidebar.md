@@ -25,11 +25,14 @@
   * [加密](content/feature/crypto.md)
   * [图片](content/feature/images.md)
   * [文本](content/feature/text.md)
-
+* 开发
+  * [代码块的标志](content/developer/code-block-flag.md)
+  * [代码运行环境的配置](content/developer/playground.md)
 
 * Q & A
-  * [如何创建一个独立页面](content/qa/create_sigle_page.md)
-  * [如何配置多语言](content/qa/i18n_basic.md)
+  * [如何创建一个独立页面](content/faq/create_sigle_page.md)
+  * [如何配置多语言](content/faq/i18n_basic.md)
+  * [static 和 assets 目录的作用和区别](content/faq/static_and_assets.md)
 
   
 * 资源链接

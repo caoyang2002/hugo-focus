@@ -1,27 +1,34 @@
 <!-- {{ .Page.Params }} -->
-<!--  {{ .Page.Params.codeRunner }} -->
-<!-- {{ .Page.Title }}  -->
-{{ $isRunCode := .Page.Params.codeRunners }}
+<!-- {{ .Page.Params.codeRunner }} -->
+<!-- {{ .Page.Title }} -->
 
-<!--  -->
-{{ $supportedLanguages := slice "python" "rust" "go" "ts" "typescript" "js"
-"javascript" "c++" "cpp" "lisp" }}
-<!-- "ruby" "swift" "java" -->
+{{ $isRunCode := .Page.Params.codeRunners }}
+<!---->
+{{ $supportedLanguages := slice }}
+<!---->
+{{ range $key, $value := site.Data.runners.languages }}
+<!---->
+{{ $supportedLanguages = $supportedLanguages | append $key }} {{ if
+$value.aliases }} {{ range $value.aliases }} {{ $supportedLanguages =
+$supportedLanguages | append . }} {{ end }} {{ end }}
+<!---->
+{{ end }}
+
+<!---->
 {{ if in $supportedLanguages .Type }}
 <div class="code-playground" data-language="{{ .Type }}">
     <!-- 代码 -->
     <div>
-        <pre>
-            <code class="language-{{ .Type }}">{{ .Inner }}</code>
-        </pre>
+        <pre><code class="language-{{ .Type }}">{{ .Inner }}</code></pre>
     </div>
-    <!-- 运行 -->
 
-    {{with $isRunCode}}
+    <!-- 运行 -->
+    {{ with $isRunCode }}
     <div class="controls">
         <button class="run-button">
-            <span style="display: flex; align-items: center; gap: 4px"
-                >运行<svg
+            <span style="display: flex; align-items: center; gap: 4px">
+                运行
+                <svg
                     t="1737473351499"
                     class="icon"
                     viewBox="0 0 1024 1024"
@@ -46,12 +53,11 @@
     <div class="output" style="display: none">
         <pre class="output-content"></pre>
     </div>
-    {{end}}
+    {{ end }}
 </div>
 {{ else if eq .Type "mermaid" }}
-<div class="mermaid">{{- .Inner | safeHTML }}</div>
+<div class="mermaid">{{ .Inner | safeHTML }}</div>
 {{ else }}
-
 <div>
     <pre><code class="language-{{ .Type }}" data-lang="{{ .Type }}">{{ .Inner }}</code></pre>
 </div>

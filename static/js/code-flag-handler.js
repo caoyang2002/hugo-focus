@@ -1,4 +1,4 @@
-// 语言映射表：主语言 -> 别名数组
+// 语言标识映射表：主语言 -> 别名数组
 const LANGUAGE_MAPPINGS = {
   // JavaScript 相关
   javascript: [

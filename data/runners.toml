@@ -1,0 +1,106 @@
+[languages.python]
+name = "Python"
+aliases = ["py"]
+
+[languages.rust]
+name = "Rust"
+aliases = ["rs"]
+
+[languages.go]
+name = "Go"
+aliases = ["golang"]
+
+[languages.typescript]
+name = "TypeScript"
+aliases = ["ts"]
+
+[languages.javascript]
+name = "JavaScript"
+aliases = ["js"]
+
+[languages.cpp]
+name = "C++"
+aliases = ["c++", "cc", "cxx"]
+
+[languages.lisp]
+name = "Common Lisp"
+aliases = ["cl", "common-lisp"]
+
+[languages.ruby]
+name = "Ruby"
+aliases = ["rb"]
+
+[languages.swift]
+name = "Swift"
+
+[languages.java]
+name = "Java"
+
+[languages.c]
+name = "C"
+
+[languages.csharp]
+name = "C#"
+aliases = ["cs", "c#"]
+
+[languages.php]
+name = "PHP"
+
+[languages.sql]
+name = "SQL"
+
+[languages.shell]
+name = "Shell/Bash"
+aliases = ["bash", "sh", "zsh"]
+
+[languages.html]
+name = "HTML"
+aliases = ["htm"]
+
+[languages.css]
+name = "CSS"
+
+[languages.lua]
+name = "Lua"
+
+[languages.r]
+name = "R"
+
+[languages.perl]
+name = "Perl"
+
+[languages.kotlin]
+name = "Kotlin"
+aliases = ["kt"]
+
+[languages.scala]
+name = "Scala"
+
+[languages.dart]
+name = "Dart"
+
+[languages.haskell]
+name = "Haskell"
+
+[languages.json]
+name = "JSON"
+
+[languages.yaml]
+name = "YAML"
+aliases = ["yml"]
+
+[languages.markdown]
+name = "Markdown"
+aliases = ["md"]
+
+[languages.zig]
+name = "Zig"
+
+[languages.nim]
+name = "Nim"
+
+[languages.vue]
+name = "Vue"
+
+[languages.jsx]
+name = "JSX"
