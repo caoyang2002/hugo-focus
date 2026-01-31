@@ -1,6 +1,6 @@
 <!-- _coverpage.md -->
 
-![logo](_media/logo.svg)
+![logo](../_media/logo.svg)
 
 # Hugo Focus <small>1.0</small>
 
