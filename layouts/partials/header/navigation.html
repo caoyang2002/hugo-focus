@@ -1,0 +1,44 @@
+<div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+>
+    <nav
+        class="lg:ml-0 lg:flex lg:flex-row lg:items-center lg:space-x-10 rtl:space-x-reverse"
+    >
+        {{ with site.Menus.main }} {{ range . }}
+        <a
+            class="block text-center text-xl leading-[5rem] lg:text-base lg:font-normal header-menu"
+            href="{{ .URL }}"
+        >
+            {{ .Name }}
+        </a>
+        {{ end }} {{ end }}
+
+        <div class="language-selector">
+            {{ partial "language-selector.html" . }}
+        </div>
+    </nav>
+</div>
+
+<style>
+    .language-selector {
+        position: relative;
+        display: inline-block;
+        z-index: 10;
+    }
+
+    .language-selector .dropdown-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        z-index: 50;
+    }
+
+    .language-selector:hover .dropdown-menu {
+        display: block;
+    }
+</style>
