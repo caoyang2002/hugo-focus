@@ -69,14 +69,14 @@
 
                 <!-- 博客统计：字数-->
                 <div class="stat-item">
-                    <!--<a href="{{ `posts` | relLangURL }}">-->
-                    <p class="stat-tag">{{ i18n "total_word_count" }}</p>
-                    <p class="stat-value">
-                        {{ $wordCount := 0 }}{{ range .Site.RegularPages }}{{
-                        $wordCount = add $wordCount .WordCount }}{{ end }}{{
-                        $wordCount }}
-                    </p>
-                    <!--</a>-->
+                    <a href="{{ `wordcloud` | relLangURL }}">
+                        <p class="stat-tag">{{ i18n "total_word_count" }}</p>
+                        <p class="stat-value">
+                            {{ $wordCount := 0 }}{{ range .Site.RegularPages
+                            }}{{ $wordCount = add $wordCount .WordCount }}{{ end
+                            }}{{ $wordCount }}
+                        </p>
+                    </a>
                 </div>
 
                 <!-- 博客统计：分类数-->

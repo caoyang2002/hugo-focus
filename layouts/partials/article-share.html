@@ -1,0 +1,1372 @@
+{{/* layouts/partials/article-share.html - 优化版本 */}} {{ $page := . }} {{
+$site := .Site }} {{ $author := $site.Params.author | default "作者" }} {{
+$avatar := $site.Params.avatar | default "/images/avatar.jpg" }} {{ $logo :=
+$site.Params.logo | default "/images/logo.png" }} {{ $title := $page.Title }} {{
+$description := $site.Params.description | default (truncate 120 $page.Summary)
+| default "网站描述" }} {{ $url := $page.Permalink | absURL }} {{ $date :=
+$page.Date.Format "2006-01-02" }} {{ $lastmod := $page.Lastmod.Format
+"2006-01-02" }} {{ $readingTime := $page.ReadingTime }} {{ $wordCount :=
+$page.WordCount }} {{ $tags := $page.Params.tags }} {{ $totalPosts := len (where
+$site.RegularPages "Section" "posts") }} {{ $featuredImage := "" }} {{ if
+$page.Params.featuredImage }} {{ $featuredImage = $page.Params.featuredImage }}
+{{ else if $page.Params.images }} {{ $featuredImage = index $page.Params.images
+0 }} {{ end }} {{ $categories := $page.Params.categories | default slice }} {{
+$postsByDate := dict }} {{ range where $site.RegularPages "Section" "posts" }}
+{{ $postDate := .Date.Format "2006-01-02" }} {{ $postsByDate = merge
+$postsByDate (dict $postDate (add (index $postsByDate $postDate | default 0) 1))
+}} {{ end }}
+
+<!-- 分享按钮 -->
+<button class="share-trigger-btn" aria-label="分享文章">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+        />
+    </svg>
+    <span class="ml-2">分享</span>
+</button>
+
+<!-- 分享面板 -->
+<div class="share-panel-overlay" id="sharePanel">
+    <div class="share-panel-container">
+        <!-- 关闭按钮 -->
+        <button class="share-close-btn" aria-label="关闭">
+            <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                />
+            </svg>
+        </button>
+
+        <!-- 主标题 -->
+        <div class="share-header">
+            <div class="share-header-icon">
+                <svg
+                    class="w-8 h-8"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                    />
+                </svg>
+            </div>
+            <h2 class="share-title">分享这篇文章</h2>
+            <p class="share-subtitle">选择你喜欢的分享方式</p>
+        </div>
+
+        <div class="share-content">
+            <!-- 快速分享按钮 -->
+            <section class="share-section">
+                <h3 class="section-label">
+                    <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z"
+                        />
+                    </svg>
+                    快速分享
+                </h3>
+                <div class="share-buttons-grid">
+                    <button
+                        class="share-btn share-btn-twitter"
+                        onclick="shareTo('twitter')"
+                    >
+                        <svg
+                            class="share-btn-icon"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                        >
+                            <path
+                                d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.213c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"
+                            />
+                        </svg>
+                        <div class="share-btn-text">
+                            <span class="share-btn-name">Twitter</span>
+                            <span class="share-btn-desc">分享到推特</span>
+                        </div>
+                    </button>
+
+                    <button
+                        class="share-btn share-btn-linkedin"
+                        onclick="shareTo('linkedin')"
+                    >
+                        <svg
+                            class="share-btn-icon"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                        >
+                            <path
+                                d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+                            />
+                        </svg>
+                        <div class="share-btn-text">
+                            <span class="share-btn-name">LinkedIn</span>
+                            <span class="share-btn-desc">职业社交</span>
+                        </div>
+                    </button>
+
+                    <button
+                        class="share-btn share-btn-weibo"
+                        onclick="shareTo('weibo')"
+                    >
+                        <svg
+                            class="share-btn-icon"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                        >
+                            <path
+                                d="M20.194 3.46c-1.616 1.155-3.742 1.84-6.115 1.84-2.373 0-4.5-.685-6.116-1.84C5.194 5.963 4 9.224 4 12.872c0 2.77 1.118 5.294 2.937 7.097 1.82 1.802 4.352 2.93 7.063 2.93s5.244-1.128 7.063-2.93C22.882 18.166 24 15.642 24 12.872c0-3.648-1.194-6.909-3.806-9.412z"
+                            />
+                        </svg>
+                        <div class="share-btn-text">
+                            <span class="share-btn-name">微博</span>
+                            <span class="share-btn-desc">分享到微博</span>
+                        </div>
+                    </button>
+
+                    <button
+                        class="share-btn share-btn-wechat"
+                        onclick="shareTo('wechat')"
+                    >
+                        <svg
+                            class="share-btn-icon"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                        >
+                            <path
+                                d="M19.365 7.354c-1.159-1.159-2.703-1.798-4.354-1.798-1.651 0-3.195.639-4.354 1.798-1.159 1.159-1.798 2.703-1.798 4.354 0 1.651.639 3.195 1.798 4.354 1.159 1.159 2.703 1.798 4.354 1.798 1.651 0 3.195-.639 4.354-1.798 1.159-1.159 1.798-2.703 1.798-4.354 0-1.651-.639-3.195-1.798-4.354z"
+                            />
+                        </svg>
+                        <div class="share-btn-text">
+                            <span class="share-btn-name">微信</span>
+                            <span class="share-btn-desc">扫码分享</span>
+                        </div>
+                    </button>
+
+                    <button
+                        class="share-btn share-btn-qq"
+                        onclick="shareTo('qq')"
+                    >
+                        <svg
+                            class="share-btn-icon"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                        >
+                            <path
+                                d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-1 15h-2v-6h2v6zm0-8h-2V7h2v2zm6 8h-4v-6h2v4h2v2z"
+                            />
+                        </svg>
+                        <div class="share-btn-text">
+                            <span class="share-btn-name">QQ</span>
+                            <span class="share-btn-desc">QQ好友</span>
+                        </div>
+                    </button>
+
+                    <button
+                        class="share-btn share-btn-copy"
+                        onclick="copyLink()"
+                    >
+                        <svg
+                            class="share-btn-icon"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                            />
+                        </svg>
+                        <div class="share-btn-text">
+                            <span class="share-btn-name">复制链接</span>
+                            <span class="share-btn-desc">复制到剪贴板</span>
+                        </div>
+                    </button>
+                </div>
+            </section>
+
+            <!-- 分享卡片预览 -->
+            <section class="share-section">
+                <h3 class="section-label">
+                    <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
+                        />
+                    </svg>
+                    分享卡片
+                </h3>
+                <div class="share-card" id="shareCard">
+                    <!-- 顶部装饰 -->
+                    <div class="card-decoration"></div>
+
+                    <!-- 文章头图 -->
+                    {{ if $featuredImage }}
+                    <div class="card-image-wrapper">
+                        <img
+                            src="{{ $featuredImage | absURL }}"
+                            alt="{{ $title }}"
+                            class="card-image"
+                            loading="lazy"
+                        />
+                        <div class="card-image-overlay"></div>
+                    </div>
+                    {{ end }}
+
+                    <!-- 文章信息 -->
+                    <div class="card-body">
+                        <h4 class="card-title">{{ $title }}</h4>
+                        <p class="card-description">{{ $description }}</p>
+
+                        <!-- 作者信息 -->
+                        <div class="card-author">
+                            {{ if $avatar }}
+                            <div class="author-avatar-wrapper">
+                                <img
+                                    src="{{ $avatar | absURL }}"
+                                    alt="{{ $author }}"
+                                    class="author-avatar"
+                                    loading="lazy"
+                                />
+                                <div class="author-avatar-ring"></div>
+                            </div>
+                            {{ end }}
+                            <div class="author-info">
+                                <p class="author-name">{{ $author }}</p>
+                                <p class="author-stats">
+                                    <span class="stat-item">
+                                        <svg
+                                            class="w-3 h-3"
+                                            fill="currentColor"
+                                            viewBox="0 0 20 20"
+                                        >
+                                            <path
+                                                d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"
+                                            />
+                                            <path
+                                                fill-rule="evenodd"
+                                                d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
+                                                clip-rule="evenodd"
+                                            />
+                                        </svg>
+                                        {{ $totalPosts }} 篇
+                                    </span>
+                                    <span class="stat-item">
+                                        <svg
+                                            class="w-3 h-3"
+                                            fill="currentColor"
+                                            viewBox="0 0 20 20"
+                                        >
+                                            <path
+                                                fill-rule="evenodd"
+                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                                                clip-rule="evenodd"
+                                            />
+                                        </svg>
+                                        {{ $readingTime }} 分钟
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- 标签 -->
+                        {{ if $tags }}
+                        <div class="card-tags">
+                            {{ range first 3 $tags }}
+                            <span class="tag-item">{{ . }}</span>
+                            {{ end }} {{ if gt (len $tags) 3 }}
+                            <span class="tag-more"
+                                >+{{ sub (len $tags) 3 }}</span
+                            >
+                            {{ end }}
+                        </div>
+                        {{ end }}
+
+                        <!-- 创作提交图 -->
+                        {{ if $postsByDate }}
+                        <div class="contribution-section">
+                            <h5 class="contribution-title">
+                                <svg
+                                    class="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                                    />
+                                </svg>
+                                创作活跃度
+                            </h5>
+                            <div class="contribution-grid">
+                                {{ $today := now.Format "2006-01-02" }} {{
+                                $startDate := now.AddDate 0 -3 0 }} {{
+                                $startDateStr := $startDate.Format "2006-01-02"
+                                }} {{ $days := dict }} {{ $maxPosts := 0 }} {{
+                                range $date, $count := $postsByDate }} {{ if ge
+                                $date $startDateStr }} {{ $days = merge $days
+                                (dict $date $count) }} {{ if gt $count $maxPosts
+                                }} {{ $maxPosts = $count }} {{ end }} {{ end }}
+                                {{ end }} {{ $totalDays := 90 }} {{ range
+                                $daysAgo := seq (sub 0 $totalDays) 0 }} {{ $date
+                                := now.AddDate 0 0 $daysAgo }} {{ $dateStr :=
+                                $date.Format "2006-01-02" }} {{ $count := index
+                                $days $dateStr | default 0 }} {{ $intensity := 0
+                                }} {{ if gt $maxPosts 0 }} {{ $intensity = div
+                                (mul $count 4) $maxPosts | math.Floor | int }}
+                                {{ end }} {{ $colorClass := "level-0" }} {{ if
+                                eq $intensity 1 }}{{ $colorClass = "level-1"
+                                }}{{ end }} {{ if eq $intensity 2 }}{{
+                                $colorClass = "level-2" }}{{ end }} {{ if eq
+                                $intensity 3 }}{{ $colorClass = "level-3" }}{{
+                                end }} {{ if eq $intensity 4 }}{{ $colorClass =
+                                "level-4" }}{{ end }}
+                                <div
+                                    class="contribution-cell {{ $colorClass }}"
+                                    data-date="{{ $dateStr }}"
+                                    data-count="{{ $count }}"
+                                    title="{{ $dateStr }}: {{ $count }} 篇"
+                                ></div>
+                                {{ end }}
+                            </div>
+                            <div class="contribution-legend">
+                                <span>少</span>
+                                <div class="legend-cells">
+                                    <div
+                                        class="contribution-cell level-0"
+                                    ></div>
+                                    <div
+                                        class="contribution-cell level-1"
+                                    ></div>
+                                    <div
+                                        class="contribution-cell level-2"
+                                    ></div>
+                                    <div
+                                        class="contribution-cell level-3"
+                                    ></div>
+                                    <div
+                                        class="contribution-cell level-4"
+                                    ></div>
+                                </div>
+                                <span>多</span>
+                            </div>
+                        </div>
+                        {{ end }}
+
+                        <!-- 底部Logo和链接 -->
+                        <div class="card-footer">
+                            {{ if $logo }}
+                            <div class="footer-logo">
+                                <img
+                                    src="{{ $logo | absURL }}"
+                                    alt="{{ $site.Title }}"
+                                    loading="lazy"
+                                />
+                                <span>{{ $site.Title }}</span>
+                            </div>
+                            {{ end }}
+                            <div class="footer-qr" id="qrcodeSmall"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 卡片操作 -->
+                <div class="card-actions">
+                    <button
+                        onclick="generateShareImage()"
+                        class="action-btn action-btn-primary"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                            />
+                        </svg>
+                        下载分享图片
+                    </button>
+                    <button
+                        onclick="downloadQRCode()"
+                        class="action-btn action-btn-secondary"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+                            />
+                        </svg>
+                        保存二维码
+                    </button>
+                </div>
+            </section>
+
+            <!-- 统计信息 -->
+            <section class="share-section">
+                <h3 class="section-label">
+                    <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                        />
+                    </svg>
+                    分享统计
+                </h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="share-count">0</div>
+                        <div class="stat-label">总分享次数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="today-share">0</div>
+                        <div class="stat-label">今日分享</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<!-- 引入必要的库 -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<script>
+    // 页面数据
+    const shareData = {
+        title: "{{ $title | safeJS }}",
+        description: "{{ $description | safeJS }}",
+        url: "{{ $url | safeJS }}",
+        author: "{{ $author | safeJS }}",
+        siteTitle: "{{ $site.Title | safeJS }}",
+    };
+
+    // 打开/关闭分享面板
+    const shareTrigger = document.querySelector(".share-trigger-btn");
+    const sharePanel = document.getElementById("sharePanel");
+    const closeBtn = document.querySelector(".share-close-btn");
+
+    shareTrigger?.addEventListener("click", () => {
+        sharePanel.classList.add("active");
+        document.body.style.overflow = "hidden";
+    });
+
+    closeBtn?.addEventListener("click", closeSharePanel);
+    sharePanel?.addEventListener("click", (e) => {
+        if (e.target === sharePanel) closeSharePanel();
+    });
+
+    function closeSharePanel() {
+        sharePanel.classList.remove("active");
+        document.body.style.overflow = "";
+    }
+
+    // ESC键关闭
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && sharePanel.classList.contains("active")) {
+            closeSharePanel();
+        }
+    });
+
+    // 生成二维码
+    function generateQRCode() {
+        const qrElement = document.getElementById("qrcodeSmall");
+        if (!qrElement) return;
+
+        qrElement.innerHTML = "";
+        QRCode.toCanvas(qrElement, shareData.url, {
+            width: 80,
+            height: 80,
+            margin: 0,
+            color: { dark: "#1e40af", light: "#ffffff" },
+        });
+    }
+
+    // 下载二维码
+    function downloadQRCode() {
+        const canvas = document.createElement("canvas");
+        QRCode.toCanvas(
+            canvas,
+            shareData.url,
+            {
+                width: 512,
+                height: 512,
+                margin: 2,
+                color: { dark: "#1e40af", light: "#ffffff" },
+            },
+            (error) => {
+                if (!error) {
+                    const link = document.createElement("a");
+                    link.download = `qrcode-${shareData.title.replace(/\s+/g, "-")}.png`;
+                    link.href = canvas.toDataURL("image/png");
+                    link.click();
+                    showToast("✓ 二维码已下载");
+                }
+            },
+        );
+    }
+
+    // 分享功能
+    function shareTo(platform) {
+        const shareUrl = encodeURIComponent(shareData.url);
+        const shareTitle = encodeURIComponent(shareData.title);
+        const shareDesc = encodeURIComponent(shareData.description);
+        let shareLink = "";
+
+        switch (platform) {
+            case "wechat":
+                showToast("📱 请使用微信扫描二维码分享");
+                return;
+            case "qq":
+                shareLink = `https://connect.qq.com/widget/shareqq/index.html?url=${shareUrl}&title=${shareTitle}&summary=${shareDesc}`;
+                break;
+            case "weibo":
+                shareLink = `http://service.weibo.com/share/share.php?url=${shareUrl}&title=${shareTitle}`;
+                break;
+            case "twitter":
+                shareLink = `https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareTitle}`;
+                break;
+            case "linkedin":
+                shareLink = `https://www.linkedin.com/shareArticle?mini=true&url=${shareUrl}&title=${shareTitle}&summary=${shareDesc}`;
+                break;
+        }
+
+        if (shareLink) {
+            window.open(shareLink, "_blank", "width=600,height=400");
+            updateShareCount();
+        }
+    }
+
+    // 复制链接
+    function copyLink() {
+        navigator.clipboard
+            .writeText(shareData.url)
+            .then(() => showToast("✓ 链接已复制到剪贴板"))
+            .catch(() => showToast("✗ 复制失败，请手动复制"));
+        updateShareCount();
+    }
+
+    // 生成分享图片
+    function generateShareImage() {
+        const shareCard = document.getElementById("shareCard");
+        if (!shareCard) return;
+
+        showToast("🎨 正在生成分享图片...");
+
+        html2canvas(shareCard, {
+            backgroundColor: "#ffffff",
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            logging: false,
+        })
+            .then((canvas) => {
+                const link = document.createElement("a");
+                link.download = `share-${shareData.title.replace(/\s+/g, "-")}.png`;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+                showToast("✓ 分享图片已生成");
+                updateShareCount();
+            })
+            .catch(() => {
+                showToast("✗ 生成失败，请重试");
+            });
+    }
+
+    // 更新分享统计
+    function updateShareCount() {
+        const today = new Date().toDateString();
+        let shareStats = JSON.parse(localStorage.getItem("shareStats") || "{}");
+        let pageStats = shareStats[window.location.pathname] || {
+            total: 0,
+            lastDate: "",
+            today: 0,
+        };
+
+        pageStats.total += 1;
+        pageStats.today =
+            pageStats.lastDate === today ? pageStats.today + 1 : 1;
+        pageStats.lastDate = today;
+
+        shareStats[window.location.pathname] = pageStats;
+        localStorage.setItem("shareStats", JSON.stringify(shareStats));
+
+        document.getElementById("share-count").textContent = pageStats.total;
+        document.getElementById("today-share").textContent = pageStats.today;
+    }
+
+    // 初始化分享统计
+    function initShareStats() {
+        const shareStats = JSON.parse(
+            localStorage.getItem("shareStats") || "{}",
+        );
+        const pageStats = shareStats[window.location.pathname] || {
+            total: 0,
+            today: 0,
+        };
+
+        document.getElementById("share-count").textContent = pageStats.total;
+        document.getElementById("today-share").textContent = pageStats.today;
+    }
+
+    // Toast提示
+    function showToast(message) {
+        const existingToast = document.querySelector(".share-toast");
+        if (existingToast) existingToast.remove();
+
+        const toast = document.createElement("div");
+        toast.className = "share-toast";
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => toast.classList.add("show"), 10);
+        setTimeout(() => {
+            toast.classList.remove("show");
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // 页面加载完成后初始化
+    document.addEventListener("DOMContentLoaded", () => {
+        generateQRCode();
+        initShareStats();
+    });
+</script>
+
+<style>
+    /* 分享触发按钮 */
+    .share-trigger-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .share-trigger-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    }
+
+    .share-trigger-btn:active {
+        transform: translateY(0);
+    }
+
+    /* 分享面板覆盖层 */
+    .share-panel-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(8px);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        padding: 1rem;
+    }
+
+    .share-panel-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* 分享面板容器 */
+    .share-panel-container {
+        background: #ffffff;
+        border-radius: 24px;
+        max-width: 480px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        transform: scale(0.9) translateY(20px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .share-panel-overlay.active .share-panel-container {
+        transform: scale(1) translateY(0);
+    }
+
+    /* 自定义滚动条 */
+    .share-panel-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .share-panel-container::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 3px;
+    }
+
+    .share-panel-container::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+    }
+
+    .share-panel-container::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    /* 关闭按钮 */
+    .share-close-btn {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        z-index: 10;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .share-close-btn:hover {
+        background: #fee2e2;
+        color: #dc2626;
+        transform: rotate(90deg);
+    }
+
+    /* 头部区域 */
+    .share-header {
+        text-align: center;
+        padding: 3rem 2rem 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 24px 24px 0 0;
+    }
+
+    .share-header-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 1rem;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+    }
+
+    .share-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem;
+    }
+
+    .share-subtitle {
+        font-size: 0.95rem;
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    /* 内容区域 */
+    .share-content {
+        padding: 2rem;
+    }
+
+    /* 区块 */
+    .share-section {
+        margin-bottom: 2rem;
+    }
+
+    .share-section:last-child {
+        margin-bottom: 0;
+    }
+
+    /* 区块标签 */
+    .section-label {
+        display: flex;
+        align-items: center;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .section-label svg {
+        margin-right: 0.5rem;
+        color: #667eea;
+    }
+
+    /* 分享按钮网格 */
+    .share-buttons-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    /* 分享按钮 */
+    .share-btn {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border: 2px solid #f1f5f9;
+        border-radius: 12px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: left;
+    }
+
+    .share-btn:hover {
+        border-color: currentColor;
+        transform: translateX(4px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .share-btn-icon {
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+        margin-right: 1rem;
+    }
+
+    .share-btn-text {
+        flex: 1;
+    }
+
+    .share-btn-name {
+        display: block;
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 0.125rem;
+    }
+
+    .share-btn-desc {
+        display: block;
+        font-size: 0.8rem;
+        color: #64748b;
+    }
+
+    /* 平台颜色 */
+    .share-btn-twitter {
+        color: #1da1f2;
+    }
+    .share-btn-linkedin {
+        color: #0a66c2;
+    }
+    .share-btn-weibo {
+        color: #e6162d;
+    }
+    .share-btn-wechat {
+        color: #07c160;
+    }
+    .share-btn-qq {
+        color: #12b7f5;
+    }
+    .share-btn-copy {
+        color: #64748b;
+    }
+
+    /* 分享卡片 */
+    .share-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        position: relative;
+    }
+
+    .card-decoration {
+        height: 6px;
+        background: linear-gradient(
+            90deg,
+            #fbbf24,
+            #f59e0b,
+            #ef4444,
+            #ec4899,
+            #8b5cf6,
+            #6366f1
+        );
+    }
+
+    .card-image-wrapper {
+        position: relative;
+        height: 180px;
+        overflow: hidden;
+    }
+
+    .card-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .card-image-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 50%;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.3), transparent);
+    }
+
+    .card-body {
+        padding: 1.5rem;
+        background: white;
+    }
+
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0 0 0.75rem;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .card-description {
+        font-size: 0.875rem;
+        color: #64748b;
+        line-height: 1.6;
+        margin: 0 0 1.25rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* 作者信息 */
+    .card-author {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .author-avatar-wrapper {
+        position: relative;
+        margin-right: 0.75rem;
+    }
+
+    .author-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .author-avatar-ring {
+        position: absolute;
+        top: -3px;
+        left: -3px;
+        right: -3px;
+        bottom: -3px;
+        border-radius: 50%;
+        border: 2px solid #667eea;
+        opacity: 0;
+        animation: ring-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes ring-pulse {
+        0%,
+        100% {
+            opacity: 0;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 0.5;
+            transform: scale(1.1);
+        }
+    }
+
+    .author-info {
+        flex: 1;
+    }
+
+    .author-name {
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 0.25rem;
+        font-size: 0.95rem;
+    }
+
+    .author-stats {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.75rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    /* 标签 */
+    .card-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .tag-item {
+        padding: 0.375rem 0.75rem;
+        background: linear-gradient(135deg, #667eea15, #764ba215);
+        color: #667eea;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        border: 1px solid #667eea30;
+    }
+
+    .tag-more {
+        padding: 0.375rem 0.75rem;
+        background: #f1f5f9;
+        color: #64748b;
+        border-radius: 20px;
+        font-size: 0.75rem;
+    }
+
+    /* 创作提交图 */
+    .contribution-section {
+        margin-bottom: 1rem;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 12px;
+    }
+
+    .contribution-title {
+        display: flex;
+        align-items: center;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #475569;
+        margin: 0 0 0.75rem;
+    }
+
+    .contribution-title svg {
+        margin-right: 0.5rem;
+        color: #667eea;
+    }
+
+    .contribution-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, 10px);
+        gap: 3px;
+        margin-bottom: 0.5rem;
+    }
+
+    .contribution-cell {
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .contribution-cell:hover {
+        transform: scale(1.5);
+        z-index: 10;
+        box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+    }
+
+    .contribution-cell.level-0 {
+        background: #ebedf0;
+    }
+    .contribution-cell.level-1 {
+        background: #c6e48b;
+    }
+    .contribution-cell.level-2 {
+        background: #7bc96f;
+    }
+    .contribution-cell.level-3 {
+        background: #239a3b;
+    }
+    .contribution-cell.level-4 {
+        background: #196127;
+    }
+
+    .contribution-legend {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.5rem;
+        font-size: 0.7rem;
+        color: #64748b;
+    }
+
+    .legend-cells {
+        display: flex;
+        gap: 3px;
+    }
+
+    /* 卡片底部 */
+    .card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 1rem;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .footer-logo {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .footer-logo img {
+        height: 28px;
+        width: auto;
+    }
+
+    .footer-logo span {
+        font-size: 0.875rem;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    #qrcodeSmall canvas {
+        display: block;
+        border-radius: 8px;
+    }
+
+    /* 卡片操作按钮 */
+    .card-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.875rem 1rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+    }
+
+    .action-btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .action-btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+    }
+
+    .action-btn-secondary {
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+    }
+
+    .action-btn-secondary:hover {
+        background: #667eea;
+        color: white;
+    }
+
+    /* 统计卡片 */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        border: 1px solid #e2e8f0;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    /* Toast提示 */
+    .share-toast {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%) translateY(100px);
+        background: #1e293b;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        z-index: 10000;
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .share-toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 640px) {
+        .share-panel-container {
+            max-width: 100%;
+            border-radius: 24px 24px 0 0;
+            max-height: 95vh;
+        }
+
+        .share-header {
+            padding: 2rem 1.5rem 1.5rem;
+        }
+
+        .share-title {
+            font-size: 1.5rem;
+        }
+
+        .share-content {
+            padding: 1.5rem;
+        }
+
+        .card-actions {
+            grid-template-columns: 1fr;
+        }
+
+        .contribution-grid {
+            grid-template-columns: repeat(auto-fill, 8px);
+            gap: 2px;
+        }
+
+        .contribution-cell {
+            width: 8px;
+            height: 8px;
+        }
+    }
+
+    /* 深色模式支持 */
+    @media (prefers-color-scheme: dark) {
+        .share-panel-container {
+            background: #1e293b;
+        }
+
+        .card-body {
+            background: #0f172a;
+        }
+
+        .card-title {
+            color: #f1f5f9;
+        }
+
+        .card-description {
+            color: #cbd5e1;
+        }
+
+        .author-name {
+            color: #f1f5f9;
+        }
+
+        .share-btn {
+            background: #334155;
+            border-color: #475569;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border-color: #475569;
+        }
+    }
+</style>

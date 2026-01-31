@@ -1,7 +1,7 @@
 {{ define "main" }}
 
 <!-- 文章页面 -->
-<article class="text-left ">
+<article class="text-left">
     <!-- 元数据 -->
     <div class="mb-14 mt-8">
         <h1 class="!my-0 pb-2.5">{{ .Title }}</h1>
@@ -74,8 +74,12 @@
 
     <section>{{ .Content }}</section>
 
-    {{ if site.Params.Reward }} {{ partial "reward.html" . }} {{end}}
-
+    <!-- 支持 -->
+    {{ if site.Params.Reward | default true }} {{ partial "reward.html" . }}
+    {{end}}
+    <!--分享按钮-->
+    {{ if .Params.showShare | default true }} {{ partial "article-share.html" .
+    }} {{ end }}
     <!-- Post Tags -->
     <!-- {{ if .Params.tags }}
     <footer class="mt-12 flex flex-wrap">
