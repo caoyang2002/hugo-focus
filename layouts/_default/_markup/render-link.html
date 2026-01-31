@@ -1,97 +1,137 @@
 {{/* layouts/_default/_markup/render-link.html */}}
-{{ $isExternal := strings.HasPrefix .Destination "http" }}
 
-<a href="{{ .Destination | safeURL }}"
-   {{ with .Title }}title="{{ . }}"{{ end }}
-   {{ if $isExternal }}
-   target="_blank"
-   rel="noopener noreferrer"
-   class="external-link"
-   {{ else }}
-   class="internal-link"
-   {{ end }}>
-  {{ .Text | safeHTML }}
-  {{ if $isExternal }}
-  <span class="external-icon">
-    {{ $iconPath := "icon/action/link.svg" }}
-    {{ $fullPath := printf "static/%s" $iconPath }}
-    {{ if fileExists $fullPath }}
-      {{ $svgContent := readFile $fullPath }}
-      {{ $styledSvg := replace $svgContent "<svg" `<svg style="display:inline-block;width:0.85em;height:0.85em;vertical-align:middle;fill:currentColor"` }}
-      {{ $styledSvg | safeHTML }}
-    {{ else }}
-      <span>↗</span>
-    {{ end }}
-  </span>
-  {{ end }}
+{{/* 1. 清理数据 */}}
+{{ $destination := .Destination | strings.TrimSpace }}
+{{ $text := .Text | strings.TrimSpace }}
+{{ $title := .Title | strings.TrimSpace }}
+
+{{/* 2. 链接类型判断 */}}
+{{ $isMailTo := strings.HasPrefix $destination "mailto:" }}
+{{ $isTel := strings.HasPrefix $destination "tel:" }}
+{{ $isAnchor := strings.HasPrefix $destination "#" }}
+{{ $isProtocolRelative := strings.HasPrefix $destination "//" }}
+{{ $isAbsolute := or
+    (strings.HasPrefix $destination "http://")
+    (strings.HasPrefix $destination "https://")
+    $isProtocolRelative
+}}
+{{ $isExternal := and $isAbsolute (not $isMailTo) (not $isTel) }}
+{{ $isInternal := and (not $isAbsolute) (not $isAnchor) (not $isMailTo) (not $isTel) }}
+
+{{/* 3. 构建属性 */}}
+{{ $attrs := slice (printf `href="%s"` ($destination | safeURL)) }}
+
+{{ with $title }}
+    {{ $attrs = $attrs | append (printf `title="%s"` (. | htmlEscape)) }}
+{{ end }}
+
+{{ if $isExternal }}
+    {{ $attrs = $attrs | append `target="_blank"` `rel="noopener noreferrer"` }}
+{{ end }}
+
+{{/* 4. 确定 CSS 类 */}}
+{{ $class := "internal-link" }}
+{{ if $isExternal }}{{ $class = "external-link" }}
+{{ else if $isMailTo }}{{ $class = "mailto-link" }}
+{{ else if $isTel }}{{ $class = "tel-link" }}
+{{ else if $isAnchor }}{{ $class = "anchor-link" }}
+{{ end }}
+
+{{ $attrs = $attrs | append (printf `class="%s"` $class) }}
+
+{{/* 5. 外部图标 - 优化后的版本 */}}
+{{ $externalIcon := "" }}
+{{ if $isExternal }}
+    {{/* 使用内联SVG，避免文件读取 */}}
+    {{ $svg := `<svg
+        class="external-icon-svg"
+        viewBox="0 0 24 24"
+        aria-hidden="true">
+            <path
+                d="M10 6v2H5v11h11v-5h2v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6zm11-3v8h-2V6.413l-7.793 7.794-1.414-1.414L17.585 5H13V3h8z"/>
+        </svg>` }}
+    {{ $externalIcon = printf `<span class="external-icon">%s</span>` $svg }}
+{{ end }}
+
+{{/* 6. 生成最终链接 */}}
+<a {{ delimit $attrs " " | safeHTMLAttr }}>
+    {{ $text | safeHTML }}{{ $externalIcon | safeHTML }}
 </a>
 
+
 <style>
-  /* 链接样式优化 */
-  .external-link {
-    color: #3b82f6;
-    text-decoration: underline;
-    text-decoration-color: rgba(59, 130, 246, 0.3);
-    transition: text-decoration-color 0.2s, color 0.2s;
-  }
+    /* 链接基础样式 */
+    .external-link, .internal-link, .mailto-link, .tel-link, .anchor-link {
+        text-decoration: underline;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 3px;
+        transition: all 0.2s ease;
+    }
 
-  .external-link:hover {
-    color: #2563eb;
-    text-decoration-color: rgba(59, 130, 246, 0.8);
-  }
-
-  .internal-link {
-    color: #8b5cf6;
-    text-decoration: underline;
-    text-decoration-color: rgba(139, 92, 246, 0.3);
-    transition: text-decoration-color 0.2s, color 0.2s;
-  }
-
-  .internal-link:hover {
-    color: #7c3aed;
-    text-decoration-color: rgba(139, 92, 246, 0.8);
-  }
-
-  .external-icon {
-    display: inline-flex;
-    align-items: center;
-    margin-left: 3px;
-    opacity: 0.7;
-    vertical-align: middle;
-    transition: opacity 0.2s;
-  }
-
-  .external-link:hover .external-icon {
-    opacity: 1;
-  }
-
-  .external-icon svg {
-    width: 0.85em;
-    height: 0.85em;
-    fill: currentColor;
-    display: inline-block;
-  }
-
-  /* 暗色模式适配 */
-  @media (prefers-color-scheme: dark) {
+    /* 外部链接 */
     .external-link {
-      color: #60a5fa;
-      text-decoration-color: rgba(96, 165, 250, 0.4);
+        color: #3b82f6;
+        text-decoration-color: rgba(59, 130, 246, 0.3);
     }
-
     .external-link:hover {
-      color: #93c5fd;
-      text-decoration-color: rgba(147, 197, 253, 0.8);
+        color: #2563eb;
+        text-decoration-color: currentColor;
     }
 
+    /* 内部链接 */
     .internal-link {
-      color: #a78bfa;
-      text-decoration-color: rgba(167, 139, 250, 0.4);
+        color: #8b5cf6;
+        text-decoration-color: rgba(139, 92, 246, 0.3);
+    }
+    .internal-link:hover {
+        color: #7c3aed;
+        text-decoration-color: currentColor;
     }
 
-    .internal-link:hover {
-      color: #c4b5fd;
-      text-decoration-color: rgba(196, 181, 253, 0.8);
+    /* 邮件链接 */
+    .mailto-link {
+        color: #10b981;
+        text-decoration-color: rgba(16, 185, 129, 0.3);
     }
-  }
+    .mailto-link:hover {
+        color: #059669;
+        text-decoration-color: currentColor;
+    }
+
+    /* 电话链接 */
+    .tel-link {
+        color: #f59e0b;
+        text-decoration-color: rgba(245, 158, 11, 0.3);
+    }
+    .tel-link:hover {
+        color: #d97706;
+        text-decoration-color: currentColor;
+    }
+
+    /* 锚点链接 */
+    .anchor-link {
+        color: #ec4899;
+        text-decoration-color: rgba(236, 72, 153, 0.3);
+    }
+    .anchor-link:hover {
+        color: #db2777;
+        text-decoration-color: currentColor;
+    }
+
+    /* 外部图标 */
+    .external-icon {
+        display: inline-flex;
+        align-items: center;
+        margin-left: 2px;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+    }
+    .external-link:hover .external-icon {
+        opacity: 1;
+    }
+    .external-icon-svg {
+        width: 0.85em;
+        height: 0.85em;
+        fill: currentColor;
+    }
 </style>
