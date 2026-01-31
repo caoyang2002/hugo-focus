@@ -4,7 +4,7 @@
 
 ## 运行按钮的加载
 
-定义在 `layout/_default/_markup/render-codeblock.html`，这将从数据文件中动态构建一个支持的语言列表。
+定义在 `layout/_default/_markup/render-codeblock.html`，这将从数据文件 `data/runners.toml` 中动态构建一个支持的语言列表。
 
 ```js
 // 创建一个空的 slice（数组）
@@ -20,8 +20,6 @@
 // 将每个别名添加到数组中
 {{ $supportedLanguages = $supportedLanguages | append . }} 
 ```
-
-运行代码的功能定义在 `layouts/partials/code_runners.html`。
 
 目前支持的语言非常有限，仅包括以下语言：
 
@@ -44,11 +42,11 @@
 2. Go Playground:
 3. Kotlin Playground:
 
-### Godbolt (Compiler Explorer):
+### Godbolt (Compiler Explorer)
 1. C
 2. C++
 
-### Wandbox API (支持多语言):
+### Wandbox API (支持多语言)
 1. PHP
 2. Ruby
 3. Swift
@@ -63,9 +61,23 @@
 12. Erlang
 13. Elixir
 14. OCaml
-### JSCL (JavaScript Common Lisp):
+
+### JSCL (JavaScript Common Lisp)
 1. Lisp
 
+运行代码的功能定义在 `layouts/partials/code_runners.html`。
+
+> 注意：
+>
+> 运行的加载按钮和实际可以运行的代码(`runner.toml`)不是一一对应的。
+> 
+> 原因是 `layout/_default/_markup/render-codeblock.html` 不能直接读取 `layouts/partials/code_runners.html`。
+>
+> `render-codeblock.html`：这是 Markdown Render Hook 模板，用于生成静态 HTML。它在 Hugo 构建 页面时执行，作用是将 Markdown 中的代码块 (`````) 转换成具体的 HTML 结构（比如一个包裹着代码的 `<pre><code>` 标签）。
+>
+> `code_runners.html`：这通常是一个模板“片段”或“组件”，可以包含 HTML、CSS、JavaScript 等。它会在页面渲染时被引用，最终输出到最终的 HTML 文件中。其中的 JavaScript 脚本只在浏览器加载页面后，于用户端执行。
+>
+> 渲染的时候会根据 `runner.toml` 进行渲染运行按钮，但是代码的执行需要编写实际的运行环境配置。并且运行环境配置 `code_runners` 无法直接暴露给 `render-codeblock`。
 
 # 工作原理
 

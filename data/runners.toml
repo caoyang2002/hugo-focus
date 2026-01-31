@@ -46,19 +46,11 @@ aliases = ["cs", "c#"]
 [languages.php]
 name = "PHP"
 
-[languages.sql]
-name = "SQL"
+
 
 [languages.shell]
 name = "Shell/Bash"
 aliases = ["bash", "sh", "zsh"]
-
-[languages.html]
-name = "HTML"
-aliases = ["htm"]
-
-[languages.css]
-name = "CSS"
 
 [languages.lua]
 name = "Lua"
@@ -82,25 +74,10 @@ name = "Dart"
 [languages.haskell]
 name = "Haskell"
 
-[languages.json]
-name = "JSON"
 
-[languages.yaml]
-name = "YAML"
-aliases = ["yml"]
-
-[languages.markdown]
-name = "Markdown"
-aliases = ["md"]
 
 [languages.zig]
 name = "Zig"
 
 [languages.nim]
 name = "Nim"
-
-[languages.vue]
-name = "Vue"
-
-[languages.jsx]
-name = "JSX"
