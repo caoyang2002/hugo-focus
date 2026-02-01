@@ -1,4 +1,3 @@
-# 第一章
+# 特性
 
-这是第一章的简介。
-
+1. [文字](content/feature/effect.md)
