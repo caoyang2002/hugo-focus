@@ -1,0 +1,52 @@
+{{- /* 获取表格属性 */ -}}
+{{- $thead := .THead -}}
+{{- $tbody := .TBody -}}
+
+{{- /* 表格容器 - 使用Tailwind响应式类 */ -}}
+<div class="overflow-x-auto rounded-xl shadow-sm border border-gray-200 my-0 py-0 bg-white">
+  <table class="min-w-full divide-y divide-gray-200">
+
+    {{- /* 表头部分 - 高对比度设计 */ -}}
+    {{- with $thead -}}
+    <thead>
+      {{- range $rowIndex, $row := . -}}
+      <tr class="bg-gradient-to-r from-gray-900 to-gray-800">
+        {{- range $colIndex, $cell := . -}}
+        <th
+          class="px-6 py-4 text-left text-sm font-bold tracking-wide text-white uppercase border-r border-gray-700 last:border-r-0
+                 {{ if eq $colIndex 0 }}rounded-tl-xl{{ end }}
+                 {{ if eq $colIndex (sub (len $row) 1) }}rounded-tr-xl{{ end }}"
+          {{- with $cell.Alignment -}}
+            {{- printf " style=%q" (printf "text-align: %s" .) | safeHTMLAttr -}}
+          {{- end -}}>
+          {{- $cell.Text | safeHTML -}}
+        </th>
+        {{- end -}}
+      </tr>
+      {{- end -}}
+    </thead>
+    {{- end -}}
+
+    {{- /* 表格主体 - 低对比斑马格 */ -}}
+    {{- with $tbody -}}
+    <tbody class="divide-y divide-gray-100">
+      {{- range $rowIndex, $row := . -}}
+      <tr class="{{ if (modBool $rowIndex 2) }}bg-gray-300{{ else }}bg-white{{ end }} hover:bg-gray-500 transition-colors duration-150">
+        {{- range $colIndex, $cell := . -}}
+        <td
+          class="px-6 py-4 text-sm {{ if (modBool $rowIndex 2) }}text-gray-700{{ else }}text-gray-600{{ end }}
+                 {{ if eq $colIndex 0 }}font-medium text-gray-900{{ end }}
+                 border-r border-gray-100 last:border-r-0"
+          {{- with $cell.Alignment -}}
+            {{- printf " style=%q" (printf "text-align: %s" .) | safeHTMLAttr -}}
+          {{- end -}}>
+          {{- $cell.Text | safeHTML -}}
+        </td>
+        {{- end -}}
+      </tr>
+      {{- end -}}
+    </tbody>
+    {{- end -}}
+
+  </table>
+</div>
