@@ -1,10 +1,108 @@
-<!---->{{ if not (.Get "summary") }}
-<!---->{{ errorf "missing param 'summary': %s" .Position }}
-<!---->{{ else if not (.Get "content") }}{{ warnf "missing param 'content': %s"
-.Position }}
-<!---->{{ end }}
+{{ $summary := .Get "summary" }} {{ $content := .Get "content" }}
+<!---->
+{{ $open := eq (.Get "openByDefault") "true" }}
+<!---->
+{{ if not $summary }}
+<!---->
+{{ errorf "details 短代码缺少必需的 'summary' 参数: %s" .Position }}
+<!---->
+{{ end }} {{ $innerContent := $content }} {{ if not $content }}
+<!---->
+{{ $innerContent = .Inner }} {{ end }}
+<!---->
+{{ if and (not $content) (not .Inner) }}
+<!---->
+{{ warnf "details 短代码缺少内容: %s" .Position }}
+<!---->
+{{ end }}
 
-<details {{ if (eq (.Get `openByDefault`) true) }}open="true" {{ end }}>
-  <summary markdown="span">{{ .Get "summary" | markdownify }}</summary>
-  {{ .Get "content" | markdownify }}
+<details class="custom-details" {{ if $open }} open{{ end }}>
+    <summary class="custom-summary">{{ $summary | markdownify }}</summary>
+    {{ with $innerContent }}
+    <div class="details-content">{{ . | markdownify }}</div>
+    {{ end }}
 </details>
+
+{{- /* 只在页面中嵌入一次样式 */ -}} {{ if not (.Page.Scratch.Get
+"details_style_embedded") }}
+<style>
+    /* 细节框基本样式 */
+    .custom-details {
+        margin: 1.5em 0;
+        padding: 0 1em;
+        border: 1px solid #e1e4e8;
+        border-radius: 8px;
+        background-color: #fafbfc;
+        transition: all 0.2s ease;
+        overflow: hidden;
+    }
+
+    /* 摘要样式 */
+    .custom-summary {
+        cursor: pointer;
+        font-weight: 600;
+        padding: 1em 0;
+        margin: 0;
+        outline: none;
+        user-select: none;
+        display: flex;
+        align-items: center;
+        list-style: none; /* 移除默认箭头 */
+        position: relative;
+    }
+
+    /* 自定义箭头图标 */
+    .custom-summary::marker,
+    .custom-summary::-webkit-details-marker {
+        display: none; /* 隐藏默认箭头 */
+    }
+
+    .custom-summary::after {
+        content: "▶";
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        transition: transform 0.2s ease;
+        color: #6a737d;
+        font-size: 0.9em;
+    }
+
+    .custom-details[open] .custom-summary::after {
+        transform: translateY(-50%) rotate(90deg);
+    }
+
+    /* 内容区域 */
+    .details-content {
+        margin-top: 0;
+        padding: 0 0 1em 0;
+        border-top: 1px solid #e1e4e8;
+    }
+
+    /* 悬停效果 */
+    .custom-details:hover {
+        border-color: #d1d9e0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    /* 展开状态 */
+    .custom-details[open] {
+        background-color: #ffffff;
+        padding-bottom: 0;
+    }
+
+    /* 空内容处理 */
+    .custom-details:not([open]) .details-content {
+        display: none;
+    }
+
+    /* 为内容添加内边距 */
+    .details-content > *:first-child {
+        margin-top: 1em;
+    }
+
+    .details-content > *:last-child {
+        margin-bottom: 0;
+    }
+</style>
+{{ .Page.Scratch.Set "details_style_embedded" true }} {{ end }}

@@ -1,0 +1,17 @@
+{{- $opts := dict "output" "htmlAndMathml" "displayMode" (eq .Type "block") -}}
+{{- $result := transform.ToMath .Inner $opts -}} {{- if $result.Err -}}
+<!---->
+{{- warnf "数学公式渲染失败 (位置: %s): %s" $.Position $result.Err -}}
+<code
+    style="
+        color: #d32f2f;
+        background-color: #ffebee;
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-family: monospace;
+    "
+>
+    [公式渲染错误: {{ $result.Err }}]
+</code>
+{{- else -}} {{- $result.Value -}} {{- $.Page.Store.Set "hasMath" true -}} {{-
+end -}}

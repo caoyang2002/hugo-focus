@@ -1,3 +1,4 @@
+<!-- layouts/partials/math.html -->
 {{ if site.Params.localKatex }}
 <link rel="stylesheet" href="{{ "katex.min.css" | relURL }}"/>
 <script defer src="{{ "katex.min.js" | relURL }}"></script>
@@ -5,41 +6,39 @@
 {{ else }}
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.css"
-  integrity="sha384-3UiQGuEI4TTMaFmGIZumfRPtfKQ3trwQE2JgosJxCnGmQpL/lJdjpcHkaaFwHlcI"
+  href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+  integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV"
   crossorigin="anonymous"
 />
 <script
   defer
-  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.js"
-  integrity="sha384-G0zcxDFp5LWZtDuRMnBkk3EphCK1lhEf4UEyEM693ka574TZGwo4IWwS6QLzM/2t"
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+  integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8"
   crossorigin="anonymous"
 ></script>
 <script
   defer
-  src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/contrib/auto-render.min.js"
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
   integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05"
   crossorigin="anonymous"
 ></script>
 {{ end }}
 
 <script>
-  document.addEventListener('DOMContentLoaded', () =>
+  document.addEventListener('DOMContentLoaded', () => {
     renderMathInElement(document.body, {
-      // customised options
-      // • auto-render specific keys, e.g.:
       delimiters: [
         { left: '$$', right: '$$', display: true },
-        { left: '$', right: '$', display: false },
-        { left: '\\(', right: '\\)', display: false },  // 添加更多分隔符
-           { left: '\\[', right: '\\]', display: true }
+        { left: '\\[', right: '\\]', display: true },
+        { left: '\\(', right: '\\)', display: false },
+        { left: '$', right: '$', display: false }  // 可选，但可能误匹配
       ],
-      // • rendering keys, e.g.:
       throwOnError: false,
       errorCallback: (error, macro) => {
-          console.warn('KaTeX 渲染错误:', error);
-          // 可选：显示用户友好的错误信息
-        }
-    }),
-  );
+        console.warn('KaTeX 渲染错误:', error, '宏:', macro);
+      },
+      // 忽略某些标签
+      ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    });
+  });
 </script>
