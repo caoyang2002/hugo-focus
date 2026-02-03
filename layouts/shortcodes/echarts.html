@@ -1,0 +1,45 @@
+<!-- /layouts/shortcodes/echarts.html -->
+{{ $id := printf "echarts-%d" now.UnixNano }} {{ $width := .Get "width" |
+default "100%" }} {{ $height := .Get "height" | default "400px" }}
+
+<!-- 确保只加载一次 ECharts -->
+{{ if not (.Page.Scratch.Get "echartsLoaded") }}
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script>
+{{ .Page.Scratch.Set "echartsLoaded" true }} {{ end }}
+
+<div id="{{ $id }}" style="width: {{ $width }}; height: {{ $height }};"></div>
+
+<script type="text/javascript">
+    window.addEventListener("load", function() {
+        // 获取容器元素
+        var chartDom = document.getElementById('{{ $id }}');
+        if (!chartDom) {
+            console.error('ECharts 容器不存在:', '{{ $id }}');
+            return;
+        }
+
+        try {
+            // 初始化图表
+            var myChart = echarts.init(chartDom);
+
+            // 解析用户传入的图表配置
+            var option = {{ .Inner | safeJS }};
+
+            // 设置配置
+            myChart.setOption(option);
+
+            // 添加响应式
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+
+            // 可选：将图表实例保存到全局，以便后续操作
+            // window.echartsInstances = window.echartsInstances || {};
+            // window.echartsInstances['{{ $id }}'] = myChart;
+
+        } catch (error) {
+            console.error('ECharts 初始化失败:', error);
+            chartDom.innerHTML = '<div style="color: red; text-align: center; padding: 20px;">图表加载失败：' + error.message + '</div>';
+        }
+    });
+</script>
