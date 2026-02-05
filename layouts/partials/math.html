@@ -16,6 +16,7 @@
   integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8"
   crossorigin="anonymous"
 ></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/mhchem.min.js"></script>
 <script
   defer
   src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
@@ -474,6 +475,7 @@
           // 单个 $ 可选，但建议只用于简单场景
           { left: '$', right: '$', display: false },
         ],
+          trust: (context) => ['\\ce', '\\pu'].includes(context.command),
 
         throwOnError: false,
         errorColor: '#dc2626',
