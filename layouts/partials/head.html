@@ -85,6 +85,16 @@
         onload="hljs.highlightAll()"
     ></script>
 
+
+    <!-- 或者 KaTeX 方案 (二选一，推荐，更快) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- 自定义样式和脚本 -->
+    <link rel="stylesheet" href="{{ "css/latex.css" | relURL }}">
+    <script defer src="{{ "js/latex.js" | relURL }}"></script>
+
     <!-- 额外的语言支持 -->
     <script
         defer
@@ -98,7 +108,7 @@
 
     <!-- math -->
     {{ if or .Params.math site.Params.math }}
-    <!---->
+    <!-- latex -->
     {{ partial "math.html" . }}
     <!---->
     {{ end }}

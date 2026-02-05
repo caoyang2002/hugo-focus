@@ -24,21 +24,749 @@
 ></script>
 {{ end }}
 
+<style>
+  /* ===== CSS 变量定义 ===== */
+  :root {
+    --katex-font-size: 1.21em;
+    --katex-line-height: 1.2;
+    --equation-margin: 1.5em;
+    --equation-padding: 0.8em;
+    --tag-font-size: 0.9em;
+    --tag-color: #64748b;
+    --tag-bg: transparent;
+    --tag-border: #e2e8f0;
+    --eqref-color: #3182ce;
+    --eqref-bg: #f7fafc;
+    --eqref-border: #e2e8f0;
+    --eqref-hover-color: #2c5282;
+    --eqref-hover-bg: #ebf8ff;
+    --eqref-hover-border: #bee3f8;
+    --scrollbar-track: #f7fafc;
+    --scrollbar-thumb: #cbd5e0;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --tag-color: #94a3b8;
+      --tag-bg: transparent;
+      --tag-border: #475569;
+      --eqref-color: #60a5fa;
+      --eqref-bg: #1e293b;
+      --eqref-border: #475569;
+      --eqref-hover-color: #93c5fd;
+      --eqref-hover-bg: #334155;
+      --eqref-hover-border: #60a5fa;
+      --scrollbar-track: #1e293b;
+      --scrollbar-thumb: #475569;
+    }
+  }
+
+  /* ===== KaTeX 基础样式 ===== */
+  .katex {
+    font: normal var(--katex-font-size) KaTeX_Main, "Cambria Math", "Times New Roman", serif;
+    line-height: var(--katex-line-height);
+    text-indent: 0;
+  }
+
+  /* ===== 块级公式容器（关键改进）===== */
+  .katex-display {
+    /* 使用 Flexbox 布局，确保公式和编号正确排列 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1em; /* 公式和编号之间的间距 */
+
+    margin: var(--equation-margin) 0;
+    padding: var(--equation-padding) 1em;
+    overflow: visible;
+
+    /* 背景和边框（可选，增强视觉区分）*/
+    background-color: rgba(248, 250, 252, 0.5);
+    border-left: 3px solid #e2e8f0;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+  }
+
+  .katex-display:hover {
+    background-color: rgba(241, 245, 249, 0.8);
+    border-left-color: #cbd5e0;
+  }
+
+  /* 公式主体容器 */
+  .katex-display > .katex {
+    /* 占据剩余空间，但不会挤压编号 */
+    flex: 1 1 auto;
+    max-width: calc(100% - 4em); /* 为编号预留空间 */
+    margin: 0;
+    text-align: center;
+    overflow: visible;
+  }
+
+  /* KaTeX HTML 渲染内容 */
+  .katex-display > .katex > .katex-html {
+    display: block;
+    text-align: center;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    /* 滚动条样式 */
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
+
+  /* Webkit 滚动条 */
+  .katex-display > .katex > .katex-html::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .katex-display > .katex > .katex-html::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: 4px;
+  }
+
+  .katex-display > .katex > .katex-html::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 4px;
+    transition: background 0.2s ease;
+  }
+
+  .katex-display > .katex > .katex-html::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+
+  /* ===== 公式编号样式（关键改进）===== */
+  .katex-display .equation-tag {
+    /* 固定宽度，防止挤压公式 */
+    flex: 0 0 auto;
+    min-width: 3em;
+
+    /* 样式 */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+    font-size: var(--tag-font-size);
+    font-weight: 500;
+    color: var(--tag-color);
+
+    /* 布局 */
+    text-align: right;
+    padding: 0.3em 0.8em;
+    margin-left: auto; /* 推到最右侧 */
+
+    /* 视觉效果 */
+    background: var(--tag-bg);
+    border: 1px solid var(--tag-border);
+    border-radius: 6px;
+
+    /* 交互 */
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+
+    /* 确保不被遮挡 */
+    z-index: 10;
+    position: relative;
+  }
+
+  .katex-display .equation-tag:hover {
+    background: var(--eqref-hover-bg);
+    border-color: var(--eqref-hover-border);
+    color: var(--eqref-hover-color);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .katex-display .equation-tag:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  /* 复制成功提示 */
+  .katex-display .equation-tag.copied {
+    background: #d1fae5;
+    color: #065f46;
+    border-color: #10b981;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .katex-display .equation-tag.copied {
+      background: #064e3b;
+      color: #6ee7b7;
+      border-color: #10b981;
+    }
+  }
+
+  /* 无编号公式 */
+  .katex-display.no-tag {
+    justify-content: center;
+  }
+
+  .katex-display.no-tag > .katex {
+    max-width: 100%;
+  }
+
+  /* ===== 行内公式 ===== */
+  .katex:not(.katex-display) {
+    font-size: 1.08em;
+    vertical-align: middle;
+    margin: 0 0.15em;
+    padding: 0.1em 0.2em;
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+  }
+
+  .katex:not(.katex-display):hover {
+    background-color: rgba(226, 232, 240, 0.3);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .katex:not(.katex-display):hover {
+      background-color: rgba(71, 85, 105, 0.3);
+    }
+  }
+
+  /* ===== 公式引用链接 ===== */
+  a.eqref {
+    display: inline-block;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+    font-size: 0.92em;
+    font-weight: 500;
+    color: var(--eqref-color);
+
+    text-decoration: none;
+    padding: 0.15em 0.5em;
+    margin: 0 0.1em;
+
+    background-color: var(--eqref-bg);
+    border: 1px solid var(--eqref-border);
+    border-radius: 4px;
+
+    transition: all 0.2s ease;
+  }
+
+  a.eqref:hover {
+    color: var(--eqref-hover-color);
+    background-color: var(--eqref-hover-bg);
+    border-color: var(--eqref-hover-border);
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(49, 130, 206, 0.2);
+  }
+
+  a.eqref:active {
+    transform: translateY(0);
+  }
+
+  /* ===== 矩阵和对齐环境优化 ===== */
+  .katex .arraycolsep {
+    width: 0.5em;
+  }
+
+  .katex .mtable {
+    margin: 0.5em 0;
+  }
+
+  /* aligned 环境优化 */
+  .katex .aligned {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  /* ===== 响应式设计 ===== */
+  @media (max-width: 1024px) {
+    .katex-display {
+      padding: 0.6em 0.8em;
+    }
+
+    .katex-display > .katex {
+      max-width: calc(100% - 3.5em);
+    }
+
+    .katex-display .equation-tag {
+      font-size: 0.85em;
+      min-width: 2.5em;
+      padding: 0.25em 0.6em;
+    }
+  }
+
+  @media (max-width: 768px) {
+    :root {
+      --equation-margin: 1.2em;
+      --equation-padding: 0.6em;
+      --tag-font-size: 0.85em;
+    }
+
+    /* 移动端：垂直布局，编号在下方 */
+    .katex-display {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.5em;
+      padding: 0.6em 0.5em;
+    }
+
+    .katex-display > .katex {
+      max-width: 100%;
+      font-size: 0.95em;
+    }
+
+    .katex-display .equation-tag {
+      align-self: flex-end;
+      margin-left: 0;
+      margin-top: 0.5em;
+      font-size: 0.8em;
+      padding: 0.2em 0.5em;
+      min-width: auto;
+    }
+
+    .katex:not(.katex-display) {
+      font-size: 1.02em;
+      margin: 0 0.1em;
+    }
+
+    a.eqref {
+      font-size: 0.88em;
+      padding: 0.12em 0.4em;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .katex-display > .katex {
+      font-size: 0.9em;
+    }
+
+    .katex-display .equation-tag {
+      font-size: 0.75em;
+    }
+
+    .katex:not(.katex-display) {
+      font-size: 1em;
+    }
+  }
+
+  /* ===== 打印样式 ===== */
+  @media print {
+    .katex-display {
+      page-break-inside: avoid;
+      border-left: 1px solid #999;
+      background: none;
+    }
+
+    .katex-display .equation-tag {
+      border: 1px solid #999;
+    }
+
+    a.eqref {
+      color: #000;
+      text-decoration: underline;
+    }
+  }
+
+  /* ===== 深色模式增强 ===== */
+  @media (prefers-color-scheme: dark) {
+    .katex-display {
+      background-color: rgba(30, 41, 59, 0.3);
+      border-left-color: #475569;
+    }
+
+    .katex-display:hover {
+      background-color: rgba(30, 41, 59, 0.5);
+      border-left-color: #64748b;
+    }
+  }
+
+  /* ===== 无障碍增强 ===== */
+  .katex-display:focus-within {
+    outline: 2px solid var(--eqref-color);
+    outline-offset: 2px;
+  }
+
+  .equation-tag:focus {
+    outline: 2px solid var(--eqref-color);
+    outline-offset: 2px;
+  }
+
+  /* ===== 错误提示样式 ===== */
+  .equation-error {
+    color: #dc2626;
+    font-style: italic;
+    font-size: 0.9em;
+    padding: 0.2em 0.5em;
+    background: #fee2e2;
+    border-radius: 4px;
+    border: 1px solid #fca5a5;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .equation-error {
+      color: #fca5a5;
+      background: #7f1d1d;
+      border-color: #dc2626;
+    }
+  }
+
+  /* ===== 加载状态 ===== */
+  .katex-display.loading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  /* ===== 特殊公式类型 ===== */
+  /* 长公式优化 */
+  .katex-display.long-formula > .katex > .katex-html {
+    text-align: left;
+    padding-right: 1em;
+  }
+
+  /* 居左对齐 */
+  .katex-display.align-left {
+    justify-content: flex-start;
+  }
+
+  .katex-display.align-left > .katex {
+    text-align: left;
+  }
+
+  /* 紧凑模式 */
+  .katex-display.compact {
+    margin: 1em 0;
+    padding: 0.4em 0.6em;
+  }
+</style>
+
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    renderMathInElement(document.body, {
-      delimiters: [
-        { left: '$$', right: '$$', display: true },
-        { left: '\\[', right: '\\]', display: true },
-        { left: '\\(', right: '\\)', display: false },
-        { left: '$', right: '$', display: false }  // 可选，但可能误匹配
-      ],
-      throwOnError: false,
-      errorCallback: (error, macro) => {
-        console.warn('KaTeX 渲染错误:', error, '宏:', macro);
-      },
-      // 忽略某些标签
-      ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-    });
-  });
+  /**
+   * 数学公式渲染和编号系统
+   * 优化版本 - 防止序号覆盖，改进布局
+   */
+
+  // 全局状态
+  const MathRenderer = {
+    equationCounter: 0,
+    equationLabels: new Map(),
+    processedEquations: new Set(),
+
+    // 初始化
+    init() {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => this.render());
+      } else {
+        this.render();
+      }
+    },
+
+    // 主渲染流程
+    render() {
+      try {
+        this.renderMath();
+        this.processEquationNumbering();
+        this.processEquationReferences();
+        this.addAccessibilityFeatures();
+      } catch (error) {
+        console.error('数学公式渲染失败:', error);
+      }
+    },
+
+    // 渲染数学公式
+    renderMath() {
+      const renderOptions = {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '\\[', right: '\\]', display: true },
+          { left: '\\(', right: '\\)', display: false },
+          // 单个 $ 可选，但建议只用于简单场景
+          { left: '$', right: '$', display: false },
+        ],
+
+        throwOnError: false,
+        errorColor: '#dc2626',
+
+        // 自定义宏
+        macros: {
+          // 常用数学集合
+          "\\RR": "\\mathbb{R}",
+          "\\NN": "\\mathbb{N}",
+          "\\ZZ": "\\mathbb{Z}",
+          "\\QQ": "\\mathbb{Q}",
+          "\\CC": "\\mathbb{C}",
+          "\\PP": "\\mathbb{P}",
+
+          // 运算符
+          "\\defeq": "\\stackrel{\\text{def}}{=}",
+          "\\eqdef": "\\stackrel{\\text{def}}{=}",
+
+          // 括号和范数
+          "\\abs": "\\left|#1\\right|",
+          "\\norm": "\\left\\|#1\\right\\|",
+          "\\inner": "\\left\\langle #1, #2 \\right\\rangle",
+          "\\set": "\\left\\{#1\\right\\}",
+          "\\bra": "\\left\\langle #1 \\right|",
+          "\\ket": "\\left| #1 \\right\\rangle",
+
+          // 微分和导数
+          "\\dd": "\\mathrm{d}",
+          "\\diff": "\\frac{\\mathrm{d}#1}{\\mathrm{d}#2}",
+          "\\pdiff": "\\frac{\\partial #1}{\\partial #2}",
+
+          // 向量
+          "\\vec": "\\boldsymbol{#1}",
+          "\\mat": "\\boldsymbol{#1}",
+        },
+
+        strict: false,
+
+        // 信任的命令
+        trust: (context) => {
+          const trustedCommands = [
+            '\\url', '\\href', '\\includegraphics',
+            '\\color', '\\textcolor', '\\colorbox', '\\fcolorbox',
+            '\\class', '\\cssId', '\\style'
+          ];
+          return trustedCommands.includes(context.command);
+        },
+
+        // 错误回调
+        errorCallback: (error, formula) => {
+          console.warn('KaTeX 渲染错误:');
+          console.warn('  错误信息:', error.message);
+          console.warn('  公式内容:', formula.substring(0, 100) + (formula.length > 100 ? '...' : ''));
+        },
+
+        // 忽略的标签和类
+        ignoredTags: [
+          'script', 'noscript', 'style', 'textarea', 'pre', 'code',
+          'option', 'annotation', 'annotation-xml', 'kbd', 'samp'
+        ],
+        ignoredClasses: ['no-math', 'ignore-math', 'katex-rendered'],
+      };
+
+      // 执行渲染
+      renderMathInElement(document.body, renderOptions);
+    },
+
+    // 处理公式编号
+    processEquationNumbering() {
+      const displays = document.querySelectorAll('.katex-display');
+
+      displays.forEach((display) => {
+        // 防止重复处理
+        if (this.processedEquations.has(display)) return;
+        this.processedEquations.add(display);
+
+        const katex = display.querySelector('.katex');
+        if (!katex) return;
+
+        const annotation = katex.querySelector('annotation[encoding="application/x-tex"]');
+        if (!annotation) return;
+
+        const tex = annotation.textContent.trim();
+
+        // 提取 \label{} 和 \tag{}
+        const labelMatch = tex.match(/\\label\{([^}]+)\}/);
+        const tagMatch = tex.match(/\\tag\{([^}]+)\}/);
+
+        // 如果有标签或编号
+        if (labelMatch || tagMatch) {
+          this.equationCounter++;
+          const eqNumber = tagMatch ? tagMatch[1] : this.equationCounter;
+
+          // 存储标签映射
+          if (labelMatch) {
+            this.equationLabels.set(labelMatch[1], eqNumber);
+            display.id = `eq:${labelMatch[1]}`;
+            display.setAttribute('data-equation-label', labelMatch[1]);
+          }
+
+          // 创建编号元素
+          this.addEquationTag(display, eqNumber, labelMatch ? labelMatch[1] : null);
+        } else {
+          display.classList.add('no-tag');
+        }
+
+        // 检测长公式
+        this.detectLongFormula(display);
+      });
+    },
+
+    // 添加公式编号标签
+    addEquationTag(display, eqNumber, label) {
+      const tag = document.createElement('span');
+      tag.className = 'equation-tag';
+      tag.textContent = `(${eqNumber})`;
+      tag.setAttribute('role', 'note');
+      tag.setAttribute('aria-label', `公式编号 ${eqNumber}`);
+
+      // 添加工具提示
+      tag.title = label
+        ? `公式编号: ${eqNumber}\n标签: ${label}\n点击复制`
+        : `公式编号: ${eqNumber}\n点击复制`;
+
+      // 点击复制功能
+      tag.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.copyToClipboard(`(${eqNumber})`, tag);
+      });
+
+      // 键盘支持
+      tag.setAttribute('tabindex', '0');
+      tag.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.copyToClipboard(`(${eqNumber})`, tag);
+        }
+      });
+
+      display.appendChild(tag);
+    },
+
+    // 复制到剪贴板
+    copyToClipboard(text, element) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text)
+          .then(() => {
+            this.showCopyFeedback(element);
+          })
+          .catch(err => {
+            console.warn('复制失败:', err);
+            this.fallbackCopy(text);
+          });
+      } else {
+        this.fallbackCopy(text);
+      }
+    },
+
+    // 降级复制方法
+    fallbackCopy(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+
+      try {
+        document.execCommand('copy');
+        console.log('使用降级方法复制成功');
+      } catch (err) {
+        console.error('复制失败:', err);
+      }
+
+      document.body.removeChild(textarea);
+    },
+
+    // 显示复制反馈
+    showCopyFeedback(element) {
+      const originalText = element.textContent;
+      const originalClass = element.className;
+
+      element.textContent = '✓ 已复制';
+      element.classList.add('copied');
+
+      setTimeout(() => {
+        element.textContent = originalText;
+        element.className = originalClass;
+      }, 1500);
+    },
+
+    // 检测长公式
+    detectLongFormula(display) {
+      const katex = display.querySelector('.katex');
+      const katexHtml = katex?.querySelector('.katex-html');
+
+      if (!katexHtml) return;
+
+      // 使用 ResizeObserver 检测
+      const observer = new ResizeObserver(() => {
+        if (katexHtml.scrollWidth > display.clientWidth - 80) {
+          display.classList.add('long-formula');
+        } else {
+          display.classList.remove('long-formula');
+        }
+      });
+
+      observer.observe(katexHtml);
+    },
+
+    // 处理公式引用
+    processEquationReferences() {
+      const walker = document.createTreeWalker(
+        document.body,
+        NodeFilter.SHOW_TEXT,
+        {
+          acceptNode: (node) => {
+            // 跳过已处理的节点和特定标签
+            if (node.parentElement?.classList.contains('katex') ||
+                node.parentElement?.tagName === 'SCRIPT' ||
+                node.parentElement?.tagName === 'STYLE') {
+              return NodeFilter.FILTER_REJECT;
+            }
+
+            if (node.textContent.includes('\\eqref{') ||
+                node.textContent.includes('\\ref{')) {
+              return NodeFilter.FILTER_ACCEPT;
+            }
+
+            return NodeFilter.FILTER_SKIP;
+          }
+        }
+      );
+
+      const textNodes = [];
+      let node;
+      while (node = walker.nextNode()) {
+        textNodes.push(node);
+      }
+
+      textNodes.forEach(textNode => {
+        this.replaceReferences(textNode);
+      });
+    },
+
+    // 替换引用
+    replaceReferences(textNode) {
+      let html = textNode.textContent;
+      let hasReplacement = false;
+
+      // 替换 \eqref{label}
+      html = html.replace(/\\eqref\{([^}]+)\}/g, (match, label) => {
+        hasReplacement = true;
+        const eqNum = this.equationLabels.get(label);
+        if (eqNum !== undefined) {
+          return `<a href="#eq:${label}" class="eqref" title="跳转到公式 ${eqNum}">(${eqNum})</a>`;
+        }
+        return `<span class="equation-error" title="未找到标签: ${label}">[公式 ${label} 未找到]</span>`;
+      });
+
+      // 替换 \ref{label}
+      html = html.replace(/\\ref\{([^}]+)\}/g, (match, label) => {
+        hasReplacement = true;
+        const eqNum = this.equationLabels.get(label);
+        if (eqNum !== undefined) {
+          return `<a href="#eq:${label}" class="eqref" title="跳转到公式 ${eqNum}">${eqNum}</a>`;
+        }
+        return `<span class="equation-error" title="未找到标签: ${label}">[${label}]</span>`;
+      });
+
+      // 只有发生替换时才更新 DOM
+      if (hasReplacement) {
+        const span = document.createElement('span');
+        span.innerHTML = html;
+        textNode.parentNode.replaceChild(span, textNode);
+      }
+    },
+
+    // 添加无障碍功能
+    addAccessibilityFeatures() {
+      // 为公式添加 aria-label
+      document.querySelectorAll('.katex-display').forEach((display, index) => {
+        if (!display.getAttribute('aria-label')) {
+          const label = display.getAttribute('data-equation-label');
+          const ariaLabel = label
+            ? `数学公式: ${label}`
+            : `数学公式 ${index + 1}`;
+          display.setAttribute('aria-label', ariaLabel);
+        }
+      });
+    }
+  };
+
+  // 初始化
+  MathRenderer.init();
 </script>
