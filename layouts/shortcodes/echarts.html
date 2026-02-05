@@ -1,7 +1,8 @@
 <!-- /layouts/shortcodes/echarts.html -->
 {{ $id := printf "echarts-%d" now.UnixNano }} {{ $width := .Get "width" |
 default "100%" }} {{ $height := .Get "height" | default "400px" }}
-
+<!-- 阻止此短代码内容出现在页面描述中 -->
+{{ .Page.Scratch.SetInMap "noindex_fragments" $id true }}
 <!-- 确保只加载一次 ECharts -->
 {{ if not (.Page.Scratch.Get "echartsLoaded") }}
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script>
