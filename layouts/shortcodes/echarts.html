@@ -6,6 +6,7 @@ default "100%" }} {{ $height := .Get "height" | default "400px" }}
 <!-- 确保只加载一次 ECharts -->
 {{ if not (.Page.Scratch.Get "echartsLoaded") }}
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script>
+<!---->
 {{ .Page.Scratch.Set "echartsLoaded" true }} {{ end }}
 
 <div id="{{ $id }}" style="width: {{ $width }}; height: {{ $height }};"></div>
