@@ -683,8 +683,12 @@
 <!-- 网站标题 -->
 {{ $title := $page.Title }}
 <!-- 描述信信息 -->
-{{ $description := $site.Params.description | default (truncate 120
-$page.Summary) | default "网站描述" }}
+{{ $description := "" }} {{ if $page.Description }} {{ $description =
+$page.Description }} {{ else if $page.Params.summary }} {{ $description =
+$page.Params.summary }} {{ else if $page.Summary }} {{ $description =
+$page.Summary | plainify | truncate 120 }} {{ else if $site.Params.description
+}} {{ $description = $site.Params.description }} {{ else }} {{ $description =
+"网站描述" }} {{ end }}
 <!-- 当前页链接 -->
 {{ $url := $page.Permalink | absURL }}
 <!-- 日期 -->
