@@ -124,6 +124,9 @@ function createLanguageFlag(pre, language, hasIcon = true) {
   const languageFlag = document.createElement("span");
   languageFlag.className = "language-flag not-prose";
   languageFlag.setAttribute("data-language", language);
+  // languageFlag.style.top = "0";
+  // languageFlag.style.right = "0";
+  // languageFlag.style.margin = "8px";
 
   // 创建图标元素
   if (hasIcon && SUPPORTED_LANGUAGES.includes(language)) {
@@ -131,8 +134,8 @@ function createLanguageFlag(pre, language, hasIcon = true) {
     icon.src = `/icon/flag/${language}.svg`;
     icon.alt = language;
     icon.style.color = "white";
-    icon.style.width = "32px";
-    icon.style.height = "32px";
+    icon.style.width = "16px";
+    icon.style.height = "16px";
     // icon.style.marginRight = "6px";
     // icon.style.verticalAlign = "middle";
 
@@ -172,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 确保pre有相对定位
     pre.style.position = "relative";
-    pre.style.paddingTop = "40px"; // 为语言标志和复制按钮留出空间
+    pre.style.paddingTop = "32px"; // 为语言标志和复制按钮留出空间
 
     // 提取语言
     console.log("开始提取语言");
@@ -181,6 +184,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let normalizedLanguage = null;
 
     const match = languageClass.match(/language-(\w+)/);
+    console.log("匹配结果：", match);
+
     if (match && match[1]) {
       // language = match[1];
       const rawLanguage = match[1];
@@ -210,6 +215,9 @@ document.addEventListener("DOMContentLoaded", () => {
     copyButton.className = "copy-button";
     copyButton.setAttribute("aria-label", "复制代码");
     copyButton.textContent = "复制";
+    // copyButton.style.position = "absolute";
+
+    // copyButton.style.zIndex = "1";
 
     // 复制功能
     copyButton.addEventListener("click", async () => {
