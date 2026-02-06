@@ -1,7 +1,8 @@
 # 代码语言标识
 
-在 `static/js/code-flag-handler.js` 中定义了语言映射，如下：
+## 一、语言映射
 
+在 `static/js/code-flag-handler.js` 中定义了语言映射，如下：
 
 ```js
 const LANGUAGE_MAPPINGS = {
@@ -104,11 +105,12 @@ const LANGUAGE_MAPPINGS = {
 ```json
 shell: ["bash", "sh", "shell", "zsh", "powershell", "ps1"]
 ```
+
 被标记为`bash` / `sh` / `shell` / `zsh` / `powershell` / `ps1` 都会被映射为 `shell` 的 svg 图标。
 
 svg 图标的源文件存放在 `static/icon/flug` 目录下。
 
-# 如何运行
+## 二、如何运行
 
 在 `head.html` 中定义了 
 

@@ -2,7 +2,7 @@
 
 运行代码需要加载运行按钮，以及运行环境。
 
-## 运行按钮的加载
+## 一、运行按钮的加载
 
 定义在 `layout/_default/_markup/render-codeblock.html`，这将从数据文件 `data/runners.toml` 中动态构建一个支持的语言列表。
 
@@ -21,6 +21,9 @@
 {{ $supportedLanguages = $supportedLanguages | append . }} 
 ```
 
+当博客文档从的元数据存在 `codeRunners = true` 时，将添加 `运行` 按钮。
+
+## 二、支持的语言
 目前支持的语言非常有限，仅包括以下语言：
 
 ### WASM 运行时 (4种)
@@ -65,6 +68,8 @@
 ### JSCL (JavaScript Common Lisp)
 1. Lisp
 
+## 三、运行代码的 Playground 实现
+
 运行代码的功能定义在 `layouts/partials/code_runners.html`。
 
 > 注意：
@@ -79,7 +84,7 @@
 >
 > 渲染的时候会根据 `runner.toml` 进行渲染运行按钮，但是代码的执行需要编写实际的运行环境配置。并且运行环境配置 `code_runners` 无法直接暴露给 `render-codeblock`。
 
-# 工作原理
+## 四、工作原理
 
 如果文件的元数据定义了 `codeRunners`，那么就添加运行代码的功能
 

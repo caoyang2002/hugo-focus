@@ -46,8 +46,6 @@ aliases = ["cs", "c#"]
 [languages.php]
 name = "PHP"
 
-
-
 [languages.shell]
 name = "Shell/Bash"
 aliases = ["bash", "sh", "zsh"]
