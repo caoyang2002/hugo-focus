@@ -30,7 +30,7 @@ categories = ["暂无"] # 分类
 tags = ["暂无"] # 标签
 description = "文章描述" # 描述
 cover = "https://img.example.com/test_image/png" # 文章封面
-codeRunner = true # 代码运行支持
+codeRunners = true # 代码运行支持
 ```
 
 - `title`：文章标题（string）
@@ -41,4 +41,4 @@ codeRunner = true # 代码运行支持
 - `tags`：标签 (string[])
 - `description`：描述 (string)
 - `cover`：文章封面 (string)
-- `codeRunner`：代码运行支持 (string)
+- `codeRunners`：代码运行支持 (string)

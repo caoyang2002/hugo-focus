@@ -1,0 +1,85 @@
+{{- $type := .Get 0 | default "info" -}} {{- $title := .Get 1 -}} {{- $icons :=
+dict "info" "ℹ️" "warning" "⚠️" "success" "✅" "danger" "❌" "note" "📝" -}} {{-
+$class := dict "info" "alert-info" "warning" "alert-warning" "success"
+"alert-success" "danger" "alert-danger" "note" "alert-note" -}}
+
+<div class="alert {{ index $class $type }}">
+    <div class="alert-icon">{{ index $icons $type }}</div>
+    <div class="alert-content">
+        {{- if $title -}}
+        <div class="alert-title">{{ $title }}</div>
+        {{- end -}}
+        <div class="alert-body">{{ .Inner | markdownify }}</div>
+    </div>
+</div>
+
+<style>
+    /* Alert 样式 */
+    .alert {
+        margin: 1.5em 0;
+        padding: 1em;
+        border-left: 4px solid;
+        border-radius: 4px;
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .alert-icon {
+        font-size: 1.2em;
+        margin-right: 0.8em;
+        margin-top: 0.1em;
+    }
+
+    .alert-content {
+        flex: 1;
+    }
+
+    .alert-title {
+        font-weight: 600;
+        margin-bottom: 0.5em;
+        font-size: 1.1em;
+    }
+
+    .alert-body p {
+        margin: 0.3em 0;
+    }
+
+    .alert-body p:first-child {
+        margin-top: 0;
+    }
+
+    .alert-body p:last-child {
+        margin-bottom: 0;
+    }
+
+    /* 不同类型样式 */
+    .alert-info {
+        border-color: #3498db;
+        background-color: #ebf5fb;
+        color: #2c3e50;
+    }
+
+    .alert-warning {
+        border-color: #f39c12;
+        background-color: #fef5e7;
+        color: #7d6608;
+    }
+
+    .alert-success {
+        border-color: #2ecc71;
+        background-color: #eafaf1;
+        color: #196f3d;
+    }
+
+    .alert-danger {
+        border-color: #e74c3c;
+        background-color: #fdedec;
+        color: #78281f;
+    }
+
+    .alert-note {
+        border-color: #9b59b6;
+        background-color: #f4ecf7;
+        color: #4a235a;
+    }
+</style>

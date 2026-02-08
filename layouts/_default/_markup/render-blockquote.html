@@ -1,0 +1,53 @@
+{{/* layouts/_default/_markup/render-blockquote.html */}}
+<!---->
+{{- $text := .Text -}}
+<!---->
+{{- $type := "" -}}
+<!---->
+{{- $title := "" -}}
+<!---->
+{{/* 提取标记但不修改内容 */}}
+<!---->
+{{- if findRE "^>!\\[[A-Z]+\\]" $text -}}
+<!---->
+{{- $matches := findRE "^>!\\[([A-Z]+)\\](.*)" $text -}}
+<!---->
+{{- if $matches -}}
+<!---->
+{{- $type = replaceRE "^>!\\[([A-Z]+)\\].*$" "$1" $text -}}
+<!---->
+{{- $title = replaceRE "^>!\\[[A-Z]+\\]\\s*(.*?)$" "$1" $text -}}
+<!---->
+{{/* 移除开头的标记行 */}} {{- $lines := split $text "\n" -}}
+<!---->
+{{- $newLines := slice -}} {{- range $idx, $line := $lines -}}
+<!---->
+{{- if or (gt $idx 0) (not (findRE "^>!\\[[A-Z]+\\]" $line)) -}}
+<!---->
+{{- $newLines = $newLines | append $line -}} {{- end -}} {{- end -}}
+<!---->
+{{- $text = delimit $newLines "\n" -}} {{- end -}} {{- end -}}
+<!---->
+{{- $type = lower $type -}} {{- if $type -}}
+<div class="markdown-callout markdown-callout-{{ $type }}">
+    <div class="callout-header">
+        {{- if eq $type "tips" }}💡
+        <!---->
+        {{- else if eq $type "warning" }}⚠️
+        <!---->
+        {{- else if eq $type "info" }}ℹ️
+        <!---->
+        {{- else if eq $type "success" }}✅
+        <!---->
+        {{- else if eq $type "danger" }}❌
+        <!---->
+        {{- else }}📌
+        <!---->
+        {{ end -}}
+        <span class="callout-title">{{ $title | default (title $type) }}</span>
+    </div>
+    <div class="callout-content">{{ $text }}</div>
+</div>
+{{- else -}}
+<blockquote>{{ $text }}</blockquote>
+{{- end -}}
