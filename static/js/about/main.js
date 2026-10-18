@@ -14,6 +14,7 @@ import { throttle, debounce } from './utils.js';
  * 初始化应用
  */
 function init() {
+    document.documentElement.classList.add('has-js');
     console.log('🚀 初始化 3D 视差个人主页...');
     
     // 检查必要元素是否存在

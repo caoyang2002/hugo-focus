@@ -4,15 +4,20 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="{{ .Params.bio }}" />
+    <meta name="description" content="{{ with .Params.bio }}{{ . }}{{ else }}{{ .Site.Params.subtitle | default .Site.Title }}{{ end }}" />
     <title>{{ .Title }} | {{ .Site.Title }}</title>
 
+    {{ with .Site.Params.favicon }}
+    <link rel="icon" href="{{ . | relURL }}" />
+    {{ end }}
+
     <!-- Font Awesome -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" />
 
     <!-- 模块化CSS -->
     {{/* 先获取所有资源对象 */}}
-    {{ $variables := resources.Get "css/about/varibales.css" }}
+    {{ $variables := resources.Get "css/about/variables.css" }}
     {{ $base := resources.Get "css/about/base.css" }}
     {{ $layer := resources.Get "css/about/layer.css" }}
     {{ $navigation := resources.Get "css/about/navigation.css" }}
@@ -38,7 +43,6 @@
 
     <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
 
-
     <!-- 预加载关键资源 -->
     {{ if .Params.avatar }}
     <link rel="preload" href="{{ .Params.avatar | relURL }}" as="image" />
@@ -49,11 +53,11 @@
 <body>
     <!-- ========================================
          3D背景层 - 统一反向偏移
-         ===========================    ============= -->
+         ======================================== -->
     <div class="layer-3d layer-deep-bg"></div>
 
     <div class="layer-3d layer-grid">
-        <svg class="grid-svg" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+        <svg class="grid-svg" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
             <defs>
                 <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
                     <path d="M 60 0 L 0 0 0 60" fill="none" stroke="currentColor" stroke-width="1" />
@@ -64,7 +68,7 @@
     </div>
 
     <div class="layer-3d layer-line">
-        <svg class="line-svg" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid meet">
+        <svg class="line-svg" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <path d="M0,400 L1000,400" stroke-linecap="round" />
             <path d="M500,0 L500,800" stroke-linecap="round" />
             <path d="M100,200 L900,600" stroke-linecap="round" />
@@ -73,17 +77,17 @@
     </div>
 
     <!-- ========================================
-         主内容层 - 300vh实际高度
+         主内容层
          ======================================== -->
     <div class="layer-3d layer-content">
         <!-- ====================================
-             第一屏：个人介绍
+             第一屏：个人介绍（高度由内容决定）
              ==================================== -->
         <section class="section section-about" id="about">
             <!-- 头像 -->
             {{ if .Params.avatar }}
-            <div class="avatar" style="margin-top: 1000px;">
-                <img src="{{ .Params.avatar | relURL }}" alt="{{ .Title }}的头像" loading="eager" />
+            <div class="avatar">
+                <img src="{{ .Params.avatar | relURL }}" alt="{{ .Title }}的头像" width="140" height="140" fetchpriority="high" />
             </div>
             {{ end }}
 
@@ -99,7 +103,7 @@
                 {{ range .Params.skills }}
                 <div class="skill-item" data-scroll-animate>
                     <div class="skill-icon">
-                        <i class="fa {{ .icon }}"></i>
+                        <i class="fa {{ .icon }}" aria-hidden="true"></i>
                     </div>
                     <h3 class="skill-name">{{ .name }}</h3>
                     <p class="skill-desc">{{ .description }}</p>
@@ -136,31 +140,28 @@
         </section>
 
         <!-- ====================================
-             第二屏：作品文字触发
+             第二屏：作品文字触发 + 覆盖层（同屏）
              ==================================== -->
-        <section class="section section-works-trigger">
-            <div class="works-text">作品</div>
-        </section>
+        <section class="section section-works-trigger" id="works">
+            <h2 class="works-text">作品</h2>
 
-        <!-- ====================================
-             第二屏覆盖层：作品视错觉展示
-             ==================================== -->
-        <section class="section-works-illusion" id="works">
-            <div class="works-container">
-                {{ range .Params.projects }}
-                <div class="work-item">
-                    <div class="work-svg icon-wrapper">
-                        {{ .svg | safeHTML }}
+            <div class="section-works-illusion" id="works-illusion">
+                <div class="works-container">
+                    {{ range .Params.projects }}
+                    <div class="work-item">
+                        <div class="work-svg icon-wrapper">
+                            {{ .svg | safeHTML }}
+                        </div>
+                        <h3 class="work-name">{{ .name }}</h3>
+                        <p class="work-desc">{{ .desc }}</p>
+                        <div class="work-tags">
+                            {{ range .tags }}
+                            <span class="tag">{{ . }}</span>
+                            {{ end }}
+                        </div>
                     </div>
-                    <h3 class="work-name">{{ .name }}</h3>
-                    <p class="work-desc">{{ .desc }}</p>
-                    <div class="work-tags">
-                        {{ range .tags }}
-                        <span class="tag">{{ . }}</span>
-                        {{ end }}
-                    </div>
+                    {{ end }}
                 </div>
-                {{ end }}
             </div>
         </section>
 
@@ -174,7 +175,7 @@
                 <a href="{{ .url }}" {{ if strings.HasPrefix .url "http" }}target="_blank" rel="noopener noreferrer" {{
                     end }} class="contact-item">
                     <div class="contact-icon">
-                        <i class="fa {{ .icon }}"></i>
+                        <i class="fa {{ .icon }}" aria-hidden="true"></i>
                     </div>
                     <span class="contact-value">{{ .value }}</span>
                 </a>
@@ -189,7 +190,7 @@
     <div class="layer-nav">
         <!-- 桌面端侧边导航 -->
         <nav class="nav-desktop" aria-label="主导航">
-            <a href="#about" class="nav-item active" data-section="about" aria-label="关于我">
+            <a href="#about" class="nav-item active" data-section="about" aria-label="关于我" aria-current="true">
                 <i class="fa fa-user" aria-hidden="true"></i>
                 <span>关于我</span>
             </a>
@@ -209,7 +210,7 @@
                 <i class="fa fa-eye" aria-hidden="true"></i>
                 <span>浏览作品</span>
             </a>
-            <a href="{{ .Site.BaseURL }}" class="nav-action" aria-label="返回主页">
+            <a href="{{ .Site.Home.RelPermalink }}" class="nav-action" aria-label="返回主页">
                 <i class="fa fa-home" aria-hidden="true"></i>
                 <span>返回主页</span>
             </a>
@@ -217,7 +218,7 @@
 
         <!-- 移动端顶部导航 -->
         <nav class="nav-mobile" aria-label="主导航">
-            <a href="#about" class="nav-item active" data-section="about" aria-label="关于我">
+            <a href="#about" class="nav-item active" data-section="about" aria-label="关于我" aria-current="true">
                 <i class="fa fa-user" aria-hidden="true"></i>
                 <span>关于我</span>
             </a>

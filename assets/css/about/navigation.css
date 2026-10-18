@@ -16,8 +16,10 @@
     align-items: flex-end;
     opacity: 0;
     animation: nav-fade-in 0.8s ease-out 0.5s forwards;
-    z-index: 99999;
+    z-index: var(--z-nav);
     pointer-events: all;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 @keyframes nav-fade-in {
@@ -183,6 +185,9 @@
     border: 1px solid var(--primary-light);
     z-index: var(--z-nav);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    will-change: transform;
 }
 
 .nav-mobile .nav-item {
@@ -208,5 +213,14 @@
 
     .nav-mobile {
         display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        max-width: calc(100vw - 24px);
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .nav-mobile::-webkit-scrollbar {
+        display: none;
     }
 }

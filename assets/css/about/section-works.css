@@ -7,10 +7,11 @@
    ======================================== */
 .section-works-trigger {
     z-index: calc(var(--z-content) + 100);
+    position: relative;
 }
 
 .works-text {
-    font-size: 30vw;
+    font-size: clamp(80px, 30vw, 420px);
     font-weight: 900;
     color: var(--primary);
     line-height: 1;
@@ -24,7 +25,8 @@
     background-clip: text;
     text-shadow: 0 0 80px var(--primary-glow);
     filter: drop-shadow(0 0 40px var(--primary-glow));
-    transition: var(--transition-base);
+    transition: none;
+    will-change: transform, opacity;
 }
 
 /* ========================================
@@ -33,10 +35,9 @@
 .section-works-illusion {
     z-index: calc(var(--z-content) + 150);
     position: absolute;
-    top: 100vh;
-    left: 0;
+    inset: 0;
     width: 100%;
-    height: 100vh;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -45,6 +46,7 @@
     transition: opacity var(--transition-strong);
     background: var(--bg-overlay);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .works-container {
@@ -65,7 +67,7 @@
     border: 1px solid var(--primary-light);
     border-radius: var(--radius-md);
     padding: 30px 20px;
-    height: 320px;
+    height: clamp(280px, 30vh, 320px);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -73,9 +75,10 @@
     text-align: center;
     transform-style: preserve-3d;
     box-shadow: var(--shadow-lg);
-    transition: var(--transition-strong);
+    transition: transform var(--transition-strong), box-shadow var(--transition-strong), border-color var(--transition-strong);
     position: relative;
     overflow: hidden;
+    will-change: transform;
 }
 
 /* 卡片光效背景 */
@@ -85,10 +88,11 @@
     inset: 0;
     background: radial-gradient(circle at center, var(--primary-light) 0%, transparent 70%);
     opacity: 0;
-    transition: var(--transition-strong);
+    transition: opacity var(--transition-strong);
 }
 
-.work-item:hover::before {
+.work-item:hover::before,
+.work-item:focus-visible::before {
     opacity: 1;
 }
 
@@ -156,8 +160,9 @@
     }
 }
 
-/* Hover效果 - 3D悬浮 */
-.work-item:hover {
+/* Hover效果 - 3D悬浮（优先使用JS tilt时会覆盖内联transform，这里仅作为回退） */
+.work-item:hover,
+.work-item:focus-visible {
     transform: rotateX(0) rotateY(0) translateZ(80px) translateY(-15px);
     z-index: 10;
     border-color: var(--primary);
@@ -178,7 +183,8 @@
     filter: drop-shadow(0 0 10px var(--primary-glow));
 }
 
-.work-item:hover .work-svg {
+.work-item:hover .work-svg,
+.work-item:focus-visible .work-svg {
     transform: translateZ(40px) scale(1.1) rotate(5deg);
     filter: drop-shadow(0 0 20px var(--primary-glow));
 }
@@ -191,7 +197,8 @@
     transition: var(--transition-smooth);
 }
 
-.work-item:hover .work-name {
+.work-item:hover .work-name,
+.work-item:focus-visible .work-name {
     color: var(--primary);
     transform: translateZ(25px);
 }
@@ -206,7 +213,8 @@
     transition: var(--transition-smooth);
 }
 
-.work-item:hover .work-desc {
+.work-item:hover .work-desc,
+.work-item:focus-visible .work-desc {
     color: var(--text-gray);
     transform: translateZ(20px);
 }
@@ -229,7 +237,7 @@
     }
 
     .work-item {
-        height: 300px;
+        height: clamp(260px, 32vh, 300px);
         padding: 25px 15px;
     }
 
@@ -247,7 +255,19 @@
         animation: none;
     }
 
-    .work-item:hover {
+    .work-item:hover,
+    .work-item:focus-visible {
         transform: translateZ(30px) translateY(-10px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .works-text {
+        transition: none;
+        will-change: auto;
+    }
+
+    .work-item:nth-child(n) {
+        animation: none;
     }
 }

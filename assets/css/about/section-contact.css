@@ -8,6 +8,8 @@
     color: var(--text-white);
     position: relative;
     overflow: hidden;
+    min-height: 100vh;
+    min-height: 100dvh;
 }
 
 /* 背景装饰效果 */
@@ -45,13 +47,25 @@
    联系标题
    ======================================== */
 .contact-title {
-    font-size: 10vw;
+    font-size: clamp(60px, 10vw, 160px);
     font-weight: 900;
     margin-bottom: 50px;
     transform: translateZ(60px);
     position: relative;
     z-index: 1;
     text-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    animation: contact-title-in 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
+@keyframes contact-title-in {
+    from {
+        opacity: 0;
+        translate: 0 20px;
+    }
+    to {
+        opacity: 1;
+        translate: 0 0;
+    }
 }
 
 /* ========================================
@@ -65,6 +79,7 @@
     transform: translateZ(50px);
     position: relative;
     z-index: 1;
+    perspective: 1000px;
 }
 
 /* ========================================
@@ -94,11 +109,13 @@
     transition: var(--transition-strong);
 }
 
-.contact-item:hover::before {
+.contact-item:hover::before,
+.contact-item:focus-visible::before {
     width: 100%;
 }
 
-.contact-item:hover {
+.contact-item:hover,
+.contact-item:focus-visible {
     transform: translateZ(60px) translateY(-15px);
     text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
 }
@@ -137,16 +154,19 @@
     transition: var(--transition-smooth);
 }
 
-.contact-item:hover .contact-icon {
+.contact-item:hover .contact-icon,
+.contact-item:focus-visible .contact-icon {
     box-shadow: 0 0 50px rgba(255, 255, 255, 0.6);
     transform: rotate(360deg) scale(1.1);
 }
 
-.contact-item:hover .contact-icon::before {
+.contact-item:hover .contact-icon::before,
+.contact-item:focus-visible .contact-icon::before {
     opacity: 1;
 }
 
-.contact-item:hover .contact-icon i {
+.contact-item:hover .contact-icon i,
+.contact-item:focus-visible .contact-icon i {
     color: var(--text-white);
     transform: scale(1.2);
 }
@@ -160,7 +180,8 @@
     transition: var(--transition-smooth);
 }
 
-.contact-item:hover .contact-value {
+.contact-item:hover .contact-value,
+.contact-item:focus-visible .contact-value {
     font-size: 17px;
     letter-spacing: 0.5px;
 }
@@ -171,6 +192,7 @@
 @media (max-width: 768px) {
     .contact-container {
         gap: var(--spacing-lg);
+        padding: 0 12px;
     }
 
     .contact-icon {
@@ -180,11 +202,28 @@
     }
 
     .contact-title {
-        font-size: 15vw;
+        font-size: clamp(46px, 15vw, 100px);
         margin-bottom: 30px;
     }
 
     .contact-value {
         font-size: 14px;
+    }
+
+    .contact-item:hover .contact-value,
+    .contact-item:focus-visible .contact-value {
+        font-size: 14px;
+        letter-spacing: 0.3px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .section-contact::before {
+        animation: none;
+    }
+
+    .contact-item:hover .contact-icon,
+    .contact-item:focus-visible .contact-icon {
+        transform: scale(1.05);
     }
 }

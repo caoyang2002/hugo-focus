@@ -1,9 +1,27 @@
 /* ========================================
-   个人介绍板块 - 第一屏
+   个人介绍板块 - 高度由内容决定
    ======================================== */
 
 .section-about {
     z-index: calc(var(--z-content) + 50);
+    min-height: 100vh;
+    min-height: 100dvh;
+    height: auto;
+    padding: 80px 0;
+    perspective: 1200px;
+}
+
+/* 首屏元素依次入场（纯CSS，不依赖JS/load事件）；
+   逐元素声明以避免覆盖各元素自身的 animation */
+@keyframes intro-up {
+    from {
+        opacity: 0;
+        transform: translateY(28px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* ========================================
@@ -20,7 +38,9 @@
     transform: translateZ(60px) scale(1.02);
     box-shadow: var(--shadow-glow);
     position: relative;
-    animation: avatar-float 3s ease-in-out infinite;
+    animation: intro-up 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.02s backwards,
+        avatar-float 3s ease-in-out infinite;
+    will-change: transform;
 }
 
 @keyframes avatar-float {
@@ -74,7 +94,7 @@
    标题和简介
    ======================================== */
 .about-title {
-    font-size: 8vw;
+    font-size: clamp(44px, 8vw, 130px);
     font-weight: 900;
     color: var(--primary);
     line-height: 1.2;
@@ -84,7 +104,8 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    animation: title-shine 3s ease-in-out infinite;
+    animation: intro-up 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.05s backwards,
+        title-shine 3s ease-in-out infinite;
 }
 
 @keyframes title-shine {
@@ -97,13 +118,14 @@
 }
 
 .about-bio {
-    font-size: 1.3vw;
+    font-size: clamp(15px, 1.3vw, 20px);
     color: var(--text-gray);
     max-width: 750px;
     line-height: 1.8;
     padding: 0 2vw;
     margin-bottom: 60px;
     transform: translateZ(40px);
+    animation: intro-up 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s backwards;
 }
 
 /* ========================================
@@ -116,6 +138,8 @@
     max-width: 900px;
     margin-bottom: 80px;
     transform: translateZ(30px);
+    perspective: 1000px;
+    animation: intro-up 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.25s backwards;
 }
 
 .skill-item {
@@ -203,10 +227,12 @@
     max-width: 1000px;
     width: 90%;
     transform: translateZ(20px);
+    perspective: 1200px;
+    animation: intro-up 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.35s backwards;
 }
 
 .exp-title {
-    font-size: 2vw;
+    font-size: clamp(22px, 2vw, 34px);
     color: var(--primary);
     margin-bottom: 40px;
     transform: translateZ(15px);
@@ -302,22 +328,29 @@
    响应式 - 移动端
    ======================================== */
 @media (max-width: 768px) {
+    .section-about {
+        padding-top: 110px;
+        padding-bottom: 60px;
+    }
+
     .about-title {
-        font-size: 15vw;
+        font-size: clamp(44px, 15vw, 90px);
     }
 
     .about-bio {
-        font-size: 3.5vw;
+        font-size: 15px;
         margin-bottom: 40px;
+        padding: 0;
     }
 
     .skills-container {
         grid-template-columns: 1fr;
         gap: var(--spacing-md);
         width: 90%;
+        margin-bottom: 60px;
     }
 
     .exp-title {
-        font-size: 5vw;
+        font-size: 24px;
     }
 }

@@ -52,17 +52,17 @@ function getScrollProgress() {
 function applyParallax() {
   const baseOffset = scrollState.scrollTop * 0.6;
 
-  // 背景层反向偏移
+  // 背景层反向偏移（JS 驱动，避免 CSS 过渡冲突）
   if (layers.deepBg) {
-    layers.deepBg.style.transform = `translate3d(0, ${-baseOffset * PARALLAX.deepBg}px, var(--z-deep-bg))`;
+    layers.deepBg.style.transform = `translate3d(0, ${-baseOffset * PARALLAX.deepBg}px, 0)`;
   }
 
   if (layers.grid) {
-    layers.grid.style.transform = `translate3d(0, ${-baseOffset * PARALLAX.grid}px, var(--z-grid))`;
+    layers.grid.style.transform = `translate3d(0, ${-baseOffset * PARALLAX.grid}px, 0)`;
   }
 
   if (layers.line) {
-    layers.line.style.transform = `translate3d(0, ${-baseOffset * PARALLAX.line}px, var(--z-line))`;
+    layers.line.style.transform = `translate3d(0, ${-baseOffset * PARALLAX.line}px, 0)`;
   }
 
   // 导航层保持固定，不应用任何transform

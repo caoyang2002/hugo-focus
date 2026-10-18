@@ -2,24 +2,22 @@
    3D 层级系统 - 视差滚动核心
    ======================================== */
 
-/* 3D层基础样式 */
+/* 3D层基础样式（滚动驱动，无CSS过渡避免滞后） */
 .layer-3d {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     pointer-events: none;
-    /* transform-style: preserve-3d; */
     backface-visibility: hidden;
-    transition: transform var(--transition-base);
     will-change: transform;
 }
 
-/* 所有背景层统一高度：300vh */
+/* 装饰层跟随 body 实际高度铺满（top/bottom 锚定） */
 .layer-deep-bg,
 .layer-grid,
 .layer-line {
-    height: 300vh;
+    bottom: 0;
 }
 
 /* ========================================
