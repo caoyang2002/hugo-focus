@@ -16,17 +16,36 @@ export const layers = {
 // 内容板块元素
 export const sections = {
     about: document.querySelector('.section-about'),
-    worksTrigger: document.querySelector('.section-works-trigger'),
+    worksTrigger: document.querySelector('.section-works-trigger'), // 作品「轨道」（高 500vh）
     worksIllusion: document.querySelector('.section-works-illusion'),
-    contact: document.querySelector('.section-contact')
+    contact: document.querySelector('.section-contact')              // 联系「轨道」（高 200vh）
 };
-
+// 技能相关元素
+export const about = {
+  section: document.querySelector('.section-about'),
+  title: document.querySelector('.about-title'),
+  bio: document.querySelector('.about-bio'),
+  avatar: document.querySelector('.avatar'),
+  skills: document.querySelector('.skills-container'),
+  skillItems: document.querySelectorAll('.skill-item'),
+};
 // 作品相关元素
 export const works = {
+    stage: document.querySelector('.works-stage'),                   // 固定舞台
     text: document.querySelector('.works-text'),
+
     illusion: document.querySelector('.section-works-illusion'),
     container: document.querySelector('.works-container'),
-    items: document.querySelectorAll('.work-item')
+    items: document.querySelectorAll('.work-item'),
+    progress: document.querySelector('[data-works-progress]')
+};
+
+// 联系相关元素
+export const contact = {
+    track: document.querySelector('.section-contact'),
+    stage: document.querySelector('.contact-stage'),
+    title: document.querySelector('.contact-title'),
+    items: document.querySelectorAll('.contact-item')
 };
 
 // 导航元素
@@ -45,19 +64,22 @@ export function getSectionById(id) {
 // 检查元素是否存在
 export function checkElements() {
     const missing = [];
-    
+
     Object.entries(layers).forEach(([key, el]) => {
         if (!el) missing.push(`layer-${key}`);
     });
-    
+
     Object.entries(sections).forEach(([key, el]) => {
         if (!el) missing.push(`section-${key}`);
     });
-    
+
+    if (!works.stage) missing.push('works-stage');
+    if (!contact.stage) missing.push('contact-stage');
+
     if (missing.length > 0) {
         console.warn('Missing elements:', missing);
         return false;
     }
-    
+
     return true;
 }

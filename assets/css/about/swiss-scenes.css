@@ -1,0 +1,391 @@
+/* ========================================
+   瑞士风格 · 滚动场景层
+   路径：assets/css/about/swiss-scenes.css（合并顺序：最后）
+
+   三个场景，三种「面」（70 / 25 / 5 的面积关系）：
+     01 关于  纸白面  + 可见 12 栏网格
+     02 作品  纸白 → 墨黑，屏幕正中放大，卡片按网格擦入
+     03 联系  整块蓝面，从下方覆盖上来占满全屏
+
+   作品 / 联系 是「固定舞台」：section 是高轨道，内部舞台 sticky 钉在屏幕上，
+   具体动画由 parallax.js 按各自的滚动进度驱动。
+   ======================================== */
+
+/* ---------- 版心：左右留白变量（桌面右侧给导航面板让位） ---------- */
+:root {
+    --pad-l: 5vw;
+    --pad-r: 5vw;
+    --paper: #f2f0eb;
+    --ink: #0a0a0a;
+    --primary: #0042da;
+}
+
+@media (min-width: 769px) {
+    :root {
+        --pad-r: calc(4vw + 208px);
+    }
+}
+
+body {
+    padding: 0;
+    min-height: 0;
+}
+
+.layer-content {
+    padding: 0;
+    min-height: 0;
+    transform-style: flat;
+    will-change: auto;
+}
+
+/* 背景层固定在视口，不随页面高度拉伸 */
+.layer-deep-bg,
+.layer-grid,
+.layer-line {
+    position: fixed;
+    top: 0;
+    bottom: auto;
+    height: 100vh;
+    height: 100dvh;
+}
+
+.swiss-cols {
+    padding: 0 var(--pad-r) 0 var(--pad-l);
+}
+
+/* ---------- 整页进度线 ---------- */
+.scroll-rule {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    z-index: var(--z-nav);
+    pointer-events: none;
+    mix-blend-mode: difference;
+}
+
+.scroll-rule span {
+    display: block;
+    height: 100%;
+    background: #fff;
+    transform-origin: 0 50%;
+    transform: scaleX(var(--scroll, 0));
+}
+
+/* ---------- 导航面板：固定宽度，便于版心让位 ---------- */
+.nav-desktop {
+    width: 184px;
+    min-width: 0;
+}
+
+/* ---------- 标签：规则线跟随文字色 ---------- */
+.swiss-label {
+    border-top-color: currentColor;
+}
+
+.swiss-label--float {
+    position: absolute;
+    top: 28px;
+    left: var(--pad-l);
+    right: var(--pad-r);
+    width: auto;
+    margin: 0;
+    z-index: 2;
+}
+
+/* 舞台内的可见网格：压在舞台背景之上、内容之下 */
+.swiss-cols--stage {
+    z-index: -1;
+    pointer-events: none;
+}
+
+.swiss-cols--light span {
+    background: rgba(255, 255, 255, 0.045);
+    border-color: rgba(255, 255, 255, 0.16);
+}
+
+/* ========================================
+   01 关于
+   ======================================== */
+.section-about {
+    padding: 120px var(--pad-r) 96px var(--pad-l);
+}
+
+/* 卡片倾斜（animations.js 的 init3DCardTilt）会写内联 transform，统一禁用 */
+.skill-item,
+.skill-item:hover {
+    transform: none !important;
+}
+
+/* ========================================
+   02 作品：500vh 轨道 + 固定舞台
+   ======================================== */
+.section-works-trigger {
+    display: block;
+    height: 500vh;
+    min-height: 0;
+    padding: 0;
+    align-content: normal
+}
+
+.works-stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100dvh;
+    width: 100%;
+    overflow: hidden;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: transparent;      /* 由 JS 写入 rgba(10,10,10,k) */
+    color: var(--ink);
+    transition: color 0.2s ease;
+}
+
+.works-stage.is-dark {
+    color: var(--paper);
+}
+
+/* 舞台自带网格：仅在墨黑阶段显示，避免与全局网格叠加 */
+.works-stage .swiss-cols {
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.works-stage.is-dark .swiss-cols {
+    opacity: 1;
+}
+
+.works-stage:not(.is-dark) .swiss-cols span {
+    background: rgba(10, 10, 10, 0.028);
+}
+
+.works-stage.is-dark .swiss-cols span {
+    background: rgba(242, 240, 235, 0.045);
+    border-color: rgba(242, 240, 235, 0.16);
+}
+
+/* 放大主体：以屏幕正中为原点（舞台 flex 居中 + origin 居中） */
+.works-stage .works-text {
+    margin: 0;
+    flex: none;
+    text-align: center;
+    white-space: nowrap;
+    line-height: 1;
+    font-size: clamp(120px, 30vw, 420px);
+    color: var(--primary);
+    -webkit-text-fill-color: currentColor;
+    transform-origin: 50% 50%;
+    transform: none;
+    will-change: auto;       /* 让浏览器在放大时重新栅格化，避免糊 */
+    pointer-events: none;
+    user-select: none;
+}
+
+/* 覆盖层：透明，只负责承载卡片；透明度与指针由 JS 控制 */
+.section-works-illusion {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+   justify-content: center;  /* 原来是 flex-start */
+    padding: 84px var(--pad-r) 72px var(--pad-l);
+    background: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    transition: none;
+}
+
+/*.works-container {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0;
+    gap: 0;
+    background: none;
+    border: 0;
+}*/
+
+.works-container {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr)); /* 或 repeat(3, ...) */
+    gap: 1px;
+    width: 90%;
+    max-width: 1100px;
+    margin: 0 auto;          /* 水平居中 */
+    background: var(--ink);
+    border: 1px solid var(--ink);
+}
+
+/* 卡片：墨黑面上的纸白线框；用负 margin 让相邻边框重叠成 1px */
+.work-item {
+    background: transparent;
+    color: var(--paper);
+    border: 1px solid rgba(242, 240, 235, 0.45);
+    margin: 0 -1px -1px 0;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.work-item::before {
+    color: rgba(242, 240, 235, 0.6);
+}
+
+.work-svg {
+    color: var(--paper);
+}
+
+.work-desc {
+    color: rgba(242, 240, 235, 0.72);
+}
+
+.work-item .tag {
+    color: var(--paper);
+    border-color: rgba(242, 240, 235, 0.6);
+}
+
+.work-item .tag:hover {
+    background: var(--paper);
+    border-color: var(--paper);
+    color: var(--ink);
+}
+
+.work-item:hover,
+.work-item:focus-visible {
+    background: var(--primary);
+    border: 1px solid var(--primary);
+}
+
+.work-item:hover::before,
+.work-item:focus-visible::before {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* 舞台底部信息行 */
+.works-meta {
+    position: absolute;
+    left: var(--pad-l);
+    right: var(--pad-r);
+    bottom: 28px;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    padding-top: 10px;
+    border-top: 1px solid currentColor;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ========================================
+   03 联系：200vh 轨道，与作品轨道末尾重叠 100vh
+   → 蓝面从下方覆盖上来，轨道顶到视口顶时占满全屏
+   ======================================== */
+.section-contact {
+    display: block;
+    position: relative;
+    height: 200vh;
+    min-height: 0;
+    margin-top: -100vh;
+    padding: 0;
+    background: var(--primary);
+    color: #fff;
+
+}
+
+.contact-stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100dvh;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gap);
+    align-content: center;
+    padding: 0 var(--pad-r) 0 var(--pad-l);
+}
+
+.contact-title {
+    margin-top: 0;
+}
+
+/* ========================================
+   移动端
+   ======================================== */
+@media (max-width: 768px) {
+    :root {
+        --pad-l: 16px;
+        --pad-r: 16px;
+    }
+
+    body {
+        padding: 0;
+    }
+
+    .section-about {
+        padding: 110px 16px 64px;
+    }
+
+    .swiss-label--float {
+        top: 64px;   /* 让出顶部移动端导航 */
+    }
+
+    .section-works-illusion {
+        padding: 112px 16px 64px;
+    }
+
+    .works-container {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .work-item {
+        height: clamp(170px, 27vh, 230px);
+        padding: 12px;
+    }
+
+    .work-svg {
+        width: 36px;
+        height: 36px;
+        margin-bottom: 8px;
+    }
+
+    .work-name {
+        font-size: 15px;
+        margin-bottom: 4px;
+    }
+
+    .work-desc {
+        font-size: 12px;
+        line-height: 1.5;
+        margin-bottom: 8px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .work-tags {
+        display: none;
+    }
+
+    .works-meta {
+        bottom: 20px;
+    }
+
+    .contact-stage {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        padding: 0 16px;
+    }
+}
+
+/* 减少动态效果：保留场景切换，去掉放大 */
+@media (prefers-reduced-motion: reduce) {
+    .works-stage,
+    .works-stage .swiss-cols {
+        transition: none;
+    }
+}

@@ -4,8 +4,8 @@
  * ========================================
  */
 
-import { nav, getSectionById } from './dom.js';
-import { handleScroll } from './parallax.js';
+import { nav } from './dom.js';
+import { handleScroll, getSceneScrollTop } from './parallax.js';
 
 // 当前激活的导航项
 let currentActiveSection = 'about';
@@ -15,15 +15,16 @@ let currentActiveSection = 'about';
  */
 export function updateNavigation(activeSection) {
     if (currentActiveSection === activeSection) return;
-    
+
     currentActiveSection = activeSection;
-    
+
     nav.items.forEach(item => {
-        const section = item.dataset.section;
-        if (section === activeSection) {
-            item.classList.add('active');
+        const isActive = item.dataset.section === activeSection;
+        item.classList.toggle('active', isActive);
+        if (isActive) {
+            item.setAttribute('aria-current', 'true');
         } else {
-            item.classList.remove('active');
+            item.removeAttribute('aria-current');
         }
     });
 }
@@ -36,24 +37,19 @@ export function getCurrentSection() {
 }
 
 /**
+ * 滚动到某个场景（作品/联系是固定舞台，要滚到正确的进度位置）
+ */
+function goToScene(id, mode) {
+    window.scrollTo({ top: getSceneScrollTop(id, mode), behavior: 'smooth' });
+    setTimeout(() => handleScroll(), 100);
+}
+
+/**
  * 导航项点击处理
  */
 function handleNavClick(e) {
     e.preventDefault();
-    
-    const target = this.dataset.section;
-    const targetElement = getSectionById(target);
-    
-    if (targetElement) {
-        // 平滑滚动到目标
-        targetElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-        });
-        
-        // 强制更新滚动状态
-        setTimeout(() => handleScroll(), 100);
-    }
+    goToScene(this.dataset.section, 'start');
 }
 
 /**
@@ -62,30 +58,16 @@ function handleNavClick(e) {
 export function initNavigation() {
     nav.items.forEach(item => {
         item.addEventListener('click', handleNavClick);
-        
-        // 添加hover效果音效（可选）
-        item.addEventListener('mouseenter', () => {
-            // 可以在这里添加音效
-        });
     });
-    
-    // 导航Action按钮特殊处理
+
+    // 导航Action按钮：「浏览作品」直接到卡片展示位置
     nav.actions.forEach(action => {
-        action.addEventListener('click', function(e) {
+        action.addEventListener('click', function (e) {
             const href = this.getAttribute('href');
-            
-            // 如果是锚点链接，使用平滑滚动
+
             if (href && href.startsWith('#')) {
                 e.preventDefault();
-                const target = href.substring(1);
-                const targetElement = getSectionById(target);
-                
-                if (targetElement) {
-                    targetElement.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
+                goToScene(href.substring(1), 'cards');
             }
         });
     });
@@ -104,7 +86,7 @@ export function addNavItem(section, label, icon) {
         <span>${label}</span>
     `;
     navItem.addEventListener('click', handleNavClick);
-    
+
     if (nav.desktop) {
         nav.desktop.appendChild(navItem);
     }

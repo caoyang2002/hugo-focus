@@ -11,31 +11,21 @@
     <link rel="icon" href="{{ . | relURL }}" />
     {{ end }}
 
-    <!-- Font Awesome -->
+    <!-- Font Awesome（技能 / 联系方式图标仍由数据驱动） -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" />
 
-    <!-- 模块化CSS -->
+    <!-- 模块化CSS：swiss.css（主题）→ swiss-scenes.css（滚动场景）必须放在最后 -->
     {{/* 先获取所有资源对象 */}}
-    {{ $variables := resources.Get "css/about/variables.css" }}
-    {{ $base := resources.Get "css/about/base.css" }}
-    {{ $layer := resources.Get "css/about/layer.css" }}
-    {{ $navigation := resources.Get "css/about/navigation.css" }}
-    {{ $section := resources.Get "css/about/section.css" }}
-    {{ $sectionAbout := resources.Get "css/about/section-about.css" }}
-    {{ $sectionWorks := resources.Get "css/about/section-works.css" }}
-    {{ $sectionContact := resources.Get "css/about/section-contact.css" }}
+    {{ $swiss := resources.Get "css/about/swiss.css" }}
+    {{ $scenes := resources.Get "css/about/swiss-scenes.css" }}
+     {{ $work := resources.Get "css/about/work-section.css" }}
 
     {{/* 合并所有资源 */}}
     {{ $css := slice
-    $variables
-    $base
-    $layer
-    $navigation
-    $section
-    $sectionAbout
-    $sectionWorks
-    $sectionContact
+    $swiss
+    $scenes
+    $work
     | resources.Concat "css/about-bundle.css"
     | minify
     | fingerprint
@@ -51,29 +41,28 @@
 </head>
 
 <body>
+    <!-- 整页滚动进度线（差值混合：在纸白/墨黑/蓝面上都可见） -->
+    <div class="scroll-rule" aria-hidden="true"><span></span></div>
+
     <!-- ========================================
-         3D背景层 - 统一反向偏移
+         背景层（固定在视口；类名保持不变）
+         深层：哑光纸底 / 网格层：可见 12 栏模数网格 / 线条层：几何基准线
          ======================================== -->
     <div class="layer-3d layer-deep-bg"></div>
 
     <div class="layer-3d layer-grid">
-        <svg class="grid-svg" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-            <defs>
-                <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
-                    <path d="M 60 0 L 0 0 0 60" fill="none" stroke="currentColor" stroke-width="1" />
-                </pattern>
-            </defs>
-            <rect width="1000" height="1000" fill="url(#grid)" class="grid-pattern" />
-        </svg>
+        <div class="swiss-cols" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
+        </div>
     </div>
 
     <div class="layer-3d layer-line">
-        <svg class="line-svg" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-            <path d="M0,400 L1000,400" stroke-linecap="round" />
-            <path d="M500,0 L500,800" stroke-linecap="round" />
-            <path d="M100,200 L900,600" stroke-linecap="round" />
-            <path d="M900,200 L100,600" stroke-linecap="round" />
-        </svg>
+        <!--<svg class="line-svg" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <path d="M0,400 L1000,400" />
+            <path d="M250,400 a250,250 0 1,0 500,0 a250,250 0 1,0 -500,0" />
+        </svg>-->
     </div>
 
     <!-- ========================================
@@ -81,9 +70,17 @@
          ======================================== -->
     <div class="layer-3d layer-content">
         <!-- ====================================
-             第一屏：个人介绍（高度由内容决定）
+             01 个人介绍（纸白底，正常滚动）
+             栏位：头像 1–3 栏 ｜ 标题、简介、技能 4–12 栏 ｜ 经历 1–3 / 4–12
              ==================================== -->
         <section class="section section-about" id="about">
+            <header class="swiss-label">
+                <span class="swiss-label__num">01</span>
+                <span class="swiss-label__zh">关于</span>
+                <span class="swiss-label__en">About</span>
+            </header>
+
+
             <!-- 头像 -->
             {{ if .Params.avatar }}
             <div class="avatar">
@@ -140,99 +137,175 @@
         </section>
 
         <!-- ====================================
-             第二屏：作品文字触发 + 覆盖层（同屏）
+             02 作品（固定舞台）
+             section = 500vh 轨道；.works-stage 钉在屏幕上：
+             屏幕正中放大文字 → 背景过渡到墨黑 → 卡片按网格擦入
              ==================================== -->
         <section class="section section-works-trigger" id="works">
-            <h2 class="works-text">作品</h2>
 
-            <div class="section-works-illusion" id="works-illusion">
-                <div class="works-container">
-                    {{ range .Params.projects }}
-                    <div class="work-item">
-                        <div class="work-svg icon-wrapper">
-                            {{ .svg | safeHTML }}
+            <div class="works-stage">
+                <div class="swiss-cols swiss-cols--stage" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                </div>
+
+                <header class="swiss-label swiss-label--float">
+                    <span class="swiss-label__num">02</span>
+                    <span class="swiss-label__zh">作品</span>
+                    <span class="swiss-label__en">Works</span>
+                </header>
+
+                <h2 class="works-text">作品</h2>
+
+                <div class="section-works-illusion" id="works-illusion">
+                    <div class="works-container">
+                        {{ range $i, $p := .Params.projects }}
+                        <div class="work-item">
+                            <div class="work-svg icon-wrapper">{{ $p.svg | safeHTML }}</div>
+                            <h3 class="work-name">{{ $p.name }}</h3>
+                            <p class="work-desc">{{ $p.desc }}</p>
+                            <div class="work-tags">{{ range $p.tags }}<span class="tag">{{ . }}</span>{{ end }}</div>
+
+                            <button class="work-detail-btn"
+                                    data-index="{{ $i }}"
+                                    data-name="{{ $p.name }}"
+                                    data-cover="{{ $p.cover | relURL }}"
+                                    data-url="{{ $p.url }}"
+                                    data-intro="{{ $p.intro }}"
+                                    data-situation="{{ $p.star.situation }}"
+                                    data-task="{{ $p.star.task }}"
+                                    data-action="{{ $p.star.action }}"
+                                    data-result="{{ $p.star.result }}">
+                                查看详情 →
+                            </button>
                         </div>
-                        <h3 class="work-name">{{ .name }}</h3>
-                        <p class="work-desc">{{ .desc }}</p>
-                        <div class="work-tags">
-                            {{ range .tags }}
-                            <span class="tag">{{ . }}</span>
-                            {{ end }}
-                        </div>
+                        {{ end }}
                     </div>
-                    {{ end }}
+                </div>
+
+                <div class="works-meta" aria-hidden="true">
+                    <span>Selected Works</span>
+                    <span><span data-works-progress>000</span> / 100</span>
                 </div>
             </div>
         </section>
 
         <!-- ====================================
-             第三屏：联系方式
+             03 联系（整块蓝色面，从下方覆盖上来占满全屏）
+             section = 200vh 轨道，margin-top:-100vh 与作品轨道末尾重叠
              ==================================== -->
         <section class="section section-contact" id="contact">
-            <h2 class="contact-title">联系我</h2>
-            <div class="contact-container">
-                {{ range .Params.contacts }}
-                <a href="{{ .url }}" {{ if strings.HasPrefix .url "http" }}target="_blank" rel="noopener noreferrer" {{
-                    end }} class="contact-item">
-                    <div class="contact-icon">
-                        <i class="fa {{ .icon }}" aria-hidden="true"></i>
-                    </div>
-                    <span class="contact-value">{{ .value }}</span>
-                </a>
-                {{ end }}
+            <div class="contact-stage">
+                <div class="swiss-cols swiss-cols--stage swiss-cols--light" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                </div>
+
+                <header class="swiss-label swiss-label--float">
+                    <span class="swiss-label__num">03</span>
+                    <span class="swiss-label__zh">联系</span>
+                    <span class="swiss-label__en">Contact</span>
+                </header>
+
+                <h2 class="contact-title">联系我</h2>
+                <div class="contact-container">
+                    {{ range .Params.contacts }}
+                    <a href="{{ .url }}" {{ if strings.HasPrefix .url "http" }}target="_blank" rel="noopener noreferrer" {{
+                        end }} class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fa {{ .icon }}" aria-hidden="true"></i>
+                        </div>
+                        <span class="contact-value">{{ .value }}</span>
+                    </a>
+                    {{ end }}
+                </div>
             </div>
         </section>
     </div>
 
+
     <!-- ========================================
          导航层 - Fixed固定悬浮
          ======================================== -->
-    <div class="layer-nav">
-        <!-- 桌面端侧边导航 -->
-        <nav class="nav-desktop" aria-label="主导航">
-            <a href="#about" class="nav-item active" data-section="about" aria-label="关于我" aria-current="true">
-                <i class="fa fa-user" aria-hidden="true"></i>
-                <span>关于我</span>
-            </a>
-            <a href="#works" class="nav-item" data-section="works" aria-label="我的作品">
-                <i class="fa fa-picture-o" aria-hidden="true"></i>
-                <span>我的作品</span>
-            </a>
-            <a href="#contact" class="nav-item" data-section="contact" aria-label="联系我">
-                <i class="fa fa-envelope" aria-hidden="true"></i>
-                <span>联系我</span>
-            </a>
+         <div class="layer-nav">
+             <!-- 桌面端侧边导航 -->
+             <nav class="nav-desktop" aria-label="主导航">
+                 <div class="nav-head" aria-hidden="true">
+                     <span class="nav-head__zh">目录</span>
+                     <span class="nav-head__en">Index</span>
+                 </div>
 
-            <div class="nav-divider" role="separator"></div>
+                 <div class="nav-list">
+                     <a href="#about" class="nav-item active" data-section="about" aria-label="关于我" aria-current="true">
+                         <span class="nav-num" aria-hidden="true">01</span>
+                         <span class="nav-label">关于我</span>
+                         <span class="nav-mark" aria-hidden="true"></span>
+                     </a>
+                     <a href="#works" class="nav-item" data-section="works" aria-label="我的作品">
+                         <span class="nav-num" aria-hidden="true">02</span>
+                         <span class="nav-label">我的作品</span>
+                         <span class="nav-mark" aria-hidden="true"></span>
+                     </a>
+                     <a href="#contact" class="nav-item" data-section="contact" aria-label="联系我">
+                         <span class="nav-num" aria-hidden="true">03</span>
+                         <span class="nav-label">联系我</span>
+                         <span class="nav-mark" aria-hidden="true"></span>
+                     </a>
+                 </div>
 
-            <!-- Action按钮 -->
-            <a href="#works" class="nav-action" aria-label="浏览作品">
-                <i class="fa fa-eye" aria-hidden="true"></i>
-                <span>浏览作品</span>
-            </a>
-            <a href="{{ .Site.Home.RelPermalink }}" class="nav-action" aria-label="返回主页">
-                <i class="fa fa-home" aria-hidden="true"></i>
-                <span>返回主页</span>
-            </a>
-        </nav>
+                 <div class="nav-divider" role="separator">
+                     <span>Actions</span>
+                 </div>
 
-        <!-- 移动端顶部导航 -->
-        <nav class="nav-mobile" aria-label="主导航">
-            <a href="#about" class="nav-item active" data-section="about" aria-label="关于我" aria-current="true">
-                <i class="fa fa-user" aria-hidden="true"></i>
-                <span>关于我</span>
-            </a>
-            <a href="#works" class="nav-item" data-section="works" aria-label="作品">
-                <i class="fa fa-picture-o" aria-hidden="true"></i>
-                <span>作品</span>
-            </a>
-            <a href="#contact" class="nav-item" data-section="contact" aria-label="联系">
-                <i class="fa fa-envelope" aria-hidden="true"></i>
-                <span>联系</span>
-            </a>
-        </nav>
-    </div>
+                 <div class="nav-actions">
+                     <a href="#works" class="nav-action" aria-label="浏览作品">
+                         <span>浏览作品</span>
+                         <span class="nav-action__arrow" aria-hidden="true">→</span>
+                     </a>
+                     <a href="{{ .Site.Home.RelPermalink }}" class="nav-action nav-action--ghost" aria-label="返回主页">
+                         <span>返回主页</span>
+                         <span class="nav-action__arrow" aria-hidden="true">←</span>
+                     </a>
+                 </div>
+             </nav>
 
+             <!-- 移动端顶部导航 -->
+             <nav class="nav-mobile" aria-label="主导航">
+                 <a href="#about" class="nav-item active" data-section="about" aria-label="关于我" aria-current="true">
+                     <span class="nav-num" aria-hidden="true">01</span>
+                     <span>关于我</span>
+                 </a>
+                 <a href="#works" class="nav-item" data-section="works" aria-label="作品">
+                     <span class="nav-num" aria-hidden="true">02</span>
+                     <span>作品</span>
+                 </a>
+                 <a href="#contact" class="nav-item" data-section="contact" aria-label="联系">
+                     <span class="nav-num" aria-hidden="true">03</span>
+                     <span>联系</span>
+                 </a>
+             </nav>
+         </div>
+
+
+         <dialog id="work-dialog" class="work-dialog" aria-labelledby="wd-title">
+             <div class="work-dialog__inner">
+                 <button class="work-dialog__close" aria-label="关闭">×</button>
+                 <img id="wd-cover" class="work-dialog__cover" alt="" />
+                 <div class="work-dialog__body">
+                     <h2 id="wd-title"></h2>
+                     <p id="wd-intro" class="work-dialog__intro"></p>
+                     <a id="wd-url" class="work-dialog__url" target="_blank" rel="noopener">项目地址 →</a>
+                     <dl class="work-dialog__star">
+                         <dt>S · 背景</dt><dd id="wd-situation"></dd>
+                         <dt>T · 任务</dt><dd id="wd-task"></dd>
+                         <dt>A · 行动</dt><dd id="wd-action"></dd>
+                         <dt>R · 结果</dt><dd id="wd-result"></dd>
+                     </dl>
+                 </div>
+             </div>
+         </dialog>
     <!-- 模块化JavaScript -->
     <script type="module" src="{{ `js/about/main.js` | relURL }}"></script>
 
