@@ -1,29 +1,32 @@
-
 /* ========================================
    作品详情：按钮 + 弹层
+   路径：assets/css/about/work-section.css（合并顺序：第 3）
    ======================================== */
+
 .work-detail-btn {
     margin-top: auto;
     align-self: flex-start;
     padding: 6px 12px;
     background: transparent;
     border: 1px solid currentColor;
+    border-radius: 0;
     color: inherit;
-    font: inherit;
     font-size: 12px;
-    letter-spacing: .08em;
+    letter-spacing: 0.08em;
     cursor: pointer;
-    transition: background .15s ease, color .15s ease, border-color .15s ease;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
+
 .work-detail-btn:hover,
 .work-detail-btn:focus-visible {
     background: var(--paper);
     color: var(--ink);
     border-color: var(--paper);
 }
-.work-item:hover .work-detail-btn,
-.work-item:focus-visible .work-detail-btn {
-    border-color: var(--paper);
+
+.work-detail-btn:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
 }
 
 /* 弹层 */
@@ -37,28 +40,35 @@
     overflow: auto;
     overscroll-behavior: contain;
 }
+
 .work-dialog::backdrop {
-    background: rgba(10, 10, 10, .72);
+    background: rgba(10, 10, 10, 0.72);
 }
 
-.work-dialog__inner { position: relative; }
+.work-dialog__inner {
+    position: relative;
+}
 
 .work-dialog__close {
     position: sticky;
     top: 0;
     float: right;
-    margin: 12px 12px 0 0;
+    z-index: 2;
     width: 36px;
     height: 36px;
+    margin: 12px 12px 0 0;
     background: var(--ink);
     color: var(--bg);
     border: 0;
     font-size: 20px;
     line-height: 1;
     cursor: pointer;
-    z-index: 2;
 }
-.work-dialog__close:hover { background: var(--primary); color: #fff; }
+
+.work-dialog__close:hover {
+    background: var(--primary);
+    color: #fff;
+}
 
 .work-dialog__cover {
     display: block;
@@ -67,12 +77,14 @@
     background: var(--ink);
 }
 
-.work-dialog__body { padding: 28px 32px 36px; }
+.work-dialog__body {
+    padding: 28px 32px 36px;
+}
 
 .work-dialog__body h2 {
     margin: 0 0 16px;
     font-size: 28px;
-    letter-spacing: -.02em;
+    letter-spacing: -0.02em;
     line-height: 1.15;
 }
 
@@ -99,13 +111,15 @@
     padding-top: 20px;
     border-top: 2px solid var(--ink);
 }
+
 .work-dialog__star dt {
     font-weight: 700;
     font-size: 12px;
-    letter-spacing: .1em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--primary);
 }
+
 .work-dialog__star dd {
     margin: 0;
     line-height: 1.75;
@@ -113,8 +127,21 @@
     white-space: pre-line;
 }
 
-@media (max-width: 768px) {
-    .work-dialog__body { padding: 20px 18px 28px; }
-    .work-dialog__star { grid-template-columns: 1fr; gap: 4px 0; }
-    .work-dialog__star dt { margin-top: 8px; }
+.work-dialog__star [hidden] {
+    display: none;
+}
+
+@media (max-width: 900px) {
+    .work-dialog__body {
+        padding: 20px 18px 28px;
+    }
+
+    .work-dialog__star {
+        grid-template-columns: 1fr;
+        gap: 4px 0;
+    }
+
+    .work-dialog__star dt {
+        margin-top: 8px;
+    }
 }

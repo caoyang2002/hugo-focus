@@ -2,203 +2,192 @@
  * ========================================
  * 滚动场景核心模块
  * ========================================
- * 三个场景，各有各的页面效果：
- *   01 关于：纸白底 + 可见网格，元素入场，几何圆线缓慢上移放大
- *   02 作品：固定舞台。文字在屏幕正中指数放大 → 背景由纸白过渡到墨黑 →
- *            卡片按网格逐张擦入
- *   03 联系：整块蓝色面从下方覆盖上来（占满全屏），标题与联系行依次擦入
- * 每个场景只读取自己的轨道（getBoundingClientRect），状态完全由滚动位置决定，
- * 所以上下滚动都是对称、连续的。
+ * 每个场景 = 一条高轨道（.scene）+ 钉在屏幕上的舞台（.scene-stage, sticky）。
+ * 轨道高度按内容测算，场景内的所有动画都由「该场景已滚过的像素 s」决定，
+ * 所以上下滚动完全对称、连续：
+ *
+ *   s: 0 ──────── Z ───────────── panStart ─────── panEnd ── P
+ *      标题放大淡出   内容逐项擦入      内容随滚动上移    停留
+ *
+ * 场景之间：下一条轨道与上一条重叠 100vh，下一个舞台（实色背景）从下方覆盖上来，
+ * 覆盖期间上一场景保持完整展示。
  */
 
-import { PARALLAX, INFO, WORKS, SKILLS, CONTACT, EASING } from "./config.js";
-import { layers, sections, works, contact,about } from "./dom.js";
-import { updateNavigation } from "./navigation.js";
-import { clamp } from "./utils.js";
+import { SCENE as S, EASING } from './config.js';
+import { scenes } from './dom.js';
+import { clamp, seg } from './utils.js';
 
-const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-let vh = window.innerHeight;
-let lastDark = null;
-
-/** 把 v 在 [a, b] 内归一化到 0~1 */
-const seg = (v, a, b) => clamp((v - a) / (b - a), 0, 1);
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const ease = EASING.easeInOut;
 
-/**
- * 初始化滚动状态
- */
-export function initScrollState() {
-  vh = window.innerHeight;
+let vh = window.innerHeight;
+let activeListener = () => {};
+
+/** 注册「当前场景变化」回调（由 main.js 连接到导航，避免模块循环依赖） */
+export function setActiveListener(fn) {
+    activeListener = fn;
 }
 
 /**
- * 背景层：固定在视口，仅几何圆线层随整页进度运动
+ * 测算所有场景：视窗高度、内容溢出、每一项的擦入时间点、轨道总高度
+ * 在初始化、窗口变化、字体/图片加载后调用
  */
-function applyParallax(progress) {
-  if (layers.line) {
-    const y = -progress * PARALLAX.lineTravelVh;
-    const s = 1 + progress * PARALLAX.lineGrow;
-    layers.line.style.transform = `translate3d(0, ${y}vh, 0) scale(${s})`;
-  }
-  if (layers.nav) {
-    layers.nav.style.transform = "none";
-  }
+export function measure() {
+    vh = window.innerHeight;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+
+    const last = scenes.length - 1;
+
+    scenes.forEach((sc, idx) => {
+        const availH = sc.viewport.clientHeight;
+        // offsetHeight 是布局高度，不受上移 transform 影响
+        const overflow = Math.max(0, Math.ceil(sc.body.offsetHeight - availH));
+        const Z = sc.title ? Math.round(S.zoom * vh) : 0;
+
+        const bodyTop = sc.body.getBoundingClientRect().top;
+        const limit = availH * S.inView;
+        const stag = (sc.itemEls.length > S.denseAfter ? S.staggerDense : S.stagger) * vh;
+        const dur = S.itemDur * vh;
+
+        // 首屏可见的项：标题放大过程中按顺序错峰擦入
+        let rank = 0;
+        let visEnd = Z;
+        const items = sc.itemEls.map((el) => {
+            const top = el.getBoundingClientRect().top - bodyTop;
+            const it = { el, mode: el.dataset.reveal || 'up', top, off: top >= limit, start: 0, dur };
+            if (!it.off) {
+                it.start = Z * S.itemStart + rank * stag;
+                rank += 1;
+                visEnd = Math.max(visEnd, it.start + dur);
+            }
+            return it;
+        });
+
+        // 首屏之外的项：内容上移到它进入视窗时再擦入
+        const panStart = visEnd;
+        let maxEnd = visEnd;
+        items.forEach((it) => {
+            if (it.off) it.start = panStart + (it.top - limit);
+            maxEnd = Math.max(maxEnd, it.start + dur);
+        });
+
+        const hold = sc.title || items.length ? S.hold * vh : 0;
+        const P = Math.round(Math.max(panStart + overflow + hold, items.length ? maxEnd + 0.15 * vh : 0));
+
+        sc.items = items;
+        sc.m = { availH, overflow, Z, panStart, P };
+
+        // 轨道高度 = 舞台 + 动画行程 +（有下一场景时）被覆盖的 100vh
+        sc.el.style.height = `${vh + P + (idx < last ? vh : 0)}px`;
+    });
 }
 
-/**
- * 作品场景
- */
-function renderWorks(rect) {
-  const { stage, text, illusion, items, progress } = works;
-  if (!stage || !text || !illusion) return 0;
-
-  const travel = Math.max(1, rect.height - vh);
-  const t = clamp(-rect.top / travel, 0, 1);
-
-  // 1) 屏幕正中放大（舞台居中 + transform-origin 居中 = 以屏幕中心为原点）
-  const u = seg(t, 0, WORKS.zoomEnd);
-  const zoom = reduceMotion ? 1 : Math.pow(WORKS.maxScale, ease(u));
-  const textOpacity = 1 - ease(seg(t, WORKS.textFadeStart, WORKS.zoomEnd));
-  text.style.transform = `scale(${zoom.toFixed(4)})`;
-  text.style.opacity = textOpacity.toFixed(3);
-
-  // 2) 舞台背景：透明（露出纸白与网格）→ 墨黑
-  const k = ease(seg(t, WORKS.bgStart, WORKS.bgEnd));
-  stage.style.backgroundColor = `rgba(10, 10, 10, ${k.toFixed(3)})`;
-  const dark = k > WORKS.darkAt;
-  if (dark !== lastDark) {
-    stage.classList.toggle("is-dark", dark);
-    lastDark = dark;
-  }
-
-  // 3) 覆盖层与卡片：按网格顺序逐张从下往上擦入
-  const overlay = ease(seg(t, WORKS.overlayStart, WORKS.overlayStart + 0.04));
-  illusion.style.opacity = overlay.toFixed(3);
-  illusion.style.pointerEvents = t >= WORKS.cardsStart ? "all" : "none";
-
-  items.forEach((el, i) => {
-    const e = ease(seg(t, WORKS.cardsStart + i * WORKS.cardStagger, WORKS.cardsStart + i * WORKS.cardStagger + WORKS.cardDur));
-    el.style.clipPath = e >= 1 ? "none" : `inset(${((1 - e) * 100).toFixed(2)}% 0 0 0)`;
-  });
-
-  if (progress) {
-    progress.textContent = String(Math.round(t * 100)).padStart(3, "0");
-  }
-
-  return t;
+/** 擦入：up = 自下而上；right = 自左向右 */
+function wipe(el, mode, e) {
+    if (e >= 1) {
+        el.style.clipPath = 'none';
+        return;
+    }
+    const p = ((1 - e) * 100).toFixed(2);
+    el.style.clipPath = mode === 'right' ? `inset(0 ${p}% 0 0)` : `inset(${p}% 0 0 0)`;
 }
 
-/**
- * 关于场景：info（标题/简介/头像）与 skills 随滚动放大
- * p = 0（about 顶部刚进视口顶部）→ 1（about 底部离开视口顶部）
- */
-function renderAbout(rect) {
-  const p = clamp((vh - rect.top) / (rect.height + vh), 0, 1);
+/** 渲染单个场景。rect 为轨道的 getBoundingClientRect() */
+function renderScene(sc, rect) {
+    const m = sc.m;
+    if (!m) return;
 
-  // --- info：标题 / 简介 / 头像 ---
-  const eInfo = ease(seg(p, INFO.start, INFO.end));
-  const sInfo = INFO.scaleStart + (1 - INFO.scaleStart) * eInfo;
-  [about.title, about.bio, about.avatar].forEach(el => {
-    if (el) el.style.transform = `scale(${sInfo.toFixed(4)})`;
-  });
+    // 舞台完全不在屏幕附近：跳过（回到屏幕前会重新按位置渲染）
+    if (rect.bottom < -80 || rect.top > vh + 80) return;
 
-  // --- skills：整体放大 + 每个 item 错峰 ---
-  const eSkills = ease(seg(p, SKILLS.start, SKILLS.end));
-  const sSkills = SKILLS.scaleStart + (1 - SKILLS.scaleStart) * eSkills;
-  if (about.skills) {
-    about.skills.style.transform = `scale(${sSkills.toFixed(4)})`;
-    about.skills.style.transformOrigin = 'left top';   // 左对齐，避免放大后溢出右侧
-  }
+    const raw = -rect.top;
+    const s = clamp(raw, 0, m.P);
 
-  about.skillItems.forEach((el, i) => {
-    const a = SKILLS.start + i * SKILLS.stagger;
-    const e = ease(seg(p, a, a + SKILLS.itemDur));
-    const s = SKILLS.scaleStart + (1 - SKILLS.scaleStart) * e;
-    el.style.transform = `scale(${s.toFixed(4)})`;
-    el.style.transformOrigin = 'left top';
-  });
+    // 1) 标题：屏幕正中放大 → 淡出
+    if (sc.title) {
+        const zoom = reduceMotion ? 1 : Math.pow(S.maxScale, ease(seg(s, 0, m.Z)));
+        const opacity = 1 - ease(seg(s, m.Z * S.fadeFrom, m.Z));
+        sc.title.style.transform = `scale(${zoom.toFixed(4)})`;
+        sc.title.style.opacity = opacity.toFixed(3);
+        sc.title.style.visibility = opacity <= 0.002 ? 'hidden' : 'visible';
+    }
 
-  return p;
-}
+    // 2) 墨黑面（作品）：纸白 → 墨黑
+    if (sc.tone === 'ink') {
+        const k = ease(seg(s, m.Z * S.veilStart, m.Z * S.veilEnd));
+        sc.stage.style.setProperty('--veil', k.toFixed(3));
+        const dark = k > S.darkAt;
+        if (dark !== sc.dark) {
+            sc.stage.classList.toggle('is-dark', dark);
+            sc.dark = dark;
+        }
+    }
 
-/**
- * 联系场景：q = 0（轨道顶部刚进入视口底部）→ 1（页面最底部）
- */
-function renderContact(rect) {
-  const q = clamp((vh - rect.top) / rect.height, 0, 1);
+    // 3) 内容上移（内容比视窗高时）
+    const pan = clamp(s - m.panStart, 0, m.overflow);
 
-  if (contact.title) {
-    const e = ease(seg(q, CONTACT.titleStart, CONTACT.titleEnd));
-    contact.title.style.clipPath =
-      e >= 1 ? "none" : `inset(-8% ${((1 - e) * 100).toFixed(2)}% -8% 0)`;
-  }
+    if (sc.hero) {
+        // 首屏被下一场景覆盖时：轻微上移 + 淡出
+        const x = seg(raw, m.P, m.P + vh);
+        sc.body.style.transform = `translate3d(0, ${(-pan - x * 0.06 * vh).toFixed(1)}px, 0)`;
+        sc.body.style.opacity = (1 - S.heroExit * x).toFixed(3);
+        if (sc.hint) sc.hint.style.opacity = (1 - seg(raw, 0, 0.2 * vh)).toFixed(3);
+    } else {
+        sc.body.style.transform = pan ? `translate3d(0, ${(-pan).toFixed(1)}px, 0)` : 'none';
+    }
 
-  contact.items.forEach((el, i) => {
-    const a = CONTACT.itemsStart + i * CONTACT.itemStep;
-    const e = ease(seg(q, a, a + CONTACT.itemDur));
-    el.style.clipPath = e >= 1 ? "none" : `inset(0 ${((1 - e) * 100).toFixed(2)}% 0 0)`;
-  });
+    // 4) 逐项擦入
+    for (const it of sc.items) {
+        wipe(it.el, it.mode, ease(seg(s, it.start, it.start + it.dur)));
+    }
 
-  return q;
+    // 5) 标题还在放大时，内容不可点击 / 聚焦
+    const ready = s >= m.Z * S.readyAt;
+    if (ready !== sc.ready) {
+        sc.body.inert = !ready;
+        sc.ready = ready;
+    }
+
+    // 6) 场景进度
+    if (sc.progress) {
+        const pct = m.P > 0 ? Math.round((s / m.P) * 100) : 0;
+        sc.progress.textContent = String(pct).padStart(3, '0');
+    }
 }
 
 /**
  * 主滚动处理函数
  */
 export function handleScroll() {
-  const y = window.scrollY;
-  const max = Math.max(1, document.documentElement.scrollHeight - vh);
-  const docProgress = clamp(y / max, 0, 1);
+    const max = Math.max(1, document.documentElement.scrollHeight - vh);
+    const docProgress = clamp(window.scrollY / max, 0, 1);
+    document.documentElement.style.setProperty('--scroll', docProgress.toFixed(4));
 
-  // 整页进度：给顶部进度线用
-  document.documentElement.style.setProperty("--scroll", docProgress.toFixed(4));
+    const rects = scenes.map((sc) => sc.el.getBoundingClientRect());
+    scenes.forEach((sc, i) => renderScene(sc, rects[i]));
 
-  applyParallax(docProgress);
-
-  const worksRect = sections.worksTrigger.getBoundingClientRect();
-  const contactRect = sections.contact.getBoundingClientRect();
-  const aboutRect = sections.about.getBoundingClientRect();
-
-  renderWorks(worksRect);
-  renderContact(contactRect);
-  renderAbout(aboutRect);
-
-  // 导航高亮：以视口中线为界
-  if (contactRect.top < vh * 0.5) {
-    updateNavigation("contact");
-  } else if (worksRect.top < vh * 0.5) {
-    updateNavigation("works");
-  } else {
-    updateNavigation("about");
-  }
+    // 导航高亮：最后一个「顶边已越过视口中线」的场景
+    let active = scenes[0].id;
+    for (let i = 0; i < scenes.length; i++) {
+        if (rects[i].top < vh * 0.5) active = scenes[i].id;
+    }
+    activeListener(active);
 }
 
 /**
- * 窗口大小改变处理
+ * 窗口大小 / 字体 / 图片变化后重新测算
  */
 export function handleResize() {
-  initScrollState();
-  handleScroll();
+    measure();
+    handleScroll();
 }
 
 /**
- * 计算某场景的「目标滚动位置」
- *  works  + "start"   → 作品文字刚钉住（t = 0）
- *  works  + "cards"   → 卡片全部展示（t ≈ 0.45）
- *  contact           → 页面最底部（联系区完整展示）
+ * 计算某场景的「目标滚动位置」：内容刚好全部展示的位置（首屏为顶部）
  */
-export function getSceneScrollTop(id, mode = "start") {
-  const doc = document.documentElement;
-  if (id === "contact") {
-    return doc.scrollHeight - window.innerHeight;
-  }
-  if (id === "works") {
-    const rect = sections.worksTrigger.getBoundingClientRect();
-    const top = rect.top + window.scrollY;
-    const travel = Math.max(1, rect.height - window.innerHeight);
-    return top + (mode === "cards" ? travel * 0.45 : 0);
-  }
-  const el = document.getElementById(id);
-  return el ? el.getBoundingClientRect().top + window.scrollY : 0;
+export function getSceneScrollTop(id) {
+    const sc = scenes.find((s) => s.id === id);
+    if (!sc || !sc.m) return 0;
+    const top = sc.el.getBoundingClientRect().top + window.scrollY;
+    return Math.round(top + (sc.hero ? 0 : Math.min(sc.m.panStart, sc.m.P)));
 }

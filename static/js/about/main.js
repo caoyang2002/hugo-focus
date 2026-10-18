@@ -4,9 +4,9 @@
  * ========================================
  */
 
-import { checkElements } from './dom.js';
-import { initScrollState, handleScroll, handleResize } from './parallax.js';
-import { initNavigation } from './navigation.js';
+import { checkElements, scenes } from './dom.js';
+import { measure, handleScroll, handleResize, setActiveListener, getSceneScrollTop } from './parallax.js';
+import { initNavigation, updateNavigation } from './navigation.js';
 import { initAllAnimations } from './animations.js';
 import { debounce } from './utils.js';
 import { initWorkDialog } from './work-dialog.js';
@@ -15,30 +15,38 @@ import { initWorkDialog } from './work-dialog.js';
  * 初始化应用
  */
 function init() {
+    // 先打上 has-js：CSS 据此把「待擦入」的内容设为隐藏初始态
     document.documentElement.classList.add('has-js');
 
-    // 检查必要元素是否存在
     if (!checkElements()) {
         console.error('❌ 缺少必要的DOM元素');
+        document.documentElement.classList.remove('has-js');
         return;
     }
 
-    initScrollState();
+    setActiveListener(updateNavigation);
+    measure();
     initNavigation();
-  initAllAnimations();
-
-  initWorkDialog();
+    initAllAnimations();
+    initWorkDialog();
     bindEventListeners();
 
     // 触发一次滚动，初始化所有状态
     handleScroll();
+
+    // 带 #hash 打开时，定位到对应场景
+    const id = decodeURIComponent(window.location.hash.slice(1));
+    if (id && scenes.some((s) => s.id === id)) {
+        window.scrollTo({ top: getSceneScrollTop(id), behavior: 'auto' });
+        handleScroll();
+    }
 }
 
 /**
  * 绑定事件监听器
  */
 function bindEventListeners() {
-    // 滚动：用 requestAnimationFrame 合并到每帧一次（比 16ms 节流更顺滑）
+    // 滚动：合并到每帧一次
     let ticking = false;
     window.addEventListener(
         'scroll',
@@ -53,14 +61,21 @@ function bindEventListeners() {
         { passive: true }
     );
 
-    // 窗口大小改变事件 - 使用防抖优化性能
-    window.addEventListener('resize', debounce(handleResize, 150));
+    // 内容尺寸会变化的时机都要重新测算：窗口、字体、图片、内容自身
+    const remeasure = debounce(handleResize, 150);
+    window.addEventListener('resize', remeasure);
+    window.addEventListener('load', handleResize);
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(handleResize);
+    }
+    if ('ResizeObserver' in window) {
+        const ro = new ResizeObserver(remeasure);
+        scenes.forEach((s) => ro.observe(s.body));
+    }
 
-    // 页面可见性改变事件
+    // 页面可见性改变
     document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) {
-            handleScroll();
-        }
+        if (!document.hidden) handleScroll();
     });
 }
 
@@ -79,5 +94,5 @@ if (document.readyState === 'loading') {
 window.Portfolio3D = {
     handleScroll,
     handleResize,
-    version: '2.0.0'
+    version: '3.0.0'
 };

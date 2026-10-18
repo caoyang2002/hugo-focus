@@ -2,55 +2,33 @@
  * ========================================
  * 配置常量 - 滚动场景参数
  * ========================================
- * 作品区 / 联系区都是「固定舞台」：各自用自己的滚动进度（0~1）驱动，
- * 不再依赖整页 300vh 的假设，所以个人介绍区高度怎么变都不会错位。
+ * 所有场景（技能 / 经历 / 项目 / 作品 / 联系）共用同一套时间线，
+ * 时间线以「滚动像素」为单位，由 parallax.js 按每个场景的真实内容高度测算：
+ *
+ *   0 ─ 标题放大淡出(zoom) ─ 内容逐项擦入 ─ 内容上移(overflow) ─ 停留(hold) ─ 被下一场景覆盖
+ *
+ * 因此内容再多、屏幕再矮，都不会错位或被截断。
  */
 
-// 背景层视差（层本身固定在视口，按整页进度运动）
-export const PARALLAX = {
-    lineTravelVh: 28,  // 几何圆线层随整页进度向上移动的距离（vh）
-    lineGrow: 0.5      // 几何圆线层整页进度内放大比例
-};
+export const SCENE = {
+    maxScale: 10,        // 标题放大倍数（指数缓动，视觉均匀）
+    zoom: 0.9,           // 标题放大阶段长度（× 视口高度）
+    fadeFrom: 0.42,      // 标题从放大阶段的该比例开始淡出
+    itemStart: 0.7,      // 第一项在放大阶段的该比例开始擦入
+    stagger: 0.16,       // 相邻两项擦入的间隔（× 视口高度）
+    staggerDense: 0.09,  // 项目很多时使用更密的间隔
+    denseAfter: 8,       // 超过该数量视为「很多」
+    itemDur: 0.45,       // 单项擦入时长（× 视口高度）
+    hold: 0.3,           // 全部展示后的停留（× 视口高度）
+    inView: 0.82,        // 内容视窗高度的该比例以内算「首屏可见」，其余项等内容上移后再擦入
+    readyAt: 0.85,       // 放大阶段走过该比例后，内容才可交互（点击 / Tab）
 
-// 关于区：info（标题/简介/头像）与 skills 的滚动放大
-export const INFO = {
-  scaleStart: 0.92,   // 进入视口时的初始缩放
-  start: 0.05,        // 在 about 进度里开始放大
-  end: 0.35,          // 放大完成
-};
+    // 墨黑面（作品）
+    veilStart: 0.08,     // 纸白 → 墨黑 开始（放大阶段比例）
+    veilEnd: 0.9,        // 结束
+    darkAt: 0.45,        // 蒙层超过该比例后切换为浅色文字
 
-// 技能区
-export const SKILLS = {
-  scaleStart: 0.94,
-  start: 0.1,
-  end: 0.45,
-  stagger: 0.04,      // 每个 skill-item 的错峰
-  itemDur: 0.18,      // 单个 item 放大时长
-};
-
-// 作品区：进度 t = 0~1（固定舞台从钉住到结束）
-// 轨道高 500vh，最后 100vh 与联系区重叠（联系区从下方覆盖上来），
-// 所以 t 的 0.75~1 是「联系区上升」阶段，作品内容保持展示。
-export const WORKS = {
-    maxScale: 12,        // 中心放大倍数（指数缓动，视觉均匀）
-    zoomEnd: 0.24,       // 放大结束
-    textFadeStart: 0.13, // 文字开始淡出
-    bgStart: 0.06,       // 舞台背景 纸白 → 墨黑 开始
-    bgEnd: 0.22,         // 舞台背景 纸白 → 墨黑 结束
-    darkAt: 0.45,        // 背景过渡超过该比例后切到浅色文字
-    overlayStart: 0.22,  // 作品覆盖层开始出现
-    cardsStart: 0.24,    // 第一张卡片开始擦入
-    cardStagger: 0.035,  // 卡片之间的错开
-    cardDur: 0.12        // 单张卡片擦入时长
-};
-
-// 联系区：进度 q = 0~1（从刚进入视口底部，到页面最底部）
-export const CONTACT = {
-    titleStart: 0.22,
-    titleEnd: 0.5,
-    itemsStart: 0.42,
-    itemStep: 0.07,
-    itemDur: 0.2
+    heroExit: 0.7        // 首屏被覆盖时的淡出幅度
 };
 
 // 缓动函数
@@ -58,16 +36,10 @@ export const EASING = {
     linear: (t) => t,
     easeIn: (t) => t * t,
     easeOut: (t) => t * (2 - t),
-    easeInOut: (t) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
-    elastic: (t) => {
-        const p = 0.3;
-        return Math.pow(2, -10 * t) * Math.sin(((t - p / 4) * (2 * Math.PI)) / p) + 1;
-    }
+    easeInOut: (t) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t)
 };
 
-// 响应式断点
+// 响应式断点（需与 CSS 中的 900px 保持一致）
 export const BREAKPOINTS = {
-    mobile: 768,
-    tablet: 1024,
-    desktop: 1440
+    mobile: 900
 };

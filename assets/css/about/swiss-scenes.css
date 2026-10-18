@@ -1,243 +1,516 @@
 /* ========================================
    瑞士风格 · 滚动场景层
-   路径：assets/css/about/swiss-scenes.css（合并顺序：最后）
+   路径：assets/css/about/swiss-scenes.css（合并顺序：第 2）
 
-   三个场景，三种「面」（70 / 25 / 5 的面积关系）：
-     01 关于  纸白面  + 可见 12 栏网格
-     02 作品  纸白 → 墨黑，屏幕正中放大，卡片按网格擦入
-     03 联系  整块蓝面，从下方覆盖上来占满全屏
+   六个场景，全部使用同一个「固定舞台」结构：
+     .scene          高轨道（高度由 parallax.js 按内容测算）
+       .scene-stage  sticky 钉在内容区，solid 背景（后一个场景从下方覆盖上来）
+         .scene-title     标题：屏幕正中放大 → 淡出（首屏没有）
+         .scene-viewport  内容视窗（内容比视窗高时，由 JS 随滚动上移）
+           .scene-body    内容
+         .scene-meta      底部信息行 / 进度
 
-   作品 / 联系 是「固定舞台」：section 是高轨道，内部舞台 sticky 钉在屏幕上，
-   具体动画由 parallax.js 按各自的滚动进度驱动。
+   场景与「面」：
+     01 关于  纸白  首屏：头像 + 标题 + 介绍 + 下滑提示
+     02 技能  纸白  标题放大淡出 → 技能项擦入
+     03 经历  纸白  标题放大淡出 → 时间轴行擦入
+     04 项目  纸白  标题放大淡出 → 项目卡擦入
+     05 作品  纸白 → 墨黑
+     06 联系  整块蓝面
    ======================================== */
 
-/* ---------- 版心：左右留白变量（桌面右侧给导航面板让位） ---------- */
-:root {
-    --pad-l: 5vw;
-    --pad-r: 5vw;
-    --paper: #f2f0eb;
-    --ink: #0a0a0a;
-    --primary: #0042da;
-}
-
-@media (min-width: 769px) {
-    :root {
-        --pad-r: calc(4vw + 208px);
-    }
-}
-
-body {
-    padding: 0;
-    min-height: 0;
-}
-
-.layer-content {
-    padding: 0;
-    min-height: 0;
-    transform-style: flat;
-    will-change: auto;
-}
-
-/* 背景层固定在视口，不随页面高度拉伸 */
-.layer-deep-bg,
-.layer-grid,
-.layer-line {
-    position: fixed;
-    top: 0;
-    bottom: auto;
-    height: 100vh;
-    height: 100dvh;
-}
-
-.swiss-cols {
-    padding: 0 var(--pad-r) 0 var(--pad-l);
-}
-
-/* ---------- 整页进度线 ---------- */
-.scroll-rule {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    z-index: var(--z-nav);
-    pointer-events: none;
-    mix-blend-mode: difference;
-}
-
-.scroll-rule span {
-    display: block;
-    height: 100%;
-    background: #fff;
-    transform-origin: 0 50%;
-    transform: scaleX(var(--scroll, 0));
-}
-
-/* ---------- 导航面板：固定宽度，便于版心让位 ---------- */
-.nav-desktop {
-    width: 184px;
-    min-width: 0;
-}
-
-/* ---------- 标签：规则线跟随文字色 ---------- */
-.swiss-label {
-    border-top-color: currentColor;
-}
-
-.swiss-label--float {
-    position: absolute;
-    top: 28px;
-    left: var(--pad-l);
-    right: var(--pad-r);
-    width: auto;
-    margin: 0;
-    z-index: 2;
-}
-
-/* 舞台内的可见网格：压在舞台背景之上、内容之下 */
-.swiss-cols--stage {
-    z-index: -1;
+/* ---------- 轨道 / 舞台 ---------- */
+.scene {
+    position: relative;
+    height: calc(var(--vh) * 2);      /* JS 会按内容覆盖 */
     pointer-events: none;
 }
 
-.swiss-cols--light span {
-    background: rgba(255, 255, 255, 0.045);
-    border-color: rgba(255, 255, 255, 0.16);
+.scene + .scene {
+    margin-top: calc(var(--vh) * -1); /* 与上一场景末尾重叠 100vh：从下方覆盖上来 */
 }
 
-/* ========================================
-   01 关于
-   ======================================== */
-.section-about {
-    padding: 120px var(--pad-r) 96px var(--pad-l);
-}
-
-/* 卡片倾斜（animations.js 的 init3DCardTilt）会写内联 transform，统一禁用 */
-.skill-item,
-.skill-item:hover {
-    transform: none !important;
-}
-
-/* ========================================
-   02 作品：500vh 轨道 + 固定舞台
-   ======================================== */
-.section-works-trigger {
-    display: block;
-    height: 500vh;
-    min-height: 0;
-    padding: 0;
-    align-content: normal
-}
-
-.works-stage {
+.scene-stage {
     position: sticky;
     top: 0;
-    height: 100vh;
-    height: 100dvh;
-    width: 100%;
+    height: var(--vh);
     overflow: hidden;
     isolation: isolate;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0;
-    background: transparent;      /* 由 JS 写入 rgba(10,10,10,k) */
+    background-color: var(--bg);
+    background-image: var(--noise);
     color: var(--ink);
+    pointer-events: auto;
     transition: color 0.2s ease;
 }
 
-.works-stage.is-dark {
+/* 墨黑面：由 JS 写入 --veil（0~1）控制黑色蒙层 */
+.scene[data-tone="ink"] .scene-stage::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background: var(--ink);
+    opacity: var(--veil, 0);
+    pointer-events: none;
+}
+
+.scene-stage.is-dark {
     color: var(--paper);
 }
 
-/* 舞台自带网格：仅在墨黑阶段显示，避免与全局网格叠加 */
-.works-stage .swiss-cols {
-    opacity: 0;
-    transition: opacity 0.25s ease;
-}
-
-.works-stage.is-dark .swiss-cols {
-    opacity: 1;
-}
-
-.works-stage:not(.is-dark) .swiss-cols span {
-    background: rgba(10, 10, 10, 0.028);
-}
-
-.works-stage.is-dark .swiss-cols span {
+.scene-stage.is-dark .swiss-cols span {
     background: rgba(242, 240, 235, 0.045);
     border-color: rgba(242, 240, 235, 0.16);
 }
 
-/* 放大主体：以屏幕正中为原点（舞台 flex 居中 + origin 居中） */
-.works-stage .works-text {
-    margin: 0;
+/* 蓝面 */
+.scene[data-tone="blue"] .scene-stage {
+    background-color: var(--primary);
+    background-image: none;
+    color: #fff;
+}
+
+.scene[data-tone="blue"] .swiss-cols span {
+    background: rgba(255, 255, 255, 0.045);
+    border-color: rgba(255, 255, 255, 0.16);
+}
+
+/* 悬浮标签 */
+.swiss-label--float {
+    position: absolute;
+    top: 28px;
+    left: var(--pad);
+    right: var(--pad);
+    z-index: 2;
+}
+
+/* ---------- 标题：屏幕正中放大 → 淡出 ---------- */
+.scene-title {
+    --title-fs: clamp(96px, calc((100vw - var(--rail) - 2 * var(--pad)) / var(--chars, 2)), 420px);
     flex: none;
-    text-align: center;
-    white-space: nowrap;
+    margin: 0;
+    font-size: var(--title-fs);
+    font-weight: 700;
     line-height: 1;
-    font-size: clamp(120px, 30vw, 420px);
+    letter-spacing: -0.05em;
+    white-space: nowrap;
+    text-align: center;
     color: var(--primary);
-    -webkit-text-fill-color: currentColor;
     transform-origin: 50% 50%;
-    transform: none;
-    will-change: auto;       /* 让浏览器在放大时重新栅格化，避免糊 */
+    will-change: auto;               /* 让浏览器在放大时重新栅格化，避免糊 */
     pointer-events: none;
     user-select: none;
 }
 
-/* 覆盖层：透明，只负责承载卡片；透明度与指针由 JS 控制 */
-.section-works-illusion {
+.scene[data-tone="blue"] .scene-title {
+    color: #fff;
+}
+
+/* ---------- 内容视窗 ---------- */
+.scene-viewport {
+    position: absolute;
+    inset: 84px 0 calc(var(--nav-h) + 72px) 0;
+    padding: 0 var(--pad);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.scene-body {
+    flex: none;
+    width: 100%;
+    margin: auto 0;                  /* 安全居中：内容溢出时自动贴顶，交给 JS 上移 */
+    position: relative;
+    will-change: transform;
+}
+
+/* 逐项擦入：JS 控制 clip-path；这里是初始（未揭示）状态 */
+.has-js [data-reveal] {
+    clip-path: inset(100% 0 0 0);
+}
+
+.has-js [data-reveal="right"] {
+    clip-path: inset(0 100% 0 0);
+}
+
+/* 底部信息行 */
+.scene-meta {
+    position: absolute;
+    left: var(--pad);
+    right: var(--pad);
+    bottom: calc(var(--nav-h) + 24px);
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    padding-top: 10px;
+    border-top: 1px solid currentColor;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+}
+
+/* 通用 12 栏内容网格 */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    column-gap: var(--gap);
+}
+
+/* ========================================
+   01 关于 · 首屏
+   ======================================== */
+.scene-hero .scene-viewport {
+    bottom: calc(var(--nav-h) + 104px);
+}
+
+.hero-body {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    column-gap: var(--gap);
+    row-gap: 24px;
+    align-items: end;
+}
+
+.hero-item {
+    animation: intro-up 0.8s var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 90ms + 80ms);
+}
+
+.avatar {
+    position: relative;
+    grid-column: 1 / span 3;
+    grid-row: 1 / span 2;
+    align-self: end;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: var(--primary);
+    box-shadow: 8px 8px 0 var(--primary);   /* 套印错位 */
+}
+
+.avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(1) contrast(1.15);
+    transition: filter 0.2s ease;
+}
+
+.avatar:hover img {
+    filter: grayscale(0) contrast(1);
+}
+
+/* 摄影网点 */
+.avatar::after {
+    content: "";
     position: absolute;
     inset: 0;
+    background-image: radial-gradient(circle, rgba(10, 10, 10, 0.35) 0.8px, transparent 1.1px);
+    background-size: 4px 4px;
+    mix-blend-mode: multiply;
+    opacity: 0.45;
+    pointer-events: none;
+}
+
+.hero-title {
+    grid-column: 4 / -1;
+    grid-row: 1;
+    align-self: end;
+    font-size: clamp(44px, 9vw, 150px);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    margin-left: -0.04em;
+    overflow-wrap: anywhere;
+}
+
+.hero-bio {
+    grid-column: 4 / span 7;
+    grid-row: 2;
+    font-size: clamp(15px, 1.4vw, 20px);
+    line-height: 1.7;
+    color: var(--text-gray);
+}
+
+.scene-hero--no-avatar .hero-title {
+    grid-column: 1 / -1;
+}
+
+.scene-hero--no-avatar .hero-bio {
+    grid-column: 1 / span 8;
+}
+
+/* 下滑提示 */
+.scroll-hint {
+    position: absolute;
+    left: var(--pad);
+    right: var(--pad);
+    bottom: calc(var(--nav-h) + 24px);
+    z-index: 2;
     display: flex;
     align-items: center;
-   justify-content: center;  /* 原来是 flex-start */
-    padding: 84px var(--pad-r) 72px var(--pad-l);
-    background: none;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    transition: none;
+    gap: var(--gap);
+    padding-top: 10px;
+    border-top: 1px solid currentColor;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink);
+    animation: intro-up 0.8s var(--ease) 0.7s both;
 }
 
-/*.works-container {
-    width: 100%;
-    max-width: 1100px;
-    margin: 0;
-    gap: 0;
-    background: none;
-    border: 0;
-}*/
+.scroll-hint__zh {
+    font-weight: 700;
+}
 
+.scroll-hint__en {
+    margin-left: auto;
+    opacity: 0.65;
+}
+
+.scroll-hint__track {
+    position: relative;
+    width: 2px;
+    height: 36px;
+    overflow: hidden;
+    background: rgba(10, 10, 10, 0.18);
+}
+
+.scroll-hint__track::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--primary);
+    animation: hint-run 1.6s var(--ease) infinite;
+}
+
+.scroll-hint:hover .scroll-hint__zh {
+    color: var(--primary);
+}
+
+/* ========================================
+   02 技能
+   ======================================== */
+.skills-grid {
+    row-gap: 40px;
+}
+
+.skill-item {
+    grid-column: span 6;
+    padding: 14px 0 0;
+    border-top: 2px solid var(--ink);
+    transition: border-color 0.15s ease;
+}
+
+.skills-grid--3 .skill-item {
+    grid-column: span 4;
+}
+
+.skill-item:hover {
+    border-top-color: var(--primary);
+}
+
+.skill-icon {
+    margin-bottom: 24px;
+    font-size: 22px;
+}
+
+.skill-name {
+    margin-bottom: 8px;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.skill-desc {
+    margin-bottom: 18px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-gray);
+}
+
+.skill-tags,
+.work-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* ========================================
+   03 经历：时间轴行
+   ======================================== */
+.exp-item {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    column-gap: var(--gap);
+    padding: 16px 0 28px;
+    border-top: 1px solid var(--ink);
+}
+
+.exp-list > .exp-item:first-child {
+    border-top-width: 2px;
+}
+
+.exp-list > .exp-item:last-child {
+    border-bottom: 1px solid var(--ink);
+}
+
+.exp-period {
+    grid-column: 1 / span 3;
+    font-size: 13px;
+    color: var(--text-light);
+    font-variant-numeric: tabular-nums;
+}
+
+.exp-main {
+    grid-column: 4 / -1;
+}
+
+.exp-company {
+    margin-bottom: 14px;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.35;
+    transition: color 0.15s ease;
+}
+
+.exp-item:hover .exp-company,
+.proj-card:hover .proj-title {
+    color: var(--primary);
+}
+
+.exp-details li {
+    position: relative;
+    margin-bottom: 8px;
+    padding-left: 24px;
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--text-gray);
+}
+
+.exp-details li::before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    color: var(--primary);
+}
+
+.exp-item:hover .exp-details li,
+.proj-card:hover .exp-details li {
+    color: var(--ink);
+}
+
+/* ========================================
+   04 项目：卡片
+   ======================================== */
+.proj-grid {
+    row-gap: 40px;
+}
+
+.proj-card {
+    grid-column: span 6;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 0 0;
+    border-top: 2px solid var(--ink);
+    transition: border-color 0.15s ease;
+}
+
+.proj-card:hover {
+    border-top-color: var(--primary);
+}
+
+.proj-index {
+    margin-bottom: 14px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    font-variant-numeric: tabular-nums;
+    color: var(--primary);
+}
+
+.proj-title {
+    font-size: clamp(20px, 2vw, 28px);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    transition: color 0.15s ease;
+}
+
+.proj-period {
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: var(--text-light);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ========================================
+   05 作品：纸白 → 墨黑，卡片 1px 规则线拼成模块
+   ======================================== */
 .works-container {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr)); /* 或 repeat(3, ...) */
-    gap: 1px;
-    width: 90%;
-    max-width: 1100px;
-    margin: 0 auto;          /* 水平居中 */
-    background: var(--ink);
-    border: 1px solid var(--ink);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    border-top: 1px solid rgba(242, 240, 235, 0.45);
+    border-left: 1px solid rgba(242, 240, 235, 0.45);
+    counter-reset: work;
 }
 
-/* 卡片：墨黑面上的纸白线框；用负 margin 让相邻边框重叠成 1px */
 .work-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: clamp(240px, 32vh, 320px);
+    padding: 20px 24px 24px;
     background: transparent;
     color: var(--paper);
-    border: 1px solid rgba(242, 240, 235, 0.45);
-    margin: 0 -1px -1px 0;
-    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    border-right: 1px solid rgba(242, 240, 235, 0.45);
+    border-bottom: 1px solid rgba(242, 240, 235, 0.45);
+    counter-increment: work;
+    transition: background 0.2s ease, color 0.2s ease;
 }
 
+/* 卡片编号 */
 .work-item::before {
+    content: counter(work, decimal-leading-zero);
+    margin-bottom: 14px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    font-variant-numeric: tabular-nums;
     color: rgba(242, 240, 235, 0.6);
 }
 
 .work-svg {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 16px;
     color: var(--paper);
 }
 
+.work-svg > svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.work-name {
+    margin-bottom: 6px;
+    font-size: 20px;
+    font-weight: 700;
+}
+
 .work-desc {
+    margin-bottom: 14px;
+    font-size: 14px;
+    line-height: 1.6;
     color: rgba(242, 240, 235, 0.72);
 }
 
@@ -253,139 +526,235 @@ body {
 }
 
 .work-item:hover,
-.work-item:focus-visible {
+.work-item:focus-within {
     background: var(--primary);
-    border: 1px solid var(--primary);
+    color: #fff;
 }
 
 .work-item:hover::before,
-.work-item:focus-visible::before {
+.work-item:focus-within::before {
     color: rgba(255, 255, 255, 0.8);
 }
 
-/* 舞台底部信息行 */
-.works-meta {
-    position: absolute;
-    left: var(--pad-l);
-    right: var(--pad-r);
-    bottom: 28px;
-    z-index: 2;
-    display: flex;
-    justify-content: space-between;
-    padding-top: 10px;
-    border-top: 1px solid currentColor;
-    font-size: 12px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    font-variant-numeric: tabular-nums;
+.work-item:hover .work-desc,
+.work-item:focus-within .work-desc {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.work-item:hover .work-svg,
+.work-item:focus-within .work-svg {
+    color: #fff;
 }
 
 /* ========================================
-   03 联系：200vh 轨道，与作品轨道末尾重叠 100vh
-   → 蓝面从下方覆盖上来，轨道顶到视口顶时占满全屏
+   06 联系：整块蓝面
    ======================================== */
-.section-contact {
-    display: block;
-    position: relative;
-    height: 200vh;
-    min-height: 0;
-    margin-top: -100vh;
-    padding: 0;
-    background: var(--primary);
-    color: #fff;
-
+.contact-container {
+    grid-column: 4 / -1;
 }
 
-.contact-stage {
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    height: 100dvh;
-    isolation: isolate;
+.contact-item {
     display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: var(--gap);
-    align-content: center;
-    padding: 0 var(--pad-r) 0 var(--pad-l);
+    grid-template-columns: 48px 1fr;
+    align-items: center;
+    column-gap: 20px;
+    padding: 16px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.6);
+    color: #fff;
+    text-decoration: none;
 }
 
-.contact-title {
-    margin-top: 0;
+.contact-item:last-child {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.contact-icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border: 1px solid #fff;
+    font-size: 20px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.contact-item:hover .contact-icon,
+.contact-item:focus-visible .contact-icon {
+    background: #fff;
+    color: var(--primary);
+}
+
+.contact-value {
+    font-size: clamp(18px, 2vw, 26px);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
+}
+
+.contact-item:hover .contact-value,
+.contact-item:focus-visible .contact-value {
+    text-decoration: underline;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 2px;
+}
+
+.contact-item:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 4px;
 }
 
 /* ========================================
    移动端
    ======================================== */
-@media (max-width: 768px) {
-    :root {
-        --pad-l: 16px;
-        --pad-r: 16px;
-    }
-
-    body {
-        padding: 0;
-    }
-
-    .section-about {
-        padding: 110px 16px 64px;
-    }
-
+@media (max-width: 900px) {
     .swiss-label--float {
-        top: 64px;   /* 让出顶部移动端导航 */
+        top: 20px;
     }
 
-    .section-works-illusion {
-        padding: 112px 16px 64px;
+    .scene-viewport {
+        inset: 64px 0 calc(var(--nav-h) + 64px) 0;
     }
 
-    .works-container {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    .scene-hero .scene-viewport {
+        bottom: calc(var(--nav-h) + 92px);
     }
 
-    .work-item {
-        height: clamp(170px, 27vh, 230px);
-        padding: 12px;
+    .scene-meta,
+    .scroll-hint {
+        bottom: calc(var(--nav-h) + 16px);
     }
 
-    .work-svg {
-        width: 36px;
-        height: 36px;
-        margin-bottom: 8px;
+    /* 首屏：头像在上，标题、简介在下 */
+    .hero-body {
+        row-gap: 16px;
+        align-items: start;
     }
 
-    .work-name {
+    .avatar {
+        grid-column: 1 / span 2;
+        grid-row: 1;
+        box-shadow: 6px 6px 0 var(--primary);
+    }
+
+    .hero-title {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        font-size: clamp(44px, 16vw, 90px);
+    }
+
+    .hero-bio {
+        grid-column: 1 / -1;
+        grid-row: 3;
         font-size: 15px;
+    }
+
+    .scene-hero--no-avatar .hero-title {
+        grid-row: 1;
+    }
+
+    .scene-hero--no-avatar .hero-bio {
+        grid-row: 2;
+    }
+
+    /* 内容全部单栏 */
+    .skills-grid {
+        row-gap: 28px;
+    }
+
+    .skill-item,
+    .skills-grid--3 .skill-item,
+    .proj-card {
+        grid-column: 1 / -1;
+    }
+
+    .proj-grid {
+        row-gap: 28px;
+    }
+
+    .exp-period,
+    .exp-main,
+    .contact-container {
+        grid-column: 1 / -1;
+    }
+
+    .exp-period {
         margin-bottom: 4px;
     }
 
-    .work-desc {
-        font-size: 12px;
-        line-height: 1.5;
-        margin-bottom: 8px;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+    .works-container {
+        grid-template-columns: 1fr;
     }
 
-    .work-tags {
-        display: none;
+    .work-item {
+        min-height: 200px;
+        padding: 16px;
     }
 
-    .works-meta {
-        bottom: 20px;
+    .work-svg {
+        width: 44px;
+        height: 44px;
+        margin-bottom: 10px;
     }
 
-    .contact-stage {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        padding: 0 16px;
+    .contact-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+    }
+
+    .contact-item {
+        grid-template-columns: 44px 1fr;
+    }
+
+    .contact-value {
+        font-size: 16px;
+        letter-spacing: 0;
     }
 }
 
-/* 减少动态效果：保留场景切换，去掉放大 */
+/* ---------- 无 JS：退化为普通纵向长页 ---------- */
+html:not(.has-js) .scene {
+    height: auto;
+    margin-top: 0;
+    pointer-events: auto;
+}
+
+html:not(.has-js) .scene-stage {
+    position: relative;
+    display: block;
+    height: auto;
+    min-height: 100vh;
+    padding: 96px var(--pad) 64px;
+}
+
+html:not(.has-js) .scene-title,
+html:not(.has-js) .scene-meta,
+html:not(.has-js) .scroll-hint {
+    display: none;
+}
+
+html:not(.has-js) .scene-viewport {
+    position: static;
+    padding: 0;
+    overflow: visible;
+}
+
+/* ---------- 减少动态效果：保留场景切换，去掉放大与入场 ---------- */
 @media (prefers-reduced-motion: reduce) {
-    .works-stage,
-    .works-stage .swiss-cols {
+    .scene-stage,
+    .skill-item,
+    .proj-card,
+    .avatar img {
         transition: none;
+    }
+
+    .hero-item,
+    .scroll-hint {
+        animation: none;
+    }
+
+    .scroll-hint__track::after {
+        animation: none;
+        transform: none;
     }
 }
