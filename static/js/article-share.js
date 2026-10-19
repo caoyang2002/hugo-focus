@@ -48,17 +48,15 @@
     /* ==========================================================
        第三方库：本地 → 多个 CDN 依次回退
        ========================================================== */
+    // qrcode 库在隐藏 iframe 里加载（独立全局作用域），
+    // 避免与站点已有的 QRCode 全局变量冲突（"Identifier 'QRCode' has already been declared"）
+    var QR_SRCS = [
+        data.vendor && data.vendor + "qrcode.min.js",
+        "https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js",
+        "https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js",
+    ];
+
     var LIBS = {
-        qrcode: {
-            test: function () {
-                return window.QRCode && typeof window.QRCode.toCanvas === "function";
-            },
-            srcs: [
-                data.vendor && data.vendor + "qrcode.min.js",
-                "https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js",
-                "https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js",
-            ],
-        },
         html2canvas: {
             test: function () {
                 return typeof window.html2canvas === "function";
@@ -114,6 +112,79 @@
             lib.pending = null;
         });
         return lib.pending;
+    }
+
+    var qrWin = null;
+    function loadQRLib() {
+        if (qrWin) return Promise.resolve(qrWin);
+        if (loadQRLib.pending) return loadQRLib.pending;
+        loadQRLib.pending = (async function () {
+            var frame = document.createElement("iframe");
+            frame.setAttribute("aria-hidden", "true");
+            frame.tabIndex = -1;
+            frame.style.cssText =
+                "position:absolute;width:0;height:0;border:0;visibility:hidden;pointer-events:none";
+            frame.srcdoc = "<!doctype html><html><head></head><body></body></html>";
+            await new Promise(function (resolve) {
+                frame.onload = resolve;
+                document.body.appendChild(frame);
+            });
+            var win = frame.contentWindow;
+            var doc = frame.contentDocument;
+            for (var i = 0; i < QR_SRCS.length; i++) {
+                var src = QR_SRCS[i];
+                if (!src) continue;
+                try {
+                    await new Promise(function (resolve, reject) {
+                        var s = doc.createElement("script");
+                        var timer = setTimeout(function () {
+                            reject(new Error("timeout"));
+                        }, 8000);
+                        s.onload = function () {
+                            clearTimeout(timer);
+                            resolve();
+                        };
+                        s.onerror = function () {
+                            clearTimeout(timer);
+                            reject(new Error("error"));
+                        };
+                        s.src = src;
+                        doc.head.appendChild(s);
+                    });
+                    if (win.QRCode && typeof win.QRCode.toDataURL === "function") {
+                        qrWin = win;
+                        return win;
+                    }
+                } catch (e) {
+                    /* 换下一个源 */
+                }
+            }
+            frame.remove();
+            throw new Error("lib failed: qrcode");
+        })();
+        loadQRLib.pending.catch(function () {
+            loadQRLib.pending = null;
+        });
+        return loadQRLib.pending;
+    }
+
+    function qrDataURL(text, width, margin) {
+        return loadQRLib().then(function (win) {
+            return new Promise(function (resolve, reject) {
+                win.QRCode.toDataURL(
+                    text,
+                    {
+                        width: width,
+                        margin: margin,
+                        errorCorrectionLevel: "M",
+                        color: { dark: "#111111", light: "#ffffff" },
+                    },
+                    function (err, url) {
+                        err ? reject(err) : resolve(url);
+                    },
+                );
+            });
+        });
     }
 
     /* ==========================================================
@@ -259,38 +330,23 @@
         if (qrBusy) return qrBusy;
         var boxes = $$("[data-sp-qr]");
         qrBusy = (async function () {
+            var url;
             try {
-                await loadLib("qrcode");
+                url = await qrDataURL(data.url, 152, 0);
             } catch (e) {
                 boxes.forEach(showQRFail);
                 return false;
             }
-            var results = await Promise.all(
-                boxes.map(function (box) {
-                    return new Promise(function (resolve) {
-                        box.innerHTML = "";
-                        var c = document.createElement("canvas");
-                        box.appendChild(c);
-                        window.QRCode.toCanvas(
-                            c,
-                            data.url,
-                            {
-                                width: 152,
-                                margin: 0,
-                                errorCorrectionLevel: "M",
-                                color: { dark: "#111111", light: "#ffffff" },
-                            },
-                            function (err) {
-                                if (err) {
-                                    showQRFail(box);
-                                    resolve(false);
-                                } else resolve(true);
-                            },
-                        );
-                    });
-                }),
-            );
-            return results.every(Boolean);
+            boxes.forEach(function (box) {
+                box.innerHTML = "";
+                var im = new Image();
+                im.src = url;
+                im.width = 76;
+                im.height = 76;
+                im.alt = "文章二维码";
+                box.appendChild(im);
+            });
+            return true;
         })();
         qrBusy.then(function (ok) {
             qrOK = ok;
@@ -545,26 +601,23 @@
         }
     }
 
+    function deliverURL(url, filename) {
+        if (UA_NO_DOWNLOAD) {
+            showPreview(url);
+            return;
+        }
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    }
+
     async function downloadQR() {
         try {
-            await loadLib("qrcode");
-            var c = document.createElement("canvas");
-            await new Promise(function (resolve, reject) {
-                window.QRCode.toCanvas(
-                    c,
-                    data.url,
-                    {
-                        width: 512,
-                        margin: 2,
-                        errorCorrectionLevel: "M",
-                        color: { dark: "#111111", light: "#ffffff" },
-                    },
-                    function (err) {
-                        err ? reject(err) : resolve();
-                    },
-                );
-            });
-            await deliver(c, "qrcode-" + safeName(data.title) + ".png");
+            var url = await qrDataURL(data.url, 512, 2);
+            deliverURL(url, "qrcode-" + safeName(data.title) + ".png");
             toast(UA_NO_DOWNLOAD ? "请长按二维码保存" : "二维码已下载");
         } catch (e) {
             toast("二维码生成失败，请检查网络后重试");
