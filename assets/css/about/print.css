@@ -1,0 +1,462 @@
+/* 打印样式：导出 PDF 简历
+   原则：只保留简历必要信息（姓名 / 简介 / 联系方式 / 技能 / 经历 / 项目 / 作品），
+   去掉导航、网格、动效、编号标签、图标、按钮、联系场景的大头像与座右铭。 */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 14mm;
+  }
+
+  :root {
+    --bg: #fff;
+    --fg: #111;
+    --ink: #111;
+    --paper: #fff;
+    --rule: #cfcfcf;
+    --grid: transparent;
+    --muted: #555;
+    --veil: 0;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #111 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    font-size: 9.5pt !important;
+    line-height: 1.55 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* ---------- 隐藏：非简历内容 ---------- */
+  .layer-nav,
+  .scroll-rule,
+  .scroll-hint,
+  .scene-meta,
+  .swiss-cols,
+  .swiss-label,
+  .work-dialog,
+  .work-detail-btn,
+  .work-svg,
+  .skill-icon,
+  .proj-index,
+  .scene::before,
+  .scene::after,
+  .scene-stage::before,
+  .scene-stage::after {
+    display: none !important;
+  }
+  /* 整个联系场景彻底不打印 */
+    .scene.scene-contact,
+    .scene.scene-contact *,
+    .scene.scene-contact::before,
+    .scene.scene-contact::after {
+      display: none !important;
+    }
+    .contact-logo,
+      .contact-container {
+        display: none !important;
+      }
+
+  /* ---------- 解除滚动 / sticky / 动效 ---------- */
+  .layer-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .scene,
+  .scene-stage,
+  .scene-viewport,
+  .scene-body {
+    position: static !important;
+    inset: auto !important;
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+    clip-path: none !important;
+    will-change: auto !important;
+    background: #fff !important;
+  }
+
+  .scene * {
+    color: #111 !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
+
+  [data-reveal],
+  .hero-item {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+    transition: none !important;
+    animation: none !important;
+    visibility: visible !important;
+  }
+
+  a {
+    text-decoration: none !important;
+  }
+  a[href^="http"]::after {
+    content: "" !important;
+  }
+
+  /* 板块之间留白；板块允许跨页，条目本身不被截断 */
+  .scene {
+    margin: 0 0 5mm 0 !important;
+  }
+
+  /* ---------- 板块标题：简历式小标题 + 下划线 ---------- */
+  .scene-title {
+    position: static !important;
+    transform: none !important;
+    opacity: 1 !important;
+    margin: 0 0 3mm 0 !important;
+    padding: 0 0 1.2mm 0 !important;
+    font-size: 11pt !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+    letter-spacing: 0.3em !important;
+    text-align: left !important;
+    border-bottom: 0.4mm solid #111 !important;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  /* ---------- 首屏：姓名 + 简介 + 联系方式 ---------- */
+  .scene-hero {
+    margin-bottom: 6mm !important;
+    padding-bottom: 4mm !important;
+    border-bottom: 0.4mm solid #111;
+  }
+
+  .scene-hero .hero-body {
+    display: grid !important;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "title avatar"
+      "bio   avatar";
+    column-gap: 6mm !important;
+    row-gap: 2mm !important;
+    align-items: start !important;
+    margin: 0 !important;
+  }
+
+  .scene-hero .hero-title {
+    grid-area: title;
+    margin: 0 !important;
+    font-size: 22pt !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0.04em !important;
+  }
+
+  .scene-hero .hero-bio {
+    grid-area: bio;
+    margin: 0 !important;
+    max-width: none !important;
+    font-size: 9.5pt !important;
+    line-height: 1.6 !important;
+    color: #333 !important;
+  }
+
+  .scene-hero .avatar {
+    grid-area: avatar;
+    margin: 0 !important;
+  }
+
+  .scene-hero .avatar img {
+    display: block;
+    width: 24mm !important;
+    height: 24mm !important;
+    object-fit: cover;
+    border-radius: 2mm !important;
+  }
+
+  /* 仅打印时出现的联系方式行（模板里 .print-only） */
+  .print-only {
+    display: block !important;
+  }
+
+  .print-contacts {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 1mm 6mm;
+    margin: 3.5mm 0 0 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+    font-size: 8.8pt !important;
+    color: #222 !important;
+  }
+
+  .print-contacts li {
+    margin: 0 !important;
+    padding: 0 !important;
+    white-space: nowrap;
+  }
+
+  .print-contacts li + li::before {
+    content: none;
+  }
+
+  /* ---------- 技能：单列紧凑行（名称 | 描述 + 标签） ---------- */
+  .skills-grid,
+  .skills-grid--2,
+  .skills-grid--3 {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2.2mm !important;
+  }
+
+  .skill-item {
+    display: grid !important;
+    grid-template-columns: 28mm 1fr;
+    column-gap: 4mm !important;
+    row-gap: 0.8mm !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .skill-name {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    margin: 0 !important;
+    font-size: 9.5pt !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.04em !important;
+    text-transform: none !important;
+  }
+
+  .skill-desc {
+    grid-column: 2;
+    margin: 0 !important;
+    font-size: 9pt !important;
+    opacity: 1 !important;
+    color: #333 !important;
+  }
+
+  .skill-tags {
+    grid-column: 2;
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 1mm !important;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 0.3mm 1.8mm !important;
+    font-size: 7.6pt !important;
+    line-height: 1.5 !important;
+    border: 0.25mm solid #999 !important;
+    border-radius: 2mm !important;
+    background: transparent !important;
+    color: #333 !important;
+  }
+
+  /* ---------- 经历：左侧时间，右侧内容 ---------- */
+  .exp-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3.5mm !important;
+  }
+
+  .exp-item {
+    display: grid !important;
+    grid-template-columns: 30mm 1fr !important;
+    column-gap: 4mm !important;
+    border: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    align-items: start !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .exp-period {
+    margin: 0.4mm 0 0 0 !important;
+    font-size: 8.4pt !important;
+    letter-spacing: 0.02em !important;
+    color: #555 !important;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .exp-company {
+    margin: 0 0 1.2mm 0 !important;
+    font-size: 10pt !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.02em !important;
+  }
+
+  .exp-details {
+    margin: 0 !important;
+    padding: 0 0 0 4mm !important;
+    list-style: disc !important;
+    display: block !important;
+  }
+
+  .exp-details li {
+    margin: 0 0 0.8mm 0 !important;
+    padding: 0 !important;
+    font-size: 9pt !important;
+    line-height: 1.55 !important;
+    opacity: 1 !important;
+  }
+
+  /* ---------- 项目：单列，标题左 / 时间右 ---------- */
+  .proj-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3.5mm !important;
+  }
+
+  .proj-card {
+    display: grid !important;
+    grid-template-columns: 1fr auto;
+    column-gap: 4mm !important;
+    row-gap: 1.2mm !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .proj-title {
+    grid-column: 1;
+    margin: 0 !important;
+    font-size: 10pt !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.02em !important;
+  }
+
+  .proj-period {
+    grid-column: 2;
+    margin: 0.4mm 0 0 0 !important;
+    font-size: 8.4pt !important;
+    color: #555 !important;
+    white-space: nowrap;
+  }
+
+  .proj-card .exp-details {
+    grid-column: 1 / -1;
+  }
+
+  /* ---------- 作品：标题 + 网址同一行，简介、标签，STAR 摘要放进浅灰面板 ---------- */
+  .works-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+
+  .work-item {
+    display: grid !important;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "name url"
+      "desc desc"
+      "tags tags"
+      "star star";
+    column-gap: 4mm !important;
+    padding: 2.6mm 0 !important;
+    border: 0 !important;
+    border-bottom: 0.2mm solid #d9d9d9 !important;
+    background: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .work-item:first-child {
+    padding-top: 0 !important;
+  }
+
+  .work-item:last-child {
+    border-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .work-name {
+    grid-area: name;
+    margin: 0 !important;
+    font-size: 10pt !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.02em !important;
+  }
+
+  .work-print__url {
+    grid-area: url;
+    align-self: baseline;
+    justify-self: end;
+    margin: 0 !important;
+    font-size: 8pt !important;
+    color: #555 !important;
+    letter-spacing: 0.01em;
+    max-width: 75mm;
+    overflow-wrap: anywhere;
+    text-align: right;
+  }
+
+  .work-desc {
+    grid-area: desc;
+    margin: 0.8mm 0 0 0 !important;
+    font-size: 9pt !important;
+    line-height: 1.55 !important;
+    opacity: 1 !important;
+    color: #333 !important;
+  }
+
+  .work-tags {
+    grid-area: tags;
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 1mm !important;
+    margin: 1.4mm 0 0 0 !important;
+  }
+
+  .work-print__star {
+    grid-area: star;
+    display: grid !important;
+    grid-template-columns: 9mm 1fr;
+    column-gap: 2mm !important;
+    row-gap: 0.9mm !important;
+    margin: 1.8mm 0 0 0 !important;
+    padding: 2mm 3mm !important;
+    background: #f5f5f5 !important;
+    border-left: 0.6mm solid #111 !important;
+    border-radius: 0 1mm 1mm 0;
+  }
+
+  .work-print__star dt {
+    margin: 0 !important;
+    font-size: 8pt !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.08em !important;
+    color: #666 !important;
+    line-height: 1.7 !important;
+  }
+
+  .work-print__star dd {
+    margin: 0 !important;
+    font-size: 8.8pt !important;
+    line-height: 1.55 !important;
+    color: #222 !important;
+  }
+
+  .work-print__star dt.is-result,
+  .work-print__star dd.is-result {
+    font-weight: 700 !important;
+    color: #111 !important;
+  }
+}

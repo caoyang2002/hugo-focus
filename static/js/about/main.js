@@ -23,7 +23,6 @@ function init() {
         document.documentElement.classList.remove('has-js');
         return;
     }
-
     setActiveListener(updateNavigation);
     measure();
     initNavigation();

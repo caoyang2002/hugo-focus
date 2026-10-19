@@ -29,7 +29,7 @@
     :where(a):not(
         :where([class~="not-prose"], [class~="not-prose"] *)
     ):visited {
-    color: #7c3aed;
+    color: #0042da;
     text-decoration: none !important;
 }
 

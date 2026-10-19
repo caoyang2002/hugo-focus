@@ -19,8 +19,11 @@
     {{ $swiss := resources.Get "css/about/swiss.css" }}
     {{ $scenes := resources.Get "css/about/swiss-scenes.css" }}
     {{ $work := resources.Get "css/about/work-section.css" }}
+    {{ $print := resources.Get "css/about/print.css" }}
     {{ $css := slice $swiss $scenes $work | resources.Concat "css/about-bundle.css" | minify | fingerprint }}
     <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+    <link rel="stylesheet" href="{{ $print.RelPermalink }}" media="print">
+    <style>.print-only{display:none}</style>
 
     {{ if .Params.avatar }}
     <link rel="preload" href="{{ .Params.avatar | relURL }}" as="image" />
@@ -42,6 +45,7 @@
         {{ $exps = $exps | append . }}
     {{ end }}
 {{ end }}
+
 
 {{ $hasSkills := gt (len .Params.skills) 0 }}
 {{ $hasExp := gt (len $exps) 0 }}
@@ -101,6 +105,13 @@
                             <p class="hero-bio hero-item" style="--i:2">{{ . }}</p>
                             {{ end }}
                         </div>
+
+                        <!-- 仅导出 PDF 时显示：联系方式放在简历顶部，替代底部「联系我」场景 -->
+                        {{ with .Params.contacts }}
+                        <ul class="print-only print-contacts">
+                            {{ range . }}<li>{{ .value }}</li>{{ end }}
+                        </ul>
+                        {{ end }}
                     </div>
                 </div>
 
@@ -273,8 +284,19 @@
                             <div class="work-item" data-reveal="up">
                                 {{ with $p.svg }}<div class="work-svg icon-wrapper">{{ . | safeHTML }}</div>{{ end }}
                                 <h3 class="work-name">{{ $p.name }}</h3>
+                                {{ with $p.url }}<a class="print-only work-print__url" href="{{ . }}">{{ . | replaceRE "^https?://" "" | strings.TrimSuffix "/" }}</a>{{ end }}
                                 <p class="work-desc">{{ $p.desc }}</p>
                                 <div class="work-tags">{{ range $p.tags }}<span class="tag">{{ . }}</span>{{ end }}</div>
+
+                                <!-- 仅导出 PDF 时显示：STAR 摘要 -->
+                                {{ if or $star.situation $star.task $star.action $star.result }}
+                                <dl class="print-only work-print__star">
+                                    {{ with $star.situation }}<dt>背景</dt><dd>{{ . }}</dd>{{ end }}
+                                    {{ with $star.task }}<dt>任务</dt><dd>{{ . }}</dd>{{ end }}
+                                    {{ with $star.action }}<dt>行动</dt><dd>{{ . }}</dd>{{ end }}
+                                    {{ with $star.result }}<dt class="is-result">结果</dt><dd class="is-result">{{ . }}</dd>{{ end }}
+                                </dl>
+                                {{ end }}
 
                                 <button type="button" class="work-detail-btn"
                                         data-index="{{ $i }}"
@@ -322,6 +344,37 @@
                 <div class="scene-viewport">
                     <div class="scene-body">
                         <div class="grid">
+                            <div class="contact-logo">
+                                {{ if .Params.avatar }}
+                                {{ $avatar := .Params.avatar }}
+                                {{ $src := cond (strings.HasPrefix $avatar "http") $avatar ($avatar | relURL) }}
+                                <div class="contact-avatar" data-reveal="right" style="--i:0">
+                                    <img src="{{ $src }}"
+                                         alt="{{ .Title }}"
+                                         width="440" height="440"
+                                         loading="eager"
+                                         decoding="async"
+                                         fetchpriority="high"
+                                         class="contact-img" />
+                                    <div class="contact-info">
+                                        <h2 class="contact-name">{{ .Title }}</h2>
+                                        {{ with .Params.motto }}
+                                        <p class="contact-motto">{{ . }}</p>
+                                        {{ end }}
+                                    </div>
+                                </div>
+                                {{ else }}
+                                <!-- 没头像时也显示介绍 -->
+                                <div class="contact-avatar" data-reveal="right" style="--i:0">
+                                    <div class="contact-info">
+                                        <h2 class="contact-name">{{ .Title }}</h2>
+                                        {{ with .Params.motto }}
+                                        <p class="contact-motto">{{ . }}</p>
+                                        {{ end }}
+                                    </div>
+                                </div>
+                                {{ end }}
+                            </div>
                             <div class="contact-container">
                                 {{ range .Params.contacts }}
                                 <a href="{{ .url }}" {{ if strings.HasPrefix .url "http" }}target="_blank" rel="noopener noreferrer" {{ end }}class="contact-item" data-reveal="right">
@@ -373,13 +426,26 @@
                 {{ if $hasWorks }}
                 <a href="#works" class="nav-action" aria-label="浏览作品">
                     <span>浏览作品</span>
-                    <span class="nav-action__arrow" aria-hidden="true">→</span>
+                    <span class="nav-action__arrow" aria-hidden="true"><svg t="1792402004058" class="icon" viewBox="0 0 1078 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="12457" width="16" height="16"><path d="M531.928769 36.576183c14.116501 0 27.647862 5.485687 37.631812 15.213638A51.3826 51.3826 0 0 1 585.139931 88.543923v883.488154a51.3826 51.3826 0 0 1-15.57935 36.754102A53.832874 53.832874 0 0 1 531.928769 1023.999817h-159.578631c-29.384996 0-53.211163-23.259312-53.211162-51.96774V88.543923c0-28.708428 23.826167-51.96774 53.211162-51.96774h159.578631z m-154.988939 55.442008v291.600828h153.69066V92.018191h-153.69066z m22.01589 516.221419v285.840857h26.605581V608.23961h-26.605581z m79.798458 0v363.792467h26.587295V608.23961h-26.587295zM53.192877 36.576183h186.184212C268.762085 36.576183 292.569966 59.835495 292.569966 88.543923v883.488154C292.569966 1000.740505 268.762085 1023.999817 239.358803 1023.999817H53.211163C23.789595 1023.999817 0 1000.740505 0 972.032077V88.543923C0 59.835495 23.807881 36.576183 53.211163 36.576183z m26.605581 51.96774c-7.05825 0-13.823931 2.742843-18.815906 7.606819a25.6913 25.6913 0 0 0-7.789675 18.377051v831.520414c0 6.89368 2.7977 13.49479 7.789675 18.377051 4.991975 4.863976 11.757655 7.606819 18.815906 7.606819h132.97305c14.701641 0 26.605581-11.629656 26.605581-25.98387V114.527793c0-14.354214-11.90394-25.965584-26.605581-25.965584H79.798458z" fill="#000000" p-id="12458"></path><path d="M109.713737 164.575543h73.142492v211.857226H109.713737V164.575543z m0 450.192035h24.374735v211.875512H109.713737V614.767578z m48.767756 0H182.856229V932.571703H158.481493V614.767578zM605.674686 48.900693L782.624658 1.778643a52.607737 52.607737 0 0 1 39.734659 5.193116 52.077454 52.077454 0 0 1 24.393021 31.597557l230.30742 854.487156c3.602268 13.348505 1.718849 27.556434-5.229689 39.515231a52.296881 52.296881 0 0 1-31.798698 24.246736L863.081399 1003.940489a52.607737 52.607737 0 0 1-39.734659-5.193117 52.077454 52.077454 0 0 1-24.39302-31.597556L568.6463 112.644374A51.766598 51.766598 0 0 1 573.875988 73.147429a52.296881 52.296881 0 0 1 31.798698-24.246736z m38.820377 43.519782a26.148441 26.148441 0 0 0-15.908492 12.141654c-3.474268 5.979399-4.388549 13.07422-2.596558 19.748472L842.747786 928.548866c1.791991 6.655967 6.180541 12.342795 12.196511 15.798778 6.01597 3.437697 13.165648 4.388549 19.858186 2.596558l126.408511-33.682117a26.148441 26.148441 0 0 0 15.908492-12.123368c3.474268-5.979399 4.388549-13.07422 2.596558-19.748473L802.958271 77.170266a26.038727 26.038727 0 0 0-12.196511-15.798779 26.313011 26.313011 0 0 0-19.858186-2.596558l-126.408511 33.682117z" fill="#000000" p-id="12459"></path><path d="M694.853669 166.367534L771.232715 146.28992l54.60087 199.916715-76.397332 20.114185L694.853669 166.349248z m116.003991 424.848161l25.453587-6.710823L890.912117 784.458158l-25.471873 6.674252-54.582584-199.898429z m50.943745-13.403361l25.435302-6.674253L969.138011 870.985725 943.666139 877.714834 861.801405 577.812334z" fill="#000000" p-id="12460"></path></svg></span>
                 </a>
                 {{ end }}
+                <button type="button" class="nav-action nav-action--export" id="export-pdf-btn" aria-label="导出 PDF 简历">
+                    <span>导出 PDF</span>
+                    <span class="nav-action__arrow" aria-hidden="true">
+                        <svg t="1792401816134" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2826" width="16" height="16"><path d="M974.848 647.168c-28.672-30.72-86.016-48.128-167.936-48.128-44.032 0-94.208 4.096-149.504 14.336-30.72-30.72-62.464-66.56-92.16-108.544-21.504-29.696-39.936-60.416-56.32-91.136 32.768-101.376 48.128-183.296 48.128-242.688 0-66.56-23.552-136.192-93.184-136.192-21.504 0-41.984 13.312-53.248 31.744-30.72 56.32-17.408 179.2 36.864 300.032-20.48 60.416-40.96 118.784-67.584 183.296-22.528 54.272-49.152 111.616-76.8 162.816-155.648 63.488-256 137.216-265.216 194.56-4.096 21.504 3.072 41.984 18.432 57.344 5.12 4.096 25.6 21.504 59.392 21.504 103.424 0 211.968-169.984 267.264-273.408 41.984-14.336 84.992-27.648 126.976-39.936 46.08-13.312 93.184-23.552 135.168-30.72C753.664 741.376 849.92 757.76 898.048 757.76c59.392 0 80.896-24.576 88.064-45.056 11.264-25.6 3.072-54.272-10.24-69.632l-1.024 4.096z m-55.296 41.984c-4.096 21.504-25.6 35.84-55.296 35.84-8.192 0-15.36-1.024-23.552-3.072-54.272-13.312-104.448-40.96-155.648-83.968 50.176-8.192 92.16-10.24 118.784-10.24 29.696 0 55.296 1.024 71.68 6.144 19.456 4.096 50.176 17.408 44.032 55.296z m-300.032-67.584c-36.864 7.168-75.776 16.384-116.736 27.648-32.768 9.216-66.56 18.432-100.352 30.72 18.432-35.84 33.792-70.656 48.128-103.424 17.408-40.96 30.72-81.92 45.056-120.832 14.336 24.576 29.696 49.152 45.056 70.656 25.6 33.792 52.224 66.56 78.848 95.232zM434.176 83.968c6.144-11.264 17.408-17.408 26.624-17.408 29.696 0 34.816 34.816 34.816 62.464 0 46.08-14.336 116.736-37.888 197.632-40.96-112.64-44.032-205.824-23.552-242.688zM279.552 756.736c-71.68 120.832-141.312 196.608-183.296 196.608-8.192 0-15.36-3.072-21.504-7.168-8.192-8.192-12.288-18.432-10.24-30.72 8.192-43.008 89.088-103.424 215.04-158.72z" fill="#2c2c2c" p-id="2827"></path>
+                        </svg>
+                    </span>
+                </button>
                 <a href="{{ .Site.Home.RelPermalink }}" class="nav-action nav-action--ghost" data-external aria-label="返回主页">
                     <span>返回主页</span>
-                    <span class="nav-action__arrow" aria-hidden="true">←</span>
+                    <span class="nav-action__arrow" aria-hidden="true">
+                        <svg t="1792401696889" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1669" width="16" height="16">
+                            <path d="M653.76 316.672H182.976L323.008 184.32a30.848 30.848 0 0 0 0-46.336 35.2 35.2 0 0 0-49.024 0L74.496 324.992A31.808 31.808 0 0 0 64 348.16c0 8.256 3.52 16.512 10.496 23.168l197.76 187.008a35.2 35.2 0 0 0 49.024 0 30.848 30.848 0 0 0 0-46.336L184.768 382.912h468.992c131.2 0 236.224 99.264 236.224 223.424 0 124.16-104.96 223.488-236.224 223.488H294.976c-19.2 0-34.944 14.848-34.944 33.088 0 18.176 15.744 33.088 34.944 33.088h358.784C823.488 896 960 766.912 960 606.336c0-160.512-136.512-289.664-306.24-289.664z"  p-id="1670">
+                            </path>
+                        </svg>
+                    </span>
                 </a>
+
             </div>
         </nav>
 
@@ -414,6 +480,19 @@
 
     <!-- 模块化JavaScript -->
     <script type="module" src="{{ `js/about/main.js` | relURL }}"></script>
+    <script>
+        // 导出 PDF 时让默认文件名变成「姓名 - 简历」，打印结束后还原
+        (function () {
+            var original = document.title;
+            window.addEventListener("beforeprint", function () {
+                original = document.title;
+                document.title = "{{ .Title }} - 简历";
+            });
+            window.addEventListener("afterprint", function () {
+                document.title = original;
+            });
+        })();
+    </script>
 </body>
 
 </html>

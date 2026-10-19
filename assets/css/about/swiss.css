@@ -331,6 +331,11 @@ button {
     transform: translateX(4px);
 }
 
+.nav-action--export {
+    background: transparent;
+    color: var(--ink);
+    border-color: var(--ink);
+}
 .nav-action--ghost {
     background: transparent;
     color: var(--ink);

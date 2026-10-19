@@ -68,6 +68,16 @@ export function initNavigation() {
         if (href.startsWith('#')) bindJump(action, href.slice(1));
     });
 
+
+    // 导出PDF
+    const exportBtn = document.getElementById('export-pdf-btn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.print();
+        });
+    }
+
     // 首屏「向下滚动」提示
     nav.jumps.forEach((el) => bindJump(el, el.dataset.jump));
 }

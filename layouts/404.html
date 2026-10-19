@@ -2,9 +2,15 @@
 
 <style>
     :root {
-        --primary-color: #3cb371;
+        --primary-color: #0042da;
         --text-color: #000;
         --transition-duration: 0.3s;
+    }
+
+    html,
+    body {
+        margin: 0;
+        padding: 0;
     }
 
     body {
@@ -21,69 +27,42 @@
     }
 
     .error-page {
-        position: relative;
-        width: calc(100vw - 4rem);
-        height: calc(100vh - 5rem);
+        position: fixed;
+        inset: 0;
         overflow: hidden;
+        background: var(--primary-color);
     }
 
-    .content-container {
-        position: relative;
+    #stage {
+        position: absolute;
+        left: 0;
+        top: 0;
         width: 100%;
         height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: space-between;
-        /* padding: 2rem; */
-    }
-
-    .text {
-        font-size: clamp(2rem, 8vw, 6rem);
-        font-weight: bold;
-        color: var(--text-color);
-        z-index: 40;
-        transition: font-size var(--transition-duration) ease;
-    }
-
-    .lost-text {
-        align-self: flex-start;
-    }
-
-    .home-text {
-        align-self: flex-end;
-    }
-
-    .floating-numbers {
-        position: absolute;
-        width: 100vw;
-        height: 100vh;
+        display: block;
         pointer-events: none;
     }
 
-    .number-container {
+    .text {
         position: absolute;
-        height: 100vh;
-        width: auto;
-        min-width: 100px;
-        transform: translateZ(0);
-        transition: all var(--transition-duration) ease;
-        outline: 2px solid var(--text-color);
-        background: var(--primary-color);
-        overflow: visible;
+        font-size: clamp(2rem, 8vw, 6rem);
+        font-weight: bold;
+        color: var(--text-color);
+        z-index: 5000;
+        pointer-events: none;
+        line-height: 1.05;
     }
 
-    .number {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        font-weight: bold;
-        line-height: 1;
-        white-space: nowrap;
-        transition: all var(--transition-duration) ease;
-        color: #000;
-        z-index: 2;
+    .lost-text {
+        padding-top: 2rem;
+        left: 1.5rem;
+        top: 1.2rem;
+    }
+
+    .home-text {
+        right: 1.5rem;
+        bottom: 1.2rem;
+        text-align: right;
     }
 
     .back-button {
@@ -98,7 +77,7 @@
         font-size: 2rem;
         border: 2px solid transparent;
         transition: all var(--transition-duration) ease;
-        z-index: 1000;
+        z-index: 6000;
         cursor: pointer;
     }
 
@@ -110,10 +89,6 @@
     }
 
     @media (max-width: 768px) {
-        .content-container {
-            padding: 1rem;
-        }
-
         .back-button {
             padding: 0.8rem 1.6rem;
         }
@@ -121,134 +96,237 @@
 </style>
 
 <div class="error-page">
-    <div class="content-container">
-        <div class="text lost-text">YOU ARE LOST?</div>
-        <div class="floating-numbers" id="floatingNumbers"></div>
-        <div class="text home-text">BACK TO HOME</div>
-        <a href="/" class="back-button">{{ i18n "back_home"}}</a>
-    </div>
+    <canvas id="stage"></canvas>
+    <div class="text lost-text">YOU ARE LOST?</div>
+    <div class="text home-text">BACK TO HOME</div>
+    <a href="/" class="back-button">{{ i18n "back_home"}}</a>
 </div>
 
 <script>
     (() => {
         const CONFIG = {
-            numbersCount: 8,
-            updateInterval: 3000,
+            count: 36, // 条纹数量
             numberSets: ["4", "0", "4"],
-            animationConfig: {
-                position: {
-                    min: 1,
-                    max: 99,
-                },
-                size: {
-                    min: 1,
-                    max: 30,
-                },
-                movement: {
-                    x: { min: -50, max: 50 },
-                    y: { min: -300, max: 300 },
-                },
-                duration: {
-                    container: { min: 5, max: 15 },
-                    number: { min: 3, max: 8 },
-                },
-            },
+            focal: 600, // z = focal 时缩放为 1
+            zMin: 260, // 最近（缩放约 2.3 倍）
+            zMax: 2600, // 最远（缩放约 0.23 倍）
+            maxBlur: 7, // 最远处的模糊半径（px）
+            vx: { min: 0, max: 160 }, // 左右速度（世界单位/秒）
+            vz: { min: 0, max: 190 }, // 前后速度
+            numberSpeed: { min: 0.4, max: 1.6 }, // 数字上下漂移的缓动速度
+            numberPick: { min: 1.2, max: 4 }, // 数字重新选目标的间隔（秒）
+            mouseParallax: 260, // 鼠标视差强度
+            nearColor: [34, 100, 255],
+            farColor: [0, 66, 218], // 与背景同色，远处雾化融入背景
+            fontFamily: "system-ui, -apple-system, Arial, sans-serif",
         };
 
-        const utils = {
-            getRandomValue: (min, max) => Math.random() * (max - min) + min,
-            createElement: (tag, className) => {
-                const element = document.createElement(tag);
-                if (className) element.className = className;
-                return element;
-            },
-            setStyles: (element, styles) => {
-                Object.assign(element.style, styles);
-            },
-        };
+        const canvas = document.getElementById("stage");
+        const ctx = canvas.getContext("2d");
+        const reduceMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)",
+        ).matches;
+        const speedFactor = reduceMotion ? 0.25 : 1;
 
-        class FloatingNumber {
-            constructor(container) {
-                this.container = container;
-                this.numberElement = null;
-                this.init();
+        const rand = (min, max) => Math.random() * (max - min) + min;
+        const sign = () => (Math.random() < 0.5 ? -1 : 1);
+        const lerp = (a, b, t) => a + (b - a) * t;
+
+        let vw = 0;
+        let vh = 0;
+        let dpr = 1;
+        let xLimit = 0;
+
+        function resize() {
+            dpr = Math.min(window.devicePixelRatio || 1, 2);
+            vw = window.innerWidth;
+            vh = window.innerHeight;
+            canvas.width = Math.round(vw * dpr);
+            canvas.height = Math.round(vh * dpr);
+            xLimit = vw * 1.1;
+        }
+
+        // 带软边的竖直色带：b 为模糊半径，b≈0 时退化为普通矩形
+        function softBand(x0, x1, b, r, g, bl, a) {
+            if (a <= 0) return;
+            if (b < 0.5) {
+                ctx.fillStyle = `rgba(${r},${g},${bl},${a})`;
+                ctx.fillRect(x0, 0, x1 - x0, vh);
+                return;
             }
+            const a0 = x0 - b;
+            const a1 = x1 + b;
+            const tot = a1 - a0;
+            const p = Math.min(0.5, (2 * b) / tot);
+            const grad = ctx.createLinearGradient(a0, 0, a1, 0);
+            grad.addColorStop(0, `rgba(${r},${g},${bl},0)`);
+            grad.addColorStop(p, `rgba(${r},${g},${bl},${a})`);
+            grad.addColorStop(1 - p, `rgba(${r},${g},${bl},${a})`);
+            grad.addColorStop(1, `rgba(${r},${g},${bl},0)`);
+            ctx.fillStyle = grad;
+            ctx.fillRect(a0, 0, tot, vh);
+        }
 
-            // 初始化
-            init() {
-                const numberContainer = utils.createElement(
-                    "div",
-                    "number-container",
-                );
-                this.numberElement = utils.createElement("div", "number");
-                this.numberElement.textContent =
+        class Stripe {
+            constructor() {
+                this.digit =
                     CONFIG.numberSets[
                         Math.floor(Math.random() * CONFIG.numberSets.length)
                     ];
-                numberContainer.appendChild(this.numberElement);
-                this.container.appendChild(numberContainer);
 
-                this.element = numberContainer;
+                this.x = rand(-xLimit, xLimit);
+                this.z = rand(CONFIG.zMin, CONFIG.zMax);
+                this.vx = sign() * rand(CONFIG.vx.min, CONFIG.vx.max);
+                this.vz = sign() * rand(CONFIG.vz.min, CONFIG.vz.max);
 
-                this.updatePosition();
+                // 字宽（em），条纹宽度按它等比缩放
+                ctx.font = `bold 100px ${CONFIG.fontFamily}`;
+                this.emW = ctx.measureText(this.digit).width / 100;
+
+                // 数字在整个屏幕高度内自由上下漂移（0 = 顶，1 = 底）
+                this.ny = rand(0, 1);
+                this.nyTarget = this.ny;
+                this.nySpeed = rand(CONFIG.numberSpeed.min, CONFIG.numberSpeed.max);
+                this.nextPick = rand(0, CONFIG.numberPick.max);
             }
 
-            // 更新位置
-            updatePosition() {
-                const { animationConfig: config } = CONFIG;
-                const size = utils.getRandomValue(
-                    config.size.min,
-                    config.size.max,
-                );
-                const moveX = utils.getRandomValue(
-                    config.movement.x.min,
-                    config.movement.x.max,
-                );
+            update(dt) {
+                this.x += this.vx * dt * speedFactor;
+                this.z += this.vz * dt * speedFactor;
+                if (this.x > xLimit) {
+                    this.x = xLimit;
+                    this.vx = -Math.abs(this.vx);
+                } else if (this.x < -xLimit) {
+                    this.x = -xLimit;
+                    this.vx = Math.abs(this.vx);
+                }
+                if (this.z > CONFIG.zMax) {
+                    this.z = CONFIG.zMax;
+                    this.vz = -Math.abs(this.vz);
+                } else if (this.z < CONFIG.zMin) {
+                    this.z = CONFIG.zMin;
+                    this.vz = Math.abs(this.vz);
+                }
 
-                const moveY = utils.getRandomValue(
-                    config.movement.y.min,
-                    config.movement.y.max,
-                );
+                this.nextPick -= dt;
+                if (this.nextPick <= 0) {
+                    this.nyTarget = rand(0, 1);
+                    this.nySpeed = rand(CONFIG.numberSpeed.min, CONFIG.numberSpeed.max);
+                    this.nextPick = rand(CONFIG.numberPick.min, CONFIG.numberPick.max);
+                }
+                this.ny += (this.nyTarget - this.ny) * Math.min(1, dt * this.nySpeed * speedFactor);
+            }
 
-                requestAnimationFrame(() => {
-                    utils.setStyles(this.element, {
-                        left: `${utils.getRandomValue(config.position.min, config.position.max)}%`,
-                        transition: `all ${utils.getRandomValue(config.duration.container.min, config.duration.container.max)}s ease`,
-                        zIndex: Math.floor(Math.random() * 10),
-                    });
+            draw(camX) {
+                const scale = CONFIG.focal / this.z;
+                const t = (this.z - CONFIG.zMin) / (CONFIG.zMax - CONFIG.zMin); // 0 近 → 1 远
+                const near = 1 - t;
 
-                    // 设置数字大小并更新容器宽度
-                    this.numberElement.style.fontSize = `${size}rem`;
+                // 近处字号最大（高度约占满屏幕），远处按透视缩小
+                const fs = (vh * 0.9 * scale) / (CONFIG.focal / CONFIG.zMin);
+                const w = fs * (this.emW + 0.3); // 条纹宽度与数字等比
+                const sx = vw / 2 + (this.x - camX) * scale;
+                const left = sx - w / 2;
+                const right = left + w;
 
-                    // 等待字体大小更新后设置容器宽度
-                    setTimeout(() => {
-                        const numberWidth = this.numberElement.offsetWidth;
-                        this.element.style.width = `${numberWidth + 40}px`; // 添加内边距
-                    }, 50);
+                // 近处实、远处虚
+                const blur = t * CONFIG.maxBlur;
+                const margin = blur + 80 * scale;
+                if (right + margin < 0 || left - margin > vw) return;
 
-                    utils.setStyles(this.numberElement, {
-                        transform: `translate(${moveX}px, ${moveY}px)`,
-                        transition: `all ${utils.getRandomValue(config.duration.number.min, config.duration.number.max)}s ease`,
-                    });
-                });
+                const fc = CONFIG.farColor;
+                const nc = CONFIG.nearColor;
+                const cr = Math.round(lerp(fc[0], nc[0], near));
+                const cg = Math.round(lerp(fc[1], nc[1], near));
+                const cb = Math.round(lerp(fc[2], nc[2], near));
+                const alpha = 0.3 + 0.7 * near;
+
+                // 近处投影，强化前后遮挡感
+                if (near > 0.2) {
+                    const sw = 70 * scale * near;
+                    const sa = 0.4 * near;
+                    let g = ctx.createLinearGradient(left - sw, 0, left, 0);
+                    g.addColorStop(0, "rgba(0,0,0,0)");
+                    g.addColorStop(1, `rgba(0,0,0,${sa})`);
+                    ctx.fillStyle = g;
+                    ctx.fillRect(left - sw, 0, sw, vh);
+                    g = ctx.createLinearGradient(right, 0, right + sw, 0);
+                    g.addColorStop(0, `rgba(0,0,0,${sa})`);
+                    g.addColorStop(1, "rgba(0,0,0,0)");
+                    ctx.fillStyle = g;
+                    ctx.fillRect(right, 0, sw, vh);
+                }
+
+                // 条纹底色 + 左右黑边（全屏高度）
+                softBand(left, right, blur, cr, cg, cb, 1);
+                const bw = Math.max(1, 4 * scale);
+                softBand(left, left + bw, blur, 0, 0, 0, alpha);
+                softBand(right - bw, right, blur, 0, 0, 0, alpha);
+
+                // 数字：中心限制在 [0.4fs, vh - 0.4fs]，保证完整显示
+                const cy = 0.4 * fs + this.ny * (vh - 0.8 * fs);
+                ctx.font = `bold ${fs}px ${CONFIG.fontFamily}`;
+                ctx.textAlign = "center";
+                ctx.textBaseline = "alphabetic";
+                const color = `rgba(0,0,0,${alpha})`;
+                const baseY = cy + 0.35 * fs;
+                if (blur < 0.5) {
+                    ctx.fillStyle = color;
+                    ctx.fillText(this.digit, sx, baseY);
+                } else {
+                    // 用 shadowBlur 画模糊文字：文字本体画在屏幕外，只留下阴影
+                    const OFF = 5000;
+                    ctx.save();
+                    ctx.shadowColor = color;
+                    ctx.shadowBlur = 2 * blur * dpr;
+                    ctx.shadowOffsetX = OFF * dpr;
+                    ctx.fillStyle = "#000";
+                    ctx.fillText(this.digit, sx - OFF, baseY);
+                    ctx.restore();
+                }
             }
         }
 
         class App {
             constructor() {
-                this.container = document.getElementById("floatingNumbers");
-                this.numbers = [];
-                this.init();
+                resize();
+                this.stripes = [];
+                for (let i = 0; i < CONFIG.count; i++) {
+                    this.stripes.push(new Stripe());
+                }
+                this.mouseX = 0;
+                this.camX = 0;
+                this.last = performance.now();
+
+                window.addEventListener("resize", resize);
+                window.addEventListener(
+                    "mousemove",
+                    (e) => {
+                        this.mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                    },
+                    { passive: true },
+                );
+                requestAnimationFrame((t) => this.frame(t));
             }
 
-            init() {
-                for (let i = 0; i < CONFIG.numbersCount; i++) {
-                    this.numbers.push(new FloatingNumber(this.container));
-                }
+            frame(now) {
+                const dt = Math.min(0.05, (now - this.last) / 1000);
+                this.last = now;
 
-                setInterval(() => {
-                    this.numbers.forEach((number) => number.updatePosition());
-                }, CONFIG.updateInterval);
+                // 相机随鼠标轻微横移，产生视差
+                const targetCam = this.mouseX * CONFIG.mouseParallax;
+                this.camX += (targetCam - this.camX) * Math.min(1, dt * 3);
+
+                for (const s of this.stripes) s.update(dt);
+
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                ctx.clearRect(0, 0, vw, vh);
+
+                // 画家算法：先画远、后画近，近的自然遮挡远的
+                const sorted = this.stripes.slice().sort((a, b) => b.z - a.z);
+                for (const s of sorted) s.draw(this.camX);
+
+                requestAnimationFrame((t) => this.frame(t));
             }
         }
 
