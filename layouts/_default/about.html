@@ -22,7 +22,8 @@
     {{ $extra := resources.Get "css/about/extra.css" }}
     {{ $print := resources.Get "css/about/print.css" }}
     {{ $hero := resources.Get "css/about/hero.css" }}
-    {{ $css := slice $swiss $scenes $work $extra $hero | resources.Concat "css/about-bundle.css" | minify | fingerprint }}
+      {{ $contact := resources.Get "css/about/contact.css" }}
+    {{ $css := slice $swiss $scenes $work $extra $hero $contact | resources.Concat "css/about-bundle.css" | minify | fingerprint }}
     <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
     <link rel="stylesheet" href="{{ $print.RelPermalink }}" media="print">
     <style>.print-only{display:none}</style>
@@ -614,14 +615,37 @@
                             </div>
                             <div class="contact-container">
                                 {{ range .Params.contacts }}
-                                <a href="{{ .url }}" {{ if strings.HasPrefix .url "http" }}target="_blank" rel="noopener noreferrer" {{ end }}{{ with .name }}title="{{ . }}" {{ end }}class="contact-item" data-reveal="right">
-                                    <div class="contact-icon">
-                                        <i class="fa {{ .icon }}" aria-hidden="true"></i>
+                                    {{ if .qr }}
+                                    <!-- 微信：点击展开二维码 -->
+                                    <div class="contact-item contact-item--qr"
+                                         data-reveal="right"
+                                         data-qr="{{ .qr | relURL }}"
+                                         data-name="{{ .name }}"
+                                         {{ with .name }}title="{{ . }}"{{ end }}
+                                         role="button"
+                                         tabindex="0"
+                                         aria-haspopup="dialog">
+                                        <div class="contact-icon">
+                                            <i class="fa {{ .icon }}" aria-hidden="true"></i>
+                                        </div>
+                                        <span class="contact-value">{{ .value }}</span>
                                     </div>
-                                    <span class="contact-value">{{ .value }}</span>
-                                </a>
+                                    {{ else }}
+                                    <!-- 普通链接（电话、邮箱等） -->
+                                    <a href="{{ .url }}"
+                                       {{ if strings.HasPrefix .url "http" }}target="_blank" rel="noopener noreferrer"{{ end }}
+                                       {{ with .name }}title="{{ . }}"{{ end }}
+                                       class="contact-item" data-reveal="right">
+                                        <div class="contact-icon">
+                                            <i class="fa {{ .icon }}" aria-hidden="true"></i>
+                                        </div>
+                                        <span class="contact-value">{{ .value }}</span>
+                                    </a>
+                                    {{ end }}
                                 {{ end }}
                             </div>
+
+
                         </div>
                     </div>
                 </div>
@@ -696,6 +720,16 @@
         </nav>
     </div>
 
+    <!-- 二维码弹层（放在 viewport 末尾，全站一份即可） -->
+    <div class="qr-modal" id="qr-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="二维码">
+        <div class="qr-modal__backdrop" data-qr-close></div>
+        <div class="qr-modal__panel">
+            <button class="qr-modal__close" type="button" aria-label="关闭" data-qr-close>&times;</button>
+            <h3 class="qr-modal__title"></h3>
+            <img class="qr-modal__img" src="" alt="二维码" width="240" height="240" decoding="async" />
+            <p class="qr-modal__tip">扫码添加 / 长按识别</p>
+        </div>
+    </div>
     <!-- 作品详情弹层 -->
     <dialog id="work-dialog" class="work-dialog" aria-labelledby="wd-title">
         <div class="work-dialog__inner">
@@ -717,6 +751,7 @@
 
     <!-- 模块化JavaScript -->
     <script type="module" src="{{ `js/about/main.js` | relURL }}"></script>
+    <!-- 导出PDF -->
     <script>
         // 导出 PDF 时让默认文件名变成「姓名 - 简历」，打印结束后还原
         (function () {
@@ -729,6 +764,48 @@
                 document.title = original;
             });
         })();
+    </script>
+    <!-- 二维码 -->
+    <script>
+    (function () {
+        const modal = document.getElementById('qr-modal');
+        if (!modal) return;
+        const img = modal.querySelector('.qr-modal__img');
+        const title = modal.querySelector('.qr-modal__title');
+
+        function open(qr, name) {
+            img.src = qr;
+            img.alt = (name || '') + ' 二维码';
+            title.textContent = name ? '扫码添加' + name : '扫码';
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+        function close() {
+            modal.classList.remove('is-open');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        document.querySelectorAll('.contact-item--qr').forEach(function (el) {
+            el.addEventListener('click', function () {
+                open(el.dataset.qr, el.dataset.name);
+            });
+            el.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    open(el.dataset.qr, el.dataset.name);
+                }
+            });
+        });
+
+        modal.querySelectorAll('[data-qr-close]').forEach(function (el) {
+            el.addEventListener('click', close);
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && modal.classList.contains('is-open')) close();
+        });
+    })();
     </script>
 </body>
 
