@@ -1,0 +1,1034 @@
+/* ==========================================================
+   article-share.css — 瑞士国际主义风格分享组件
+   放置：assets/css/article-share.css（或 static/css/）
+   配色：黑 #111 / 纸白 #f2f2ef / 强调蓝 #0042da（约 70 / 25 / 5）
+   规则：直角、细线、无阴影、无渐变、无衬线、左对齐、模数网格
+   所有类名带 sp- 前缀；浮层由 JS 移到 <body>，因此变量挂在 .sp-scope 上
+   ========================================================== */
+
+/* ---------- 设计变量 + 基础重置（触发按钮、浮层、toast 共用） ---------- */
+.sp-scope {
+    --sp-accent: #0042da;
+    --sp-bg: #f2f2ef;
+    --sp-text: #111111;
+    --sp-text-2: #555550;
+    --sp-text-3: #8a8a85;
+    --sp-rule: #111111;
+    --sp-hair: rgba(17, 17, 17, 0.18);
+    --sp-tab-bg: #e6e6e1;
+    --sp-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    font-family:
+        "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Noto Sans SC",
+        "Microsoft YaHei", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    letter-spacing: normal;
+    text-align: left;
+    color: var(--sp-text);
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-color-scheme: dark) {
+    .sp-scope {
+        --sp-bg: #161616;
+        --sp-text: #f2f2ef;
+        --sp-text-2: #b5b5b0;
+        --sp-text-3: #77776f;
+        --sp-rule: #f2f2ef;
+        --sp-hair: rgba(242, 242, 239, 0.22);
+        --sp-tab-bg: #202020;
+        --sp-accent: #4a7bff; /* 深底上的可读蓝 */
+    }
+}
+
+.sp-scope *,
+.sp-scope *::before,
+.sp-scope *::after {
+    box-sizing: border-box;
+}
+.sp-scope :where(h2, h3, h4, h5, p, figure, ul, ol) {
+    margin: 0;
+    padding: 0;
+    font-family: inherit;
+    letter-spacing: inherit;
+    text-transform: none;
+}
+.sp-scope :where(button, input) {
+    font: inherit;
+    color: inherit;
+    margin: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 0;
+}
+.sp-scope :where(img) {
+    max-width: none;
+    height: auto;
+    border: 0;
+}
+.sp-scope [hidden] {
+    display: none !important;
+}
+
+html.sp-lock {
+    overflow: hidden !important;
+}
+
+/* ---------- 触发按钮 ---------- */
+.sp-inline {
+    display: inline-block;
+    vertical-align: middle;
+}
+.sp-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    height: 40px;
+    padding: 0 16px;
+    background: #111;
+    color: #fff;
+    border: 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 0.15s linear;
+}
+.sp-trigger svg {
+    width: 16px;
+    height: 16px;
+}
+.sp-trigger:hover {
+    background: #0042da;
+}
+.sp-trigger:focus-visible,
+.sp-close:focus-visible,
+.sp-tab:focus-visible,
+.sp-channel:focus-visible,
+.sp-btn:focus-visible,
+.sp-seg button:focus-visible,
+.sp-linkbox button:focus-visible {
+    outline: 3px solid #0042da;
+    outline-offset: -3px;
+}
+.sp-trigger:focus-visible {
+    outline-offset: 2px;
+}
+
+/* ---------- 浮层（挂在 <body> 下，z-index 取极高值） ---------- */
+.sp-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(17, 17, 17, 0.72);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity 0.2s linear,
+        visibility 0.2s linear;
+}
+.sp-overlay.is-open {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 面板：头部 + 标签 固定，内容区独立滚动 */
+.sp-panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 520px;
+    max-height: min(92vh, 900px);
+    max-height: min(92dvh, 900px);
+    overflow: hidden;
+    background: var(--sp-bg);
+    border-top: 8px solid #0042da;
+    transform: translateY(16px);
+    transition: transform 0.25s var(--sp-ease);
+}
+.sp-overlay.is-open .sp-panel {
+    transform: translateY(0);
+}
+
+/* ---------- 头部 ---------- */
+.sp-header {
+    position: relative;
+    flex: none;
+    padding: 20px 64px 16px 24px;
+}
+.sp-kicker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--sp-text-2);
+}
+.sp-kicker::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    background: #0042da;
+}
+.sp-title {
+    font-size: 1.9rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--sp-text);
+}
+.sp-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: transparent;
+    color: var(--sp-text);
+    border: 2px solid var(--sp-rule);
+    cursor: pointer;
+    transition:
+        background 0.15s linear,
+        color 0.15s linear;
+}
+.sp-close svg {
+    width: 16px;
+    height: 16px;
+}
+.sp-close:hover {
+    background: var(--sp-text);
+    color: var(--sp-bg);
+}
+
+/* ---------- 顶部标签切换 ---------- */
+.sp-tabs {
+    flex: none;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    background: var(--sp-tab-bg);
+    border-top: 2px solid var(--sp-rule);
+    border-bottom: 2px solid var(--sp-rule);
+}
+.sp-tab {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 12px 14px 12px;
+    background: transparent;
+    color: var(--sp-text-2);
+    border: 0;
+    border-right: 1px solid var(--sp-hair);
+    font-size: 0.85rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: left;
+    cursor: pointer;
+    transition:
+        background 0.15s linear,
+        color 0.15s linear;
+}
+.sp-tab:last-child {
+    border-right: 0;
+}
+.sp-tab i {
+    font-style: normal;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--sp-text-3);
+    font-variant-numeric: tabular-nums;
+}
+.sp-tab:hover {
+    color: var(--sp-text);
+}
+.sp-tab[aria-selected="true"] {
+    background: var(--sp-bg);
+    color: var(--sp-text);
+    /* 盖住底部粗线，形成“标签与内容相连”的效果 */
+    margin-bottom: -2px;
+    padding-bottom: 14px;
+}
+.sp-tab[aria-selected="true"]::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: #0042da;
+}
+.sp-tab[aria-selected="true"] i {
+    color: var(--sp-accent);
+}
+
+/* ---------- 内容区 ---------- */
+.sp-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 24px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--sp-text-3) transparent;
+}
+.sp-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+.sp-scroll::-webkit-scrollbar-thumb {
+    background: var(--sp-text-3);
+}
+
+.sp-pane {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.sp-pane-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--sp-text);
+}
+.sp-lead {
+    margin-top: 4px;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: var(--sp-text-2);
+}
+.sp-note {
+    font-size: 0.75rem;
+    line-height: 1.6;
+    color: var(--sp-text-3);
+}
+.sp-label {
+    padding-top: 8px;
+    margin-bottom: 12px;
+    border-top: 2px solid var(--sp-rule);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--sp-text);
+}
+
+/* ---------- 01 快速分享 ---------- */
+.sp-linkbox {
+    display: flex;
+    border: 2px solid var(--sp-rule);
+}
+.sp-linkbox:focus-within {
+    outline: 3px solid #0042da;
+    outline-offset: 2px;
+}
+.sp-linkbox input {
+    flex: 1;
+    min-width: 0;
+    height: 44px;
+    padding: 0 12px;
+    background: transparent;
+    border: 0;
+    outline: none;
+    font-size: 0.82rem;
+    color: var(--sp-text);
+    text-overflow: ellipsis;
+}
+.sp-linkbox button {
+    flex: none;
+    padding: 0 18px;
+    background: var(--sp-text);
+    color: var(--sp-bg);
+    border: 0;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s linear, color 0.15s linear;
+}
+.sp-linkbox button:hover {
+    background: #0042da;
+    color: #fff;
+}
+
+.sp-channels {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--sp-hair);
+    border: 1px solid var(--sp-hair);
+}
+.sp-channel {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    min-height: 88px;
+    padding: 12px;
+    background: var(--sp-bg);
+    color: var(--sp-text);
+    border: 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s linear, color 0.15s linear;
+}
+.sp-channel img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    filter: grayscale(1);
+    transition: filter 0.15s linear;
+}
+.sp-channel:hover {
+    background: #0042da;
+    color: #fff;
+}
+.sp-channel:hover img {
+    filter: grayscale(1) brightness(0) invert(1);
+}
+
+.sp-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 2px solid var(--sp-rule);
+}
+.sp-stat {
+    padding-top: 12px;
+}
+.sp-stat + .sp-stat {
+    padding-left: 16px;
+    border-left: 1px solid var(--sp-hair);
+}
+.sp-stat-value {
+    display: block;
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: var(--sp-text);
+    font-variant-numeric: tabular-nums;
+}
+.sp-stat:first-child .sp-stat-value {
+    color: var(--sp-accent);
+}
+.sp-stat-label {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--sp-text-2);
+}
+
+/* ---------- 按钮 ---------- */
+.sp-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+.sp-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 16px;
+    border: 2px solid #111;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+    transition:
+        background 0.15s linear,
+        color 0.15s linear,
+        border-color 0.15s linear;
+}
+.sp-btn svg {
+    flex: none;
+    width: 18px;
+    height: 18px;
+}
+.sp-btn--primary {
+    background: #111;
+    color: #fff;
+}
+.sp-btn--primary:hover {
+    background: #0042da;
+    border-color: #0042da;
+}
+.sp-btn--ghost,
+.sp-btn--wide {
+    background: transparent;
+    color: var(--sp-text);
+    border-color: var(--sp-rule);
+}
+.sp-btn--ghost:hover {
+    background: var(--sp-text);
+    color: var(--sp-bg);
+}
+.sp-btn--wide {
+    grid-column: 1 / -1;
+}
+.sp-btn--wide:hover {
+    background: #0042da;
+    border-color: #0042da;
+    color: #fff;
+}
+.sp-btn[disabled] {
+    opacity: 0.5;
+    cursor: progress;
+}
+
+/* ---------- 内容长度分段控件 ---------- */
+.sp-seg {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: 2px solid var(--sp-rule);
+}
+.sp-seg button {
+    padding: 10px 6px;
+    background: transparent;
+    color: var(--sp-text);
+    border: 0;
+    border-right: 1px solid var(--sp-rule);
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s linear, color 0.15s linear;
+}
+.sp-seg button:last-child {
+    border-right: 0;
+}
+.sp-seg button:hover {
+    background: var(--sp-tab-bg);
+}
+.sp-seg button[aria-pressed="true"] {
+    background: var(--sp-text);
+    color: var(--sp-bg);
+}
+
+/* ==========================================================
+   卡片（导出为图片，固定浅色，不随深色模式变化）
+   ========================================================== */
+.sp-card {
+    overflow: hidden;
+    background: #f2f2ef;
+    color: #111;
+    border: 2px solid #111;
+    font-family:
+        "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Noto Sans SC",
+        "Microsoft YaHei", sans-serif;
+    text-align: left;
+}
+
+/* 封面 */
+.sp-card-cover {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #111;
+    border-bottom: 2px solid #111;
+}
+.sp-fit-cover {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.sp-card-cover--plain {
+    display: flex;
+    align-items: flex-end;
+    padding: 16px;
+    background: #0042da;
+}
+.sp-card-cover--plain::before {
+    content: "";
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #f2f2ef;
+}
+.sp-card-cover--plain::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 96px;
+    height: 96px;
+    background: #111;
+}
+.sp-card-cover-site {
+    position: relative;
+    z-index: 1;
+    max-width: 60%;
+    color: #fff;
+    font-size: 1.6rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+/* 海报卡片正文 */
+.sp-card-main {
+    padding: 16px 16px 8px;
+}
+.sp-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 0;
+    margin-bottom: 12px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #666660;
+    font-variant-numeric: tabular-nums;
+}
+.sp-card-meta span + span::before {
+    content: "/";
+    margin: 0 8px;
+    color: #0042da;
+}
+.sp-card-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 12px;
+    font-size: 1.55rem;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: #111;
+}
+.sp-card-desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 16px;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: #4a4a46;
+}
+.sp-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+.sp-tag {
+    padding: 3px 8px;
+    border: 1px solid #111;
+    color: #111;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+.sp-tag--more {
+    border-color: #0042da;
+    color: #0042da;
+}
+
+.sp-author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-top: 1px solid #111;
+}
+.sp-avatar {
+    flex: none;
+    display: block;
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    background-color: #ddd;
+}
+.sp-author-name {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #111;
+}
+.sp-author-stats {
+    margin-top: 2px;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    color: #666660;
+}
+.sp-author-stats b {
+    color: #0042da;
+    font-weight: 800;
+}
+
+/* 热力图 */
+.sp-heat {
+    margin-bottom: 8px;
+    padding-top: 12px;
+    border-top: 1px solid #111;
+}
+.sp-heat-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #111;
+}
+.sp-heat-head small {
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    color: #666660;
+}
+.sp-heat-grid {
+    display: grid;
+    grid-template-rows: repeat(7, 1fr);
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 2px;
+}
+.sp-cell {
+    aspect-ratio: 1;
+    min-width: 0;
+    background: #dcdcd6;
+}
+.sp-cell.l1 {
+    background: #a9a9a3;
+}
+.sp-cell.l2 {
+    background: #6a6a66;
+}
+.sp-cell.l3 {
+    background: #111;
+}
+.sp-cell.l4 {
+    background: #0042da;
+}
+.sp-heat-legend {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    margin: 8px 0;
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    color: #666660;
+}
+.sp-heat-legend .sp-cell {
+    width: 10px;
+    height: 10px;
+    aspect-ratio: auto;
+}
+
+/* 卡片底部：黑底锚点 + 二维码 */
+.sp-card-foot {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px;
+    background: #111;
+    color: #f2f2ef;
+}
+.sp-foot-brand {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
+}
+.sp-foot-logo {
+    align-self: flex-start;
+    display: block;
+    height: 32px;
+    width: auto;
+    max-width: 110px;
+    padding: 4px;
+    object-fit: contain;
+    background: #f2f2ef;
+}
+.sp-foot-name {
+    display: block;
+    overflow: hidden;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: #fff;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.sp-foot-tip {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #9a9a94;
+}
+.sp-foot-url {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.65rem;
+    line-height: 1.4;
+    color: #77776f;
+    word-break: break-all;
+}
+.sp-qr {
+    flex: none;
+    width: 88px;
+    height: 88px;
+    padding: 6px;
+    background: #fff;
+    line-height: 0;
+}
+.sp-qr canvas,
+.sp-qr img {
+    display: block;
+    width: 76px !important;
+    height: 76px !important;
+}
+.sp-qr-retry {
+    display: grid;
+    place-items: center;
+    width: 76px;
+    height: 76px;
+    padding: 4px;
+    background: #fff;
+    color: #0042da;
+    border: 1px dashed #0042da;
+    font-size: 0.62rem;
+    font-weight: 700;
+    line-height: 1.4;
+    text-align: center;
+    cursor: pointer;
+}
+
+/* 内容卡片 */
+.sp-ccard-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 2px solid #111;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+}
+.sp-ccard-head span:first-child {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.sp-ccard-head span:first-child::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    background: #0042da;
+}
+.sp-ccard-main {
+    padding: 24px 16px 8px;
+}
+.sp-ccard-title {
+    margin-bottom: 16px;
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: #111;
+}
+.sp-ccard-body {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #111;
+    font-size: 0.9rem;
+    line-height: 1.95;
+    color: #222;
+}
+.sp-ccard-body p {
+    margin: 0 0 0.9em;
+}
+.sp-ccard-body h5 {
+    margin: 1.4em 0 0.6em;
+    padding-left: 10px;
+    border-left: 4px solid #0042da;
+    font-size: 0.95rem;
+    font-weight: 800;
+    line-height: 1.5;
+    color: #111;
+}
+.sp-ccard-body > :first-child {
+    margin-top: 0;
+}
+.sp-ccard-more {
+    margin: 4px 0 16px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #0042da;
+}
+
+/* ---------- 预览层（微信 / iOS 等不支持下载时长按保存） ---------- */
+.sp-preview {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    background: rgba(17, 17, 17, 0.96);
+    color: #f2f2ef;
+}
+.sp-preview-bar {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(242, 242, 239, 0.25);
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+.sp-preview-bar button {
+    padding: 6px 12px;
+    background: transparent;
+    color: #f2f2ef;
+    border: 2px solid #f2f2ef;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+.sp-preview-body {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    padding: 16px;
+}
+.sp-preview-body img {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 0 auto;
+    max-width: 480px;
+}
+
+/* ---------- 导出舞台（离屏，固定宽度，保证成图一致） ---------- */
+.sp-stage {
+    position: absolute;
+    left: -10000px;
+    top: 0;
+    pointer-events: none;
+}
+.sp-stage .sp-card-title,
+.sp-stage .sp-card-desc {
+    display: block;
+    -webkit-line-clamp: unset;
+    overflow: visible;
+}
+.sp-stage .sp-card-title {
+    font-size: 1.9rem;
+}
+.sp-stage .sp-ccard-title {
+    font-size: 2.1rem;
+}
+
+/* ---------- Toast ---------- */
+.sp-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 32px;
+    z-index: 2147483001;
+    max-width: calc(100vw - 32px);
+    padding: 12px 20px;
+    background: #111;
+    color: #fff;
+    border-left: 6px solid #0042da;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transform: translate(-50%, 24px);
+    opacity: 0;
+    transition:
+        transform 0.25s var(--sp-ease),
+        opacity 0.2s linear;
+    pointer-events: none;
+}
+.sp-toast.is-show {
+    transform: translate(-50%, 0);
+    opacity: 1;
+}
+
+/* ---------- 移动端：底部抽屉 ---------- */
+@media (max-width: 640px) {
+    .sp-overlay {
+        align-items: flex-end;
+        padding: 0;
+    }
+    .sp-panel {
+        max-width: 100%;
+        max-height: 94vh;
+        max-height: 94dvh;
+        transform: translateY(100%);
+    }
+    .sp-overlay.is-open .sp-panel {
+        transform: translateY(0);
+    }
+    .sp-header {
+        padding: 16px 56px 12px 16px;
+    }
+    .sp-close {
+        top: 12px;
+        right: 12px;
+    }
+    .sp-title {
+        font-size: 1.6rem;
+    }
+    .sp-tab {
+        padding: 10px 10px;
+        font-size: 0.8rem;
+    }
+    .sp-scroll {
+        padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+    }
+    .sp-actions {
+        grid-template-columns: 1fr;
+    }
+    .sp-heat-grid {
+        gap: 1px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sp-scope *,
+    .sp-scope *::before,
+    .sp-scope *::after {
+        transition-duration: 0.01ms !important;
+    }
+}
