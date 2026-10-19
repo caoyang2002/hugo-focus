@@ -4,7 +4,7 @@
 
 
 /* 自我评价 */
-.summary-list {
+.self_eval-list {
   display: grid;
   gap: 0;
   max-width: 46rem;
@@ -13,7 +13,7 @@
   list-style: none;
 }
 
-.summary-item {
+.self_eval-item {
   display: grid;
   grid-template-columns: 3rem 1fr;
   gap: 1rem;
@@ -22,14 +22,14 @@
   border-top: 1px solid var(--rule, rgba(0, 0, 0, 0.18));
 }
 
-.summary-index {
+.self_eval-index {
   font-size: 0.75rem;
   letter-spacing: 0.2em;
   opacity: 0.5;
   font-variant-numeric: tabular-nums;
 }
 
-.summary-item p {
+.self_eval-item p {
   margin: 0;
   font-size: 1.05rem;
   line-height: 1.8;

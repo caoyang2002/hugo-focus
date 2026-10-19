@@ -32,30 +32,12 @@
     <link rel="preload" href="{{ .Params.avatar | relURL }}" as="image" />
     {{ end }}
 </head>
-
-{{/*
-  数据准备
-  - experiences 里 `type: project` 的条目进入「项目」板块，其余进入「经历」板块
-  - projects（原「作品」数据）保持不变，仍然是「作品」板块
-  - 各板块没有数据时整块不渲染，目录与编号自动跟着变化
-*/}}
-{{ $exps := slice }}
-{{ $projectItems := slice }}
-{{ range .Params.experiences }}
-    {{ if eq (.type | default "experience") "project" }}
-        {{ $projectItems = $projectItems | append . }}
-    {{ else }}
-        {{ $exps = $exps | append . }}
-    {{ end }}
-{{ end }}
-
-
+{{ $hasSelfEval := gt (len .Params.self_eval) 0 }}
 {{ $hasSkills := gt (len .Params.skills) 0 }}
-{{ $hasExp := gt (len $exps) 0 }}
-{{ $hasProj := gt (len $projectItems) 0 }}
+{{ $hasExp := gt (len .Params.experiences) 0 }}
+{{ $hasProj := gt (len .Params.experiences) 0 }}
 {{ $hasWorks := gt (len .Params.projects) 0 }}
 {{ $hasContact := gt (len .Params.contacts) 0 }}
-{{ $hasSummary := gt (len .Params.summary) 0 }}
 {{ $hasEdu := gt (len .Params.education) 0 }}
 {{ $hasHonors := or (gt (len .Params.awards) 0) (gt (len .Params.certificates) 0) }}
 {{ $hasOS := gt (len .Params.opensource) 0 }}
@@ -74,16 +56,16 @@
 {{ with .Params.website }}{{ $facts = $facts | append (dict "k" "网站" "v" (. | replaceRE "^https?://" "" | strings.TrimSuffix "/") "url" .) }}{{ end }}
 
 {{/* 目录：id / 桌面名称 / 移动端短名称 */}}
-{{ $nav := slice (dict "id" "about" "zh" "关于我" "short" "关于") }}
-{{ if $hasSummary }}{{ $nav = $nav | append (dict "id" "summary" "zh" "自我评价" "short" "评价") }}{{ end }}
-{{ if $hasSkills }}{{ $nav = $nav | append (dict "id" "skills" "zh" "技能" "short" "技能") }}{{ end }}
-{{ if $hasExp }}{{ $nav = $nav | append (dict "id" "experience" "zh" "经历" "short" "经历") }}{{ end }}
-{{ if $hasProj }}{{ $nav = $nav | append (dict "id" "projects" "zh" "项目" "short" "项目") }}{{ end }}
-{{ if $hasEdu }}{{ $nav = $nav | append (dict "id" "education" "zh" "教育经历" "short" "教育") }}{{ end }}
-{{ if $hasHonors }}{{ $nav = $nav | append (dict "id" "honors" "zh" "荣誉证书" "short" "荣誉") }}{{ end }}
+{{ $nav := slice (dict "id" "about" "zh" "个人简介" "short" "简介") }}
+{{ if $hasSelfEval }}{{ $nav = $nav | append (dict "id" "self_eval" "zh" "自我评价" "short" "评价") }}{{ end }}
+{{ if $hasSkills }}{{ $nav = $nav | append (dict "id" "skills" "zh" "技能专长" "short" "技能") }}{{ end }}
+{{ if $hasExp }}{{ $nav = $nav | append (dict "id" "experience" "zh" "工作经历" "short" "经历") }}{{ end }}
+{{ if $hasProj }}{{ $nav = $nav | append (dict "id" "projects" "zh" "项目经历" "short" "项目") }}{{ end }}
+{{ if $hasWorks }}{{ $nav = $nav | append (dict "id" "works" "zh" "作品展示" "short" "作品") }}{{ end }}
 {{ if $hasOS }}{{ $nav = $nav | append (dict "id" "opensource" "zh" "开源项目" "short" "开源") }}{{ end }}
-{{ if $hasWorks }}{{ $nav = $nav | append (dict "id" "works" "zh" "作品" "short" "作品") }}{{ end }}
-{{ if $hasContact }}{{ $nav = $nav | append (dict "id" "contact" "zh" "联系我" "short" "联系") }}{{ end }}
+{{ if $hasEdu }}{{ $nav = $nav | append (dict "id" "education" "zh" "教育背景" "short" "教育") }}{{ end }}
+{{ if $hasHonors }}{{ $nav = $nav | append (dict "id" "honors" "zh" "荣誉证书" "short" "荣誉") }}{{ end }}
+{{ if $hasContact }}{{ $nav = $nav | append (dict "id" "contact" "zh" "联系信息" "short" "联系") }}{{ end }}
 
 {{/* 首屏「下滑」提示指向第一个后续场景 */}}
 {{ $hintTarget := "" }}
@@ -102,9 +84,7 @@
          ======================================== -->
     <main class="layer-content">
 
-        <!-- ====================================
-             01 关于 · 首屏：头像 + 标题 + 介绍 + 下滑提示
-             ==================================== -->
+<!-- ==================================== 01 关于 · 首屏：头像 + 标题 + 介绍 + 下滑提示 ==================================== -->
         {{ $n = add $n 1 }}
         <section class="scene scene-hero {{ if not .Params.avatar }}scene-hero--no-avatar{{ end }}" id="about" data-scene="about" data-type="hero" data-tone="paper">
             <div class="scene-stage">
@@ -139,7 +119,16 @@
 
                         {{ with $facts }}
                         <ul class="hero-facts">
-                            {{ range . }}<li><span class="hero-facts__k">{{ .k }}</span>{{ if .url }}<a href="{{ .url }}" target="_blank" rel="noopener noreferrer">{{ .v }}</a>{{ else }}<span class="hero-facts__v">{{ .v }}</span>{{ end }}</li>{{ end }}
+                            {{ range . }}
+                            <li>
+                                <span class="hero-facts__k">{{ .k }}</span>
+                                {{ if .url }}
+                                <a href="{{ .url }}" target="_blank" rel="noopener noreferrer">{{ .v }}</a>
+                                {{ else }}
+                                <span class="hero-facts__v">{{ .v }}</span>
+                                {{ end }}
+                            </li>
+                            {{ end }}
                         </ul>
                         {{ end }}
 
@@ -162,29 +151,27 @@
             </div>
         </section>
 
-        <!-- ====================================
-             自我评价：编号列表逐条擦入
-             ==================================== -->
-        {{ if $hasSummary }}
+<!-- ==================================== 02 自我评价：编号列表逐条擦入 ==================================== -->
+        {{ if $hasSelfEval }}
         {{ $n = add $n 1 }}
-        <section class="scene scene-summary" id="summary" data-scene="summary" data-tone="paper">
+        <section class="scene scene-self_eval" id="self_eval" data-scene="self_eval" data-tone="paper">
             <div class="scene-stage">
                 {{ $grid }}
 
                 <header class="swiss-label swiss-label--float">
                     <span class="swiss-label__num">{{ printf "%02d" $n }}</span>
                     <span class="swiss-label__zh">评价</span>
-                    <span class="swiss-label__en">Summary</span>
+                    <span class="swiss-label__en">Self Eval</span>
                 </header>
 
                 <h2 class="scene-title" style="--chars:4">自我评价</h2>
 
                 <div class="scene-viewport">
                     <div class="scene-body">
-                        <ol class="summary-list">
-                            {{ range $i, $item := .Params.summary }}
-                            <li class="summary-item" data-reveal="up">
-                                <span class="summary-index" aria-hidden="true">{{ printf "%02d" (add $i 1) }}</span>
+                        <ol class="self_eval-list">
+                            {{ range $i, $item := .Params.self_eval }}
+                            <li class="self_eval-item" data-reveal="up">
+                                <span class="self_eval-index" aria-hidden="true">{{ printf "%02d" (add $i 1) }}</span>
                                 <p>{{ $item.text }}</p>
                             </li>
                             {{ end }}
@@ -193,16 +180,14 @@
                 </div>
 
                 <div class="scene-meta" aria-hidden="true">
-                    <span>Summary</span>
+                    <span>Self Eval</span>
                     <span><span data-scene-progress>000</span> / 100</span>
                 </div>
             </div>
         </section>
         {{ end }}
 
-        <!-- ====================================
-             02 技能：标题放大淡出 → 技能项擦入
-             ==================================== -->
+<!-- ==================================== 03 技能：标题放大淡出 → 技能项擦入 ==================================== -->
         {{ if $hasSkills }}
         {{ $n = add $n 1 }}
         <section class="scene scene-skills" id="skills" data-scene="skills" data-tone="paper">
@@ -265,9 +250,7 @@
         </section>
         {{ end }}
 
-        <!-- ====================================
-             03 项目经历：标题放大淡出 → 时间轴行从左向右擦入
-             ==================================== -->
+<!-- ==================================== 04 工作经验：标题放大淡出 → 时间轴行从左向右擦入 ==================================== -->
         {{ if $hasExp }}
         {{ $n = add $n 1 }}
         <section class="scene scene-experience" id="experience" data-scene="experience" data-tone="paper">
@@ -276,16 +259,16 @@
 
                 <header class="swiss-label swiss-label--float">
                     <span class="swiss-label__num">{{ printf "%02d" $n }}</span>
-                    <span class="swiss-label__zh">项目经历</span>
+                    <span class="swiss-label__zh">工作经历</span>
                     <span class="swiss-label__en">Experience</span>
                 </header>
 
-                <h2 class="scene-title" style="--chars:4">项目经历</h2>
+                <h2 class="scene-title" style="--chars:4">工作经历</h2>
 
                 <div class="scene-viewport">
                     <div class="scene-body">
                         <div class="exp-list">
-                            {{ range $exps }}
+                            {{ range .Params.experiences }}
                             <article class="exp-item" data-reveal="right">
                                 <p class="exp-period">{{ .period }}</p>
                                 <div class="exp-main">
@@ -310,10 +293,7 @@
         </section>
         {{ end }}
 
-        <!-- ====================================
-             04 项目：标题放大淡出 → 项目卡自下而上擦入
-             （数据：experiences 中 type: project 的条目）
-             ==================================== -->
+<!-- ==================================== 04 项目：标题放大淡出 → 项目卡自下而上擦入 ==================================== -->
         {{ if $hasProj }}
         {{ $n = add $n 1 }}
         <section class="scene scene-projects" id="projects" data-scene="projects" data-tone="paper">
@@ -322,16 +302,16 @@
 
                 <header class="swiss-label swiss-label--float">
                     <span class="swiss-label__num">{{ printf "%02d" $n }}</span>
-                    <span class="swiss-label__zh">项目</span>
+                    <span class="swiss-label__zh">项目经历</span>
                     <span class="swiss-label__en">Projects</span>
                 </header>
 
-                <h2 class="scene-title" style="--chars:2">项目</h2>
+                <h2 class="scene-title" style="--chars:4">项目经历</h2>
 
                 <div class="scene-viewport">
                     <div class="scene-body">
                         <div class="grid proj-grid">
-                            {{ range $i, $p := $projectItems }}
+                            {{ range $i, $p := .Params.experiences }}
                             <article class="proj-card" data-reveal="up">
                                 <span class="proj-index">{{ printf "%02d" (add $i 1) }}</span>
                                 <h3 class="proj-title">{{ $p.title }}{{ with $p.company }} | {{ . }}{{ end }}</h3>
@@ -355,9 +335,111 @@
         </section>
         {{ end }}
 
-        <!-- ====================================
-             教育经历：沿用经历的时间轴版式
-             ==================================== -->
+<!-- ==================================== 04 作品展示：标题放大淡出，同时背景纸白 → 墨黑，卡片逐张擦入 ==================================== -->
+        {{ if $hasWorks }}
+        {{ $n = add $n 1 }}
+        <section class="scene scene-works" id="works" data-scene="works" data-tone="ink">
+            <div class="scene-stage">
+                {{ $grid }}
+
+                <header class="swiss-label swiss-label--float">
+                    <span class="swiss-label__num">{{ printf "%02d" $n }}</span>
+                    <span class="swiss-label__zh">作品展示</span>
+                    <span class="swiss-label__en">Works</span>
+                </header>
+
+                <h2 class="scene-title" style="--chars:4">作品展示</h2>
+
+                <div class="scene-viewport">
+                    <div class="scene-body">
+                        <div class="works-container">
+                            {{ range $i, $p := .Params.projects }}
+                            {{ $star := $p.star | default dict }}
+                            <div class="work-item" data-reveal="up">
+                                {{ with $p.svg }}<div class="work-svg icon-wrapper">{{ . | safeHTML }}</div>{{ end }}
+                                <h3 class="work-name">{{ $p.name }}</h3>
+                                {{ with $p.url }}<a class="print-only work-print__url" href="{{ . }}">{{ . | replaceRE "^https?://" "" | strings.TrimSuffix "/" }}</a>{{ end }}
+                                <p class="work-desc">{{ $p.desc }}</p>
+                                <div class="work-tags">{{ range $p.tags }}<span class="tag">{{ . }}</span>{{ end }}</div>
+
+                                <!-- 仅导出 PDF 时显示：STAR 摘要 -->
+                                {{ if or $star.situation $star.task $star.action $star.result }}
+                                <dl class="print-only work-print__star">
+                                    {{ with $star.situation }}<dt>背景</dt><dd>{{ . }}</dd>{{ end }}
+                                    {{ with $star.task }}<dt>任务</dt><dd>{{ . }}</dd>{{ end }}
+                                    {{ with $star.action }}<dt>行动</dt><dd>{{ . }}</dd>{{ end }}
+                                    {{ with $star.result }}<dt class="is-result">结果</dt><dd class="is-result">{{ . }}</dd>{{ end }}
+                                </dl>
+                                {{ end }}
+
+                                <button type="button" class="work-detail-btn"
+                                        data-index="{{ $i }}"
+                                        data-name="{{ $p.name }}"
+                                        {{ with $p.cover }}data-cover="{{ . | relURL }}"{{ end }}
+                                        data-url="{{ $p.url }}"
+                                        data-intro="{{ $p.intro }}"
+                                        data-situation="{{ $star.situation }}"
+                                        data-task="{{ $star.task }}"
+                                        data-action="{{ $star.action }}"
+                                        data-result="{{ $star.result }}">
+                                    查看详情 →
+                                </button>
+                            </div>
+                            {{ end }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scene-meta" aria-hidden="true">
+                    <span>Selected Works</span>
+                    <span><span data-scene-progress>000</span> / 100</span>
+                </div>
+            </div>
+        </section>
+        {{ end }}
+
+
+
+
+
+<!-- ==================================== 开源项目：链接卡片 ==================================== -->
+        {{ if $hasOS }}
+        {{ $n = add $n 1 }}
+        <section class="scene scene-opensource" id="opensource" data-scene="opensource" data-tone="paper">
+            <div class="scene-stage">
+                {{ $grid }}
+
+                <header class="swiss-label swiss-label--float">
+                    <span class="swiss-label__num">{{ printf "%02d" $n }}</span>
+                    <span class="swiss-label__zh">开源</span>
+                    <span class="swiss-label__en">Open Source</span>
+                </header>
+
+                <h2 class="scene-title" style="--chars:4">开源项目</h2>
+
+                <div class="scene-viewport">
+                    <div class="scene-body">
+                        <div class="os-grid">
+                            {{ range .Params.opensource }}
+                            <a class="os-item" href="{{ .url }}" target="_blank" rel="noopener noreferrer" data-reveal="up">
+                                <h3 class="os-name">{{ .name }}</h3>
+                                <p class="os-desc">{{ .desc }}</p>
+                                <span class="os-url">{{ .url | replaceRE "^https?://" "" | strings.TrimSuffix "/" }}</span>
+                            </a>
+                            {{ end }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scene-meta" aria-hidden="true">
+                    <span>Open Source</span>
+                    <span><span data-scene-progress>000</span> / 100</span>
+                </div>
+            </div>
+        </section>
+        {{ end }}
+
+<!-- ==================================== 教育背景：沿用经历的时间轴版式 ==================================== -->
         {{ if $hasEdu }}
         {{ $n = add $n 1 }}
         <section class="scene scene-education" id="education" data-scene="education" data-tone="paper">
@@ -366,11 +448,11 @@
 
                 <header class="swiss-label swiss-label--float">
                     <span class="swiss-label__num">{{ printf "%02d" $n }}</span>
-                    <span class="swiss-label__zh">教育</span>
+                    <span class="swiss-label__zh">教育背景</span>
                     <span class="swiss-label__en">Education</span>
                 </header>
 
-                <h2 class="scene-title" style="--chars:4">教育经历</h2>
+                <h2 class="scene-title" style="--chars:4">教育背景</h2>
 
                 <div class="scene-viewport">
                     <div class="scene-body">
@@ -400,9 +482,7 @@
         </section>
         {{ end }}
 
-        <!-- ====================================
-             荣誉证书：奖项 + 证书两栏
-             ==================================== -->
+<!-- ==================================== 荣誉证书：奖项 + 证书两栏 ==================================== -->
         {{ if $hasHonors }}
         {{ $n = add $n 1 }}
         <section class="scene scene-honors" id="honors" data-scene="honors" data-tone="paper">
@@ -457,114 +537,7 @@
             </div>
         </section>
         {{ end }}
-
-        <!-- ====================================
-             开源项目：链接卡片
-             ==================================== -->
-        {{ if $hasOS }}
-        {{ $n = add $n 1 }}
-        <section class="scene scene-opensource" id="opensource" data-scene="opensource" data-tone="paper">
-            <div class="scene-stage">
-                {{ $grid }}
-
-                <header class="swiss-label swiss-label--float">
-                    <span class="swiss-label__num">{{ printf "%02d" $n }}</span>
-                    <span class="swiss-label__zh">开源</span>
-                    <span class="swiss-label__en">Open Source</span>
-                </header>
-
-                <h2 class="scene-title" style="--chars:4">开源项目</h2>
-
-                <div class="scene-viewport">
-                    <div class="scene-body">
-                        <div class="os-grid">
-                            {{ range .Params.opensource }}
-                            <a class="os-item" href="{{ .url }}" target="_blank" rel="noopener noreferrer" data-reveal="up">
-                                <h3 class="os-name">{{ .name }}</h3>
-                                <p class="os-desc">{{ .desc }}</p>
-                                <span class="os-url">{{ .url | replaceRE "^https?://" "" | strings.TrimSuffix "/" }}</span>
-                            </a>
-                            {{ end }}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="scene-meta" aria-hidden="true">
-                    <span>Open Source</span>
-                    <span><span data-scene-progress>000</span> / 100</span>
-                </div>
-            </div>
-        </section>
-        {{ end }}
-
-        <!-- ====================================
-             05 作品：标题放大淡出，同时背景纸白 → 墨黑，卡片逐张擦入
-             ==================================== -->
-        {{ if $hasWorks }}
-        {{ $n = add $n 1 }}
-        <section class="scene scene-works" id="works" data-scene="works" data-tone="ink">
-            <div class="scene-stage">
-                {{ $grid }}
-
-                <header class="swiss-label swiss-label--float">
-                    <span class="swiss-label__num">{{ printf "%02d" $n }}</span>
-                    <span class="swiss-label__zh">作品</span>
-                    <span class="swiss-label__en">Works</span>
-                </header>
-
-                <h2 class="scene-title" style="--chars:2">作品</h2>
-
-                <div class="scene-viewport">
-                    <div class="scene-body">
-                        <div class="works-container">
-                            {{ range $i, $p := .Params.projects }}
-                            {{ $star := $p.star | default dict }}
-                            <div class="work-item" data-reveal="up">
-                                {{ with $p.svg }}<div class="work-svg icon-wrapper">{{ . | safeHTML }}</div>{{ end }}
-                                <h3 class="work-name">{{ $p.name }}</h3>
-                                {{ with $p.url }}<a class="print-only work-print__url" href="{{ . }}">{{ . | replaceRE "^https?://" "" | strings.TrimSuffix "/" }}</a>{{ end }}
-                                <p class="work-desc">{{ $p.desc }}</p>
-                                <div class="work-tags">{{ range $p.tags }}<span class="tag">{{ . }}</span>{{ end }}</div>
-
-                                <!-- 仅导出 PDF 时显示：STAR 摘要 -->
-                                {{ if or $star.situation $star.task $star.action $star.result }}
-                                <dl class="print-only work-print__star">
-                                    {{ with $star.situation }}<dt>背景</dt><dd>{{ . }}</dd>{{ end }}
-                                    {{ with $star.task }}<dt>任务</dt><dd>{{ . }}</dd>{{ end }}
-                                    {{ with $star.action }}<dt>行动</dt><dd>{{ . }}</dd>{{ end }}
-                                    {{ with $star.result }}<dt class="is-result">结果</dt><dd class="is-result">{{ . }}</dd>{{ end }}
-                                </dl>
-                                {{ end }}
-
-                                <button type="button" class="work-detail-btn"
-                                        data-index="{{ $i }}"
-                                        data-name="{{ $p.name }}"
-                                        {{ with $p.cover }}data-cover="{{ . | relURL }}"{{ end }}
-                                        data-url="{{ $p.url }}"
-                                        data-intro="{{ $p.intro }}"
-                                        data-situation="{{ $star.situation }}"
-                                        data-task="{{ $star.task }}"
-                                        data-action="{{ $star.action }}"
-                                        data-result="{{ $star.result }}">
-                                    查看详情 →
-                                </button>
-                            </div>
-                            {{ end }}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="scene-meta" aria-hidden="true">
-                    <span>Selected Works</span>
-                    <span><span data-scene-progress>000</span> / 100</span>
-                </div>
-            </div>
-        </section>
-        {{ end }}
-
-        <!-- ====================================
-             06 联系：整块蓝面，标题放大淡出 → 联系行擦入
-             ==================================== -->
+<!-- ==================================== 06 联系信息：整块蓝面，标题放大淡出 → 联系行擦入 ==================================== -->
         {{ if $hasContact }}
         {{ $n = add $n 1 }}
         <section class="scene scene-contact" id="contact" data-scene="contact" data-tone="blue">
@@ -573,11 +546,11 @@
 
                 <header class="swiss-label swiss-label--float">
                     <span class="swiss-label__num">{{ printf "%02d" $n }}</span>
-                    <span class="swiss-label__zh">联系</span>
+                    <span class="swiss-label__zh">联系信息</span>
                     <span class="swiss-label__en">Contact</span>
                 </header>
 
-                <h2 class="scene-title" style="--chars:3">联系我</h2>
+                <h2 class="scene-title" style="--chars:4">联系信息</h2>
 
                 <div class="scene-viewport">
                     <div class="scene-body">
@@ -659,9 +632,7 @@
         {{ end }}
     </main>
 
-    <!-- ========================================
-         导航层：桌面端是固定在右侧的独立侧栏，移动端是底部导航条
-         ======================================== -->
+<!-- ======================================== 导航层：桌面端是固定在右侧的独立侧栏，移动端是底部导航条 ======================================== -->
     <div class="layer-nav">
         <nav class="nav-desktop" aria-label="主导航">
             <div class="nav-head" aria-hidden="true">
@@ -720,7 +691,7 @@
         </nav>
     </div>
 
-    <!-- 二维码弹层（放在 viewport 末尾，全站一份即可） -->
+<!-- ======================================== 二维码弹层 ========================================-->
     <div class="qr-modal" id="qr-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="二维码">
         <div class="qr-modal__backdrop" data-qr-close></div>
         <div class="qr-modal__panel">
@@ -730,7 +701,7 @@
             <p class="qr-modal__tip">扫码添加 / 长按识别</p>
         </div>
     </div>
-    <!-- 作品详情弹层 -->
+    <!-- ======================================== 作品详情弹层 ======================================== -->
     <dialog id="work-dialog" class="work-dialog" aria-labelledby="wd-title">
         <div class="work-dialog__inner">
             <button type="button" class="work-dialog__close" aria-label="关闭">×</button>
