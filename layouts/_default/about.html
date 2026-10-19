@@ -19,8 +19,10 @@
     {{ $swiss := resources.Get "css/about/swiss.css" }}
     {{ $scenes := resources.Get "css/about/swiss-scenes.css" }}
     {{ $work := resources.Get "css/about/work-section.css" }}
+    {{ $extra := resources.Get "css/about/extra.css" }}
     {{ $print := resources.Get "css/about/print.css" }}
-    {{ $css := slice $swiss $scenes $work | resources.Concat "css/about-bundle.css" | minify | fingerprint }}
+    {{ $hero := resources.Get "css/about/hero.css" }}
+    {{ $css := slice $swiss $scenes $work $extra $hero | resources.Concat "css/about-bundle.css" | minify | fingerprint }}
     <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
     <link rel="stylesheet" href="{{ $print.RelPermalink }}" media="print">
     <style>.print-only{display:none}</style>
@@ -52,12 +54,33 @@
 {{ $hasProj := gt (len $projectItems) 0 }}
 {{ $hasWorks := gt (len .Params.projects) 0 }}
 {{ $hasContact := gt (len .Params.contacts) 0 }}
+{{ $hasSummary := gt (len .Params.summary) 0 }}
+{{ $hasEdu := gt (len .Params.education) 0 }}
+{{ $hasHonors := or (gt (len .Params.awards) 0) (gt (len .Params.certificates) 0) }}
+{{ $hasOS := gt (len .Params.opensource) 0 }}
+
+{{/* 姓名：优先用 name，没有则退回页面 title；nickname 作为副标 */}}
+{{ $name := .Params.name | default .Title }}
+
+{{/* 个人信息条：求职状态 / 期望城市 / 期望薪资 / 出生年月 / 性别 / 现居 / 网站 */}}
+{{ $facts := slice }}
+{{ with .Params.job_status }}{{ $facts = $facts | append (dict "k" "状态" "v" .) }}{{ end }}
+{{ with .Params.expected_city }}{{ $facts = $facts | append (dict "k" "期望城市" "v" .) }}{{ end }}
+{{ with .Params.expected_salary }}{{ $facts = $facts | append (dict "k" "期望薪资" "v" .) }}{{ end }}
+{{ with .Params.birth }}{{ $facts = $facts | append (dict "k" "出生" "v" .) }}{{ end }}
+{{ with .Params.gender }}{{ $facts = $facts | append (dict "k" "性别" "v" .) }}{{ end }}
+{{ with .Params.address }}{{ $facts = $facts | append (dict "k" "现居" "v" .) }}{{ end }}
+{{ with .Params.website }}{{ $facts = $facts | append (dict "k" "网站" "v" (. | replaceRE "^https?://" "" | strings.TrimSuffix "/") "url" .) }}{{ end }}
 
 {{/* 目录：id / 桌面名称 / 移动端短名称 */}}
 {{ $nav := slice (dict "id" "about" "zh" "关于我" "short" "关于") }}
+{{ if $hasSummary }}{{ $nav = $nav | append (dict "id" "summary" "zh" "自我评价" "short" "评价") }}{{ end }}
 {{ if $hasSkills }}{{ $nav = $nav | append (dict "id" "skills" "zh" "技能" "short" "技能") }}{{ end }}
 {{ if $hasExp }}{{ $nav = $nav | append (dict "id" "experience" "zh" "经历" "short" "经历") }}{{ end }}
 {{ if $hasProj }}{{ $nav = $nav | append (dict "id" "projects" "zh" "项目" "short" "项目") }}{{ end }}
+{{ if $hasEdu }}{{ $nav = $nav | append (dict "id" "education" "zh" "教育经历" "short" "教育") }}{{ end }}
+{{ if $hasHonors }}{{ $nav = $nav | append (dict "id" "honors" "zh" "荣誉证书" "short" "荣誉") }}{{ end }}
+{{ if $hasOS }}{{ $nav = $nav | append (dict "id" "opensource" "zh" "开源项目" "short" "开源") }}{{ end }}
 {{ if $hasWorks }}{{ $nav = $nav | append (dict "id" "works" "zh" "作品" "short" "作品") }}{{ end }}
 {{ if $hasContact }}{{ $nav = $nav | append (dict "id" "contact" "zh" "联系我" "short" "联系") }}{{ end }}
 
@@ -97,19 +120,32 @@
                         <div class="hero-body">
                             {{ if .Params.avatar }}
                             <div class="avatar hero-item" style="--i:0">
-                                <img src="{{ .Params.avatar | relURL }}" alt="{{ .Title }}的头像" width="140" height="140" fetchpriority="high" />
+                                <img src="{{ .Params.avatar | relURL }}" alt="{{ $name }}的头像" width="140" height="140" fetchpriority="high" />
                             </div>
                             {{ end }}
-                            <h1 class="hero-title hero-item" style="--i:1">{{ .Title }}</h1>
+                            <h1 class="hero-title hero-item" style="--i:1">{{ $name }}
+                                {{ if and .Params.nickname (ne .Params.nickname $name) }}
+                                    <small class="hero-nick">{{ .Params.nickname }}</small>
+                                {{ end }}
+                            </h1>
+                            {{ with .Params.job_intent }}
+                            <p class="hero-intent hero-item" style="--i:2">{{ . }}</p>
+                            {{ end }}
                             {{ with .Params.bio }}
-                            <p class="hero-bio hero-item" style="--i:2">{{ . }}</p>
+                            <p class="hero-bio hero-item" style="--i:3">{{ . }}</p>
                             {{ end }}
                         </div>
+
+                        {{ with $facts }}
+                        <ul class="hero-facts">
+                            {{ range . }}<li><span class="hero-facts__k">{{ .k }}</span>{{ if .url }}<a href="{{ .url }}" target="_blank" rel="noopener noreferrer">{{ .v }}</a>{{ else }}<span class="hero-facts__v">{{ .v }}</span>{{ end }}</li>{{ end }}
+                        </ul>
+                        {{ end }}
 
                         <!-- 仅导出 PDF 时显示：联系方式放在简历顶部，替代底部「联系我」场景 -->
                         {{ with .Params.contacts }}
                         <ul class="print-only print-contacts">
-                            {{ range . }}<li>{{ .value }}</li>{{ end }}
+                            {{ range . }}<li>{{ with .name }}<span class="pc-k">{{ . }}</span>{{ end }}{{ .value }}</li>{{ end }}
                         </ul>
                         {{ end }}
                     </div>
@@ -124,6 +160,44 @@
                 {{ end }}
             </div>
         </section>
+
+        <!-- ====================================
+             自我评价：编号列表逐条擦入
+             ==================================== -->
+        {{ if $hasSummary }}
+        {{ $n = add $n 1 }}
+        <section class="scene scene-summary" id="summary" data-scene="summary" data-tone="paper">
+            <div class="scene-stage">
+                {{ $grid }}
+
+                <header class="swiss-label swiss-label--float">
+                    <span class="swiss-label__num">{{ printf "%02d" $n }}</span>
+                    <span class="swiss-label__zh">评价</span>
+                    <span class="swiss-label__en">Summary</span>
+                </header>
+
+                <h2 class="scene-title" style="--chars:4">自我评价</h2>
+
+                <div class="scene-viewport">
+                    <div class="scene-body">
+                        <ol class="summary-list">
+                            {{ range $i, $item := .Params.summary }}
+                            <li class="summary-item" data-reveal="up">
+                                <span class="summary-index" aria-hidden="true">{{ printf "%02d" (add $i 1) }}</span>
+                                <p>{{ $item.text }}</p>
+                            </li>
+                            {{ end }}
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="scene-meta" aria-hidden="true">
+                    <span>Summary</span>
+                    <span><span data-scene-progress>000</span> / 100</span>
+                </div>
+            </div>
+        </section>
+        {{ end }}
 
         <!-- ====================================
              02 技能：标题放大淡出 → 技能项擦入
@@ -147,14 +221,35 @@
                         <div class="grid skills-grid skills-grid--{{ if gt (len .Params.skills) 4 }}3{{ else }}2{{ end }}">
                             {{ range .Params.skills }}
                             <article class="skill-item" data-reveal="up">
-                                <div class="skill-icon">
-                                    <i class="fa {{ .icon }}" aria-hidden="true"></i>
-                                </div>
-                                <h3 class="skill-name">{{ .name }}</h3>
-                                <p class="skill-desc">{{ .description }}</p>
-                                <div class="skill-tags">
-                                    {{ range .tags }}<span class="tag">{{ . }}</span>{{ end }}
-                                </div>
+                              <div class="skill-icon">
+                                <i class="fa {{ .icon }}" aria-hidden="true"></i>
+                              </div>
+                              <h3 class="skill-name">{{ .name }}</h3>
+
+                              {{ with .level }}
+                                {{ $lv := . }}
+                                {{ if lt $lv 0 }}{{ $lv = 0 }}{{ end }}
+                                {{ if gt $lv 10 }}{{ $lv = 10 }}{{ end }}
+
+                                {{ $bar := "" }}
+                                {{ range $i := seq 1 10 }}
+                                  {{ if le $i $lv }}
+                                    {{ $bar = printf "%s▰" $bar }}
+                                  {{ else }}
+                                    {{ $bar = printf "%s▱" $bar }}
+                                  {{ end }}
+                                {{ end }}
+
+                               {{ $texts := slice "" "了解" "略懂" "入门" "基础" "上手" "熟练" "扎实" "深入" "精通" "深耕" }}
+                                {{ $text := index $texts $lv }}
+
+                                <p class="skill-level" aria-label="{{ $text }}">{{ $bar }}｜{{ $text }}</p>
+                              {{ end }}
+
+                              <p class="skill-desc">{{ .description }}</p>
+                              <div class="skill-tags">
+                                {{ range .tags }}<span class="tag">{{ . }}</span>{{ end }}
+                              </div>
                             </article>
                             {{ end }}
                         </div>
@@ -170,7 +265,7 @@
         {{ end }}
 
         <!-- ====================================
-             03 经历：标题放大淡出 → 时间轴行从左向右擦入
+             03 项目经历：标题放大淡出 → 时间轴行从左向右擦入
              ==================================== -->
         {{ if $hasExp }}
         {{ $n = add $n 1 }}
@@ -180,11 +275,11 @@
 
                 <header class="swiss-label swiss-label--float">
                     <span class="swiss-label__num">{{ printf "%02d" $n }}</span>
-                    <span class="swiss-label__zh">经历</span>
+                    <span class="swiss-label__zh">项目经历</span>
                     <span class="swiss-label__en">Experience</span>
                 </header>
 
-                <h2 class="scene-title" style="--chars:2">经历</h2>
+                <h2 class="scene-title" style="--chars:4">项目经历</h2>
 
                 <div class="scene-viewport">
                     <div class="scene-body">
@@ -253,6 +348,148 @@
 
                 <div class="scene-meta" aria-hidden="true">
                     <span>Projects</span>
+                    <span><span data-scene-progress>000</span> / 100</span>
+                </div>
+            </div>
+        </section>
+        {{ end }}
+
+        <!-- ====================================
+             教育经历：沿用经历的时间轴版式
+             ==================================== -->
+        {{ if $hasEdu }}
+        {{ $n = add $n 1 }}
+        <section class="scene scene-education" id="education" data-scene="education" data-tone="paper">
+            <div class="scene-stage">
+                {{ $grid }}
+
+                <header class="swiss-label swiss-label--float">
+                    <span class="swiss-label__num">{{ printf "%02d" $n }}</span>
+                    <span class="swiss-label__zh">教育</span>
+                    <span class="swiss-label__en">Education</span>
+                </header>
+
+                <h2 class="scene-title" style="--chars:4">教育经历</h2>
+
+                <div class="scene-viewport">
+                    <div class="scene-body">
+                        <div class="exp-list edu-list">
+                            {{ range .Params.education }}
+                            <article class="exp-item" data-reveal="right">
+                                <p class="exp-period">{{ .period }}</p>
+                                <div class="exp-main">
+                                    <h3 class="exp-company">{{ .school }}{{ with .major }} | {{ . }}{{ end }}{{ with .degree }}<span class="edu-degree">{{ . }}</span>{{ end }}{{ with .rank }}<span class="edu-rank">{{ . }}</span>{{ end }}</h3>
+                                    {{ with .details }}
+                                    <ul class="exp-details">
+                                        {{ range . }}<li>{{ . }}</li>{{ end }}
+                                    </ul>
+                                    {{ end }}
+                                </div>
+                            </article>
+                            {{ end }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scene-meta" aria-hidden="true">
+                    <span>Education</span>
+                    <span><span data-scene-progress>000</span> / 100</span>
+                </div>
+            </div>
+        </section>
+        {{ end }}
+
+        <!-- ====================================
+             荣誉证书：奖项 + 证书两栏
+             ==================================== -->
+        {{ if $hasHonors }}
+        {{ $n = add $n 1 }}
+        <section class="scene scene-honors" id="honors" data-scene="honors" data-tone="paper">
+            <div class="scene-stage">
+                {{ $grid }}
+
+                <header class="swiss-label swiss-label--float">
+                    <span class="swiss-label__num">{{ printf "%02d" $n }}</span>
+                    <span class="swiss-label__zh">荣誉</span>
+                    <span class="swiss-label__en">Honors</span>
+                </header>
+
+                <h2 class="scene-title" style="--chars:4">荣誉证书</h2>
+
+                <div class="scene-viewport">
+                    <div class="scene-body">
+                        <div class="honor-groups">
+                            {{ with .Params.awards }}
+                            <div class="honor-group" data-reveal="up">
+                                <h3 class="honor-heading">荣誉奖项</h3>
+                                <ul class="honor-list">
+                                    {{ range . }}
+                                    <li class="honor-item">
+                                        <span class="honor-name">{{ .name }}</span>
+                                        <span class="honor-meta">{{ .period }}</span>
+                                    </li>
+                                    {{ end }}
+                                </ul>
+                            </div>
+                            {{ end }}
+                            {{ with .Params.certificates }}
+                            <div class="honor-group" data-reveal="up">
+                                <h3 class="honor-heading">证书</h3>
+                                <ul class="honor-list">
+                                    {{ range . }}
+                                    <li class="honor-item">
+                                        <span class="honor-name">{{ .name }}{{ with .score }}<span class="honor-score">{{ . }}</span>{{ end }}</span>
+                                        <span class="honor-meta">{{ .date }}</span>
+                                    </li>
+                                    {{ end }}
+                                </ul>
+                            </div>
+                            {{ end }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scene-meta" aria-hidden="true">
+                    <span>Honors</span>
+                    <span><span data-scene-progress>000</span> / 100</span>
+                </div>
+            </div>
+        </section>
+        {{ end }}
+
+        <!-- ====================================
+             开源项目：链接卡片
+             ==================================== -->
+        {{ if $hasOS }}
+        {{ $n = add $n 1 }}
+        <section class="scene scene-opensource" id="opensource" data-scene="opensource" data-tone="paper">
+            <div class="scene-stage">
+                {{ $grid }}
+
+                <header class="swiss-label swiss-label--float">
+                    <span class="swiss-label__num">{{ printf "%02d" $n }}</span>
+                    <span class="swiss-label__zh">开源</span>
+                    <span class="swiss-label__en">Open Source</span>
+                </header>
+
+                <h2 class="scene-title" style="--chars:4">开源项目</h2>
+
+                <div class="scene-viewport">
+                    <div class="scene-body">
+                        <div class="os-grid">
+                            {{ range .Params.opensource }}
+                            <a class="os-item" href="{{ .url }}" target="_blank" rel="noopener noreferrer" data-reveal="up">
+                                <h3 class="os-name">{{ .name }}</h3>
+                                <p class="os-desc">{{ .desc }}</p>
+                                <span class="os-url">{{ .url | replaceRE "^https?://" "" | strings.TrimSuffix "/" }}</span>
+                            </a>
+                            {{ end }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scene-meta" aria-hidden="true">
+                    <span>Open Source</span>
                     <span><span data-scene-progress>000</span> / 100</span>
                 </div>
             </div>
@@ -350,14 +587,14 @@
                                 {{ $src := cond (strings.HasPrefix $avatar "http") $avatar ($avatar | relURL) }}
                                 <div class="contact-avatar" data-reveal="right" style="--i:0">
                                     <img src="{{ $src }}"
-                                         alt="{{ .Title }}"
+                                         alt="{{ $name }}"
                                          width="440" height="440"
                                          loading="eager"
                                          decoding="async"
                                          fetchpriority="high"
                                          class="contact-img" />
                                     <div class="contact-info">
-                                        <h2 class="contact-name">{{ .Title }}</h2>
+                                        <h2 class="contact-name">{{ $name }}</h2>
                                         {{ with .Params.motto }}
                                         <p class="contact-motto">{{ . }}</p>
                                         {{ end }}
@@ -367,7 +604,7 @@
                                 <!-- 没头像时也显示介绍 -->
                                 <div class="contact-avatar" data-reveal="right" style="--i:0">
                                     <div class="contact-info">
-                                        <h2 class="contact-name">{{ .Title }}</h2>
+                                        <h2 class="contact-name">{{ $name }}</h2>
                                         {{ with .Params.motto }}
                                         <p class="contact-motto">{{ . }}</p>
                                         {{ end }}
@@ -377,7 +614,7 @@
                             </div>
                             <div class="contact-container">
                                 {{ range .Params.contacts }}
-                                <a href="{{ .url }}" {{ if strings.HasPrefix .url "http" }}target="_blank" rel="noopener noreferrer" {{ end }}class="contact-item" data-reveal="right">
+                                <a href="{{ .url }}" {{ if strings.HasPrefix .url "http" }}target="_blank" rel="noopener noreferrer" {{ end }}{{ with .name }}title="{{ . }}" {{ end }}class="contact-item" data-reveal="right">
                                     <div class="contact-icon">
                                         <i class="fa {{ .icon }}" aria-hidden="true"></i>
                                     </div>
@@ -486,7 +723,7 @@
             var original = document.title;
             window.addEventListener("beforeprint", function () {
                 original = document.title;
-                document.title = "{{ .Title }} - 简历";
+                document.title = "{{ $name }} - 简历";
             });
             window.addEventListener("afterprint", function () {
                 document.title = original;

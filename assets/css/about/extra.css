@@ -1,0 +1,145 @@
+/* 简历新增板块（自我评价 / 教育 / 荣誉证书 / 开源）与个人信息条的网页样式
+   放到 assets/css/about/resume-extra.css，会被 about.html 并入 about-bundle.css。
+   颜色沿用页面变量，没有变量时使用回退值。 */
+
+
+/* 自我评价 */
+.summary-list {
+  display: grid;
+  gap: 0;
+  max-width: 46rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.summary-item {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: 1rem;
+  align-items: baseline;
+  padding: 1.2rem 0;
+  border-top: 1px solid var(--rule, rgba(0, 0, 0, 0.18));
+}
+
+.summary-index {
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  opacity: 0.5;
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-item p {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+/* 技能熟练度 */
+.skill-level {
+  margin: 0.2rem 0 0.7rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+}
+
+/* 教育：学位 / 排名徽标 */
+.edu-degree,
+.edu-rank {
+  display: inline-block;
+  margin-left: 0.7em;
+  padding: 0.1em 0.65em;
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  opacity: 0.7;
+  vertical-align: middle;
+}
+
+/* 荣誉证书 */
+.honor-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 2.5rem 3rem;
+}
+
+.honor-heading {
+  margin: 0 0 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  opacity: 0.55;
+}
+
+.honor-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.honor-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 0;
+  border-top: 1px solid var(--rule, rgba(0, 0, 0, 0.18));
+}
+
+.honor-score {
+  margin-left: 0.8em;
+  font-size: 0.85em;
+  opacity: 0.55;
+  font-variant-numeric: tabular-nums;
+}
+
+.honor-meta {
+  white-space: nowrap;
+  opacity: 0.6;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 开源项目 */
+.os-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1.5rem;
+}
+
+.os-item {
+  display: block;
+  padding: 1.3rem 1.5rem;
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid var(--rule, rgba(0, 0, 0, 0.18));
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.os-item:hover,
+.os-item:focus-visible {
+  border-color: currentColor;
+  transform: translateY(-2px);
+}
+
+.os-name {
+  margin: 0 0 0.4rem;
+  font-size: 1.1rem;
+}
+
+.os-desc {
+  margin: 0 0 0.9rem;
+  line-height: 1.7;
+  opacity: 0.75;
+}
+
+.os-url {
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .os-item {
+    transition: none;
+  }
+}
