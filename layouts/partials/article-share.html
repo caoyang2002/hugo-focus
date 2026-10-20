@@ -65,8 +65,9 @@
     data-desc="{{ $description }}"
     data-url="{{ $url }}"
     data-site="{{ $site.Title }}"
-    data-vendor="{{ "js/vendor/" | relURL }}"
+    data-vendor="{{ `js/about/main.js` | relURL }}"
 >
+    <!-- <script type="module" src="{{ `js/about/main.js` | relURL }}"></script>-->
     <button
         type="button"
         class="sp-trigger"
