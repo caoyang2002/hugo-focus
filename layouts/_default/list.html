@@ -1,12 +1,12 @@
 {{ define "main" }}
-<!-- 调试信息（生产环境可删除） -->
-<!-- 页面类型: {{ .Type }}, 首页: {{ .IsHome }}, 布局: {{ .Params.listStyle }}, 文章数: {{ len .Pages }} -->
+<!-- 首页配置 -->
+<!--页面类型: {{ .Type }}, 首页: {{ .IsHome }}, 布局: {{ .Params.listStyle }}, 文章数: {{ len .Pages }}-->
 
 {{- $pageType := .Type -}} {{- $isHome := .IsHome -}}
 <!---->
 {{- $layout := .Params.listStyle | default "default" -}}
-<!---->
-{{- if $isHome -}} {{/* 首页布局 */}}
+<!-- 首页 -->
+{{- if $isHome -}}
 <!---->
 {{ partial "list/home-layout.html" . }} {{- else if eq $pageType "tags" -}} {{/*
 标签页布局 */}} {{ partial "list/tag-layout.html" . }} {{- else if eq $pageType

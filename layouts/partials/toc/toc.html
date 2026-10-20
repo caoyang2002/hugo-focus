@@ -1,0 +1,23 @@
+{{ if and (ne .Params.toc false) (ne .TableOfContents `<nav id="TableOfContents"></nav>`) }}
+
+{{ partial "toc/toc-toggle.html" . }}
+
+<aside class="toc-aside mr-4">
+    <div class="toc-container">
+        <div class="toc-header">
+            <h3 class="toc-title">目录</h3>
+            {{ partial "toc/toc-close.html" . }}
+        </div>
+        <nav id="TableOfContents" class="toc">
+            {{ .TableOfContents }}
+        </nav>
+    </div>
+</aside>
+
+{{ $css := resources.Get "css/toc.css" | minify | fingerprint }}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}">
+
+{{ $js := resources.Get "js/toc.js" | minify | fingerprint }}
+<script src="{{ $js.RelPermalink }}" defer></script>
+
+{{ end }}

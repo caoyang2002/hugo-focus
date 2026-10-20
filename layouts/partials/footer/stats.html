@@ -1,0 +1,14 @@
+{{/* 访问量统计：仅当站点启用 busuanzi 时才输出 */}}
+{{ if site.Params.busuanzi | default true }}
+<div>
+    <p class="link mx-6 opacity-60">
+        {{ i18n "total_number_website_visits" }}
+        <span id="busuanzi_value_page_pv">
+            <svg class="inline-block w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.25"/>
+                <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+        </span>
+    </p>
+</div>
+{{ end }}

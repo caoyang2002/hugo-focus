@@ -1,0 +1,92 @@
+/* ==========================================================
+   主布局：48 列 Grid
+   aside  = 8 列  （第 1~8 列，固定在页面左侧）
+   main   = 40 列 （第 9~48 列，占满右侧全部空间）
+   ========================================================== */
+
+/* 禁止页面左右滚动 */
+html,
+body {
+    overflow-x: hidden;
+}
+
+.layout-grid {
+    display: grid;
+    grid-template-columns: repeat(48, minmax(0, 1fr));
+    gap: 0;                 /* 用 padding 控制间距，保证 48 列精确铺满 */
+
+    width: 100%;
+    max-width: none;        /* 不限制宽度，侧栏贴页面左侧 */
+    margin: 0;
+    padding: 0;
+    min-height: calc(100vh - 5rem);
+}
+
+/* ===== 移动端默认：单栏，侧栏隐藏 ===== */
+.layout-main {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    min-width: 0;
+    padding: 3rem 1rem;
+}
+
+.layout-aside {
+    display: none;
+}
+
+/* 覆盖 Tailwind prose 默认的 max-width: 65ch，让 main 铺满 */
+.layout-main.prose {
+    max-width: none;
+    width: 100%;
+}
+
+/* ===== 桌面端 ≥ 1024px：aside 8 列（左）+ main 40 列（右） ===== */
+@media (min-width: 1024px) {
+    .layout-aside {
+        display: block;
+        grid-column: 40 / span 8;   /* 第 1~8 列 */
+        grid-row: 1;
+        min-width: 0;
+        overflow: hidden;          /* 不允许左右滚动 */
+        padding: 0 1rem 0 2rem;
+    }
+
+    .layout-main {
+        grid-column: 1 / span 40;  /* 第 9~48 列 */
+        grid-row: 1;
+        padding: 3rem 2rem;
+    }
+}
+
+/* ===== aside sticky 容器（固定在左侧） ===== */
+.layout-aside-sticky {
+    position: sticky;
+    top: 6rem;
+    max-height: calc(100vh - 8rem);
+    overflow-x: hidden;            /* 禁止横向滚动 */
+    overflow-y: auto;              /* 仅允许纵向滚动 */
+    overscroll-behavior: contain;
+    word-break: break-word;        /* 长内容换行，避免撑出横向滚动条 */
+}
+
+.layout-aside-sticky * {
+    max-width: 100%;
+}
+
+.layout-aside-sticky::-webkit-scrollbar {
+    width: 4px;
+}
+.layout-aside-sticky::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+}
+.dark .layout-aside-sticky::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== 移动端 footer 补偿 ===== */
+@media (max-width: 1023px) {
+    .layout-grid {
+        padding-bottom: 4rem;
+    }
+}

@@ -35,6 +35,8 @@
     $code_copy := resources.Get "css/code-handler.css" }} {{ $prose :=
     resources.Get "css/prose.css" }}
 
+    {{ $layoutCSS := resources.Get "css/layout.css" | minify | fingerprint }}
+    <link rel="stylesheet" href="{{ $layoutCSS.RelPermalink }}">
     <!-- 安全合并版本 -->
     {{ $resources := slice }} {{ if $main }}{{ $resources = $resources | append
     $main }}{{ end }} {{ if $custom }}{{ $resources = $resources | append

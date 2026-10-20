@@ -1,39 +1,33 @@
 <!doctype html>
 
-{{ $.Scratch.Delete "bg_color" }}<!---->
-{{ $.Scratch.Delete "social_list" }}<!---->
-{{ $.Scratch.Delete "avatar_url" }}<!---->
+{{ $.Scratch.Delete "bg_color" }}
+{{ $.Scratch.Delete "social_list" }}
+{{ $.Scratch.Delete "avatar_url" }}
 
-<!-- bg_color -->
-{{ $color_map := dict "linen" "#faf8f1" "wheat" "#f8f5d7" "gray" "#fbfbfb"
-"light" "#fff" }}<!---->
-{{ $.Scratch.Set "bg_color" (index $color_map (site.Params.color | default
-(print "linen"))) }}<!---->
-{{ $bg_color := $.Scratch.Get "bg_color" }}<!---->
+{{/* ===== bg_color ===== */}}
+{{ $color_map := dict "linen" "#faf8f1" "wheat" "#f8f5d7" "gray" "#fbfbfb" "light" "#fff" }}
+{{ $.Scratch.Set "bg_color" (index $color_map (site.Params.color | default "linen")) }}
+{{ $bg_color := $.Scratch.Get "bg_color" }}
 
-<!-- social_list -->
-{{ $social_params := slice "twitter" "github" "instagram" "linkedin" "mastodon"
-"threads" "bluesky" "rss" }}<!---->
-{{ range $social_params }}<!---->
-{{ if isset site.Params . }}<!---->
-{{ $.Scratch.Add "social_list" (slice .) }}<!---->
-{{ end }}<!---->
-{{ end }}<!---->
+{{/* ===== social_list ===== */}}
+{{ $social_params := slice "twitter" "github" "instagram" "linkedin" "mastodon" "threads" "bluesky" "rss" }}
+{{ range $social_params }}
+    {{ if isset site.Params . }}
+        {{ $.Scratch.Add "social_list" (slice .) }}
+    {{ end }}
+{{ end }}
 
-<!-- avatar_url -->
-{{ if site.Params.avatar }}<!---->
-<!-- {{ printf "Avatar setting: %s" site.Params.avatar }} -->
-{{if or (hasPrefix site.Params.avatar "http") (hasPrefix site.Params.avatar
-"https") (hasPrefix site.Params.avatar "/")}}<!---->
-{{ $.Scratch.Set "avatar_url" site.Params.avatar }}<!---->
-{{ else }}<!---->
-{{ $official_cdn := "https://www.gravatar.com/avatar/" }}<!---->
-{{ $cdn := (site.Params.gravatarCdn | default $official_cdn) }}<!---->
-{{ $md5 := (md5 site.Params.avatar) }}<!---->
-{{ $avatar_url := print $cdn $md5 "?s=160&d=identicon" }}<!---->
-{{ $.Scratch.Set "avatar_url" $avatar_url }}<!---->
-{{ end }}<!---->
-{{ end }}<!---->
+{{/* ===== avatar_url ===== */}}
+{{ if site.Params.avatar }}
+    {{ if or (hasPrefix site.Params.avatar "http") (hasPrefix site.Params.avatar "https") (hasPrefix site.Params.avatar "/") }}
+        {{ $.Scratch.Set "avatar_url" site.Params.avatar }}
+    {{ else }}
+        {{ $official_cdn := "https://www.gravatar.com/avatar/" }}
+        {{ $cdn := (site.Params.gravatarCdn | default $official_cdn) }}
+        {{ $md5 := (md5 site.Params.avatar) }}
+        {{ $.Scratch.Set "avatar_url" (print $cdn $md5 "?s=160&d=identicon") }}
+    {{ end }}
+{{ end }}
 
 <html
     class="not-ready lg:text-base close"
@@ -41,7 +35,10 @@
     lang="{{ or site.LanguageCode site.Language.Lang }}"
     dir="{{ if site.Params.direction }}{{ site.Params.direction }}{{ else }}ltr{{ end }}"
 >
-    <!-- 元数据 -->
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     {{ if .Site.Params.backgroundImage }}
     <style>
         body {
@@ -52,13 +49,9 @@
             background-size: cover;
             min-height: 100vh;
         }
-
-        html,
-        body {
-            min-height: 100vh;
-        }
+        html, body { min-height: 100vh; }
     </style>
-    {{else}}
+    {{ else }}
     <style>
         body {
             min-height: 100vh;
@@ -68,50 +61,41 @@
             -webkit-tap-highlight-color: transparent;
         }
     </style>
-
     {{ end }}
 
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!--  -->
     {{ partial "head.html" . }}
+</head>
 
-    <body class="text-black duration-200 ease-out dark:text-white">
-        <!--  -->
-        {{ partial "header.html" . }}
+<body class="text-black duration-200 ease-out dark:text-white">
+    {{ partial "header.html" . }}
 
-        <div class="relative flex justify-start max-w-[90vw] px-8">
-            <!-- <main
-                class="min-h-[calc(100vh-5rem)] py-12 prose prose-neutral flex-1 dark:prose-invert text-left"
-            >  -->
-            <main
-                class="min-h-[calc(100vh-5rem)] py-12 prose prose-neutral flex-1 dark:prose-invert text-left max-w-full lg:max-w-4xl xl:max-w-6xl"
-            >
-                <!-- <main class="min-h-[calc(100vh-5rem)] py-12 flex-1 test-left bg-red-500"> -->
-                {{ block "main" . }} {{ end }}
-            </main>
-            {{ if .IsHome }}
-            <!-- <div class="hidden lg:block ml-8"> -->
-            <!-- <div class="hidden lg:block fixed right-0 top-0 h-full z-40">
-                {{ partial "stats.html" . }}
-            </div> -->
-
-            <div
-                class="hidden lg:block fixed right-0 top-0 h-screen w-128 pt-24 pb-24 pr-8 z-40"
-            >
-                <div class="h-full overflow-y-auto mt-4">
-                    {{ partial "stats.html" . }}
-                </div>
+    {{/* ===== 48 列 Grid 主布局：左侧 aside 8 列 + 右侧 main 40 列 ===== */}}
+    <div class="layout-grid">
+        {{ if .IsHome }}
+        <aside class="layout-aside">
+            <div class="layout-aside-sticky">
+                {{ partial "sidebar/sidebar.html" . }}
             </div>
-            {{else}}
-            <div class="ml-2 mr-4">{{ partial "tocbar.html" . }}</div>
+        </aside>
+        {{ else }}
+        <aside class="layout-aside">
+            <div class="layout-aside-sticky">
+                {{ partial "toc/toc.html" . }}
+            </div>
+        </aside>
+        {{ end }}
 
-            {{end}}
-        </div>
+        <main class="layout-main prose prose-neutral dark:prose-invert text-left max-w-none">
+            {{ block "main" . }} {{ end }}
+        </main>
+    </div>
 
-        {{ partial "footer.html" . }}
-        <!-- 在底部引入 Python WASM 支持 -->
-        {{ if .Params.codeRunners }} {{ partial "code_runners.html" . }} {{ end
-        }}
-    </body>
+    {{ partial "footer/footer.html" . }}
+
+    {{ if .Params.codeRunners }}
+        {{ partial "code_runners.html" . }}
+    {{ end }}
+</body>
 </html>

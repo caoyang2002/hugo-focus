@@ -1,0 +1,6 @@
+<div class="popular-posts">
+    <h3 class="section-title">{{ i18n "hot_articles" }}</h3>
+    {{ range first 5 (where .Site.RegularPages.ByDate.Reverse "Section" "posts") }}
+    <a href="{{ .RelPermalink }}" class="post-link">{{ .Title }}</a>
+    {{ end }}
+</div>

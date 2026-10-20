@@ -8,7 +8,6 @@
 {{- /* 置顶文章区域 */ -}}
 {{- if $featured -}}
 <section class="featured-posts mb-16">
-    {{- /* 修改这里：传递 $featured 而不是 $pages */ -}}
     {{ partial "components/featured-scroll.html" $featured }}
 </section>
 {{- end -}}

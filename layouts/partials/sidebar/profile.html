@@ -1,0 +1,58 @@
+{{ $site := .Site }}
+<div class="profile-section">
+    {{ $avatar := $site.Params.avatar | default "/about/avatar.jpg" }}
+
+    <div class="avatar-container">
+        <a href="{{ site.BaseURL }}" class="avatar-link">
+            <img src="{{ $avatar }}" class="avatar" alt="avatar" />
+            <div class="avatar-overlay"></div>
+        </a>
+    </div>
+
+    {{ with site.Params.name }}
+    <h2 class="profile-name">{{ . }}</h2>
+    {{ end }}
+
+    {{ with site.Params.bio }}
+    <p class="profile-bio">{{ . }}</p>
+    {{ end }}
+
+    {{ with $.Scratch.Get "social_list" }}
+    <div class="social-links">
+        {{ range . }}
+        {{ $platform := . }}
+        {{ $socialURL := "" }}
+
+        {{ if eq . "rss" }}
+            {{ $socialURL = "index.xml" | absURL }}
+        {{ else if eq . "mastodon" }}
+            {{ $socialURL = index site.Params . }}
+        {{ else if eq . "threads" }}
+            {{ $socialURL = printf "https://threads.net/%s" (index site.Params .) }}
+        {{ else if eq . "bluesky" }}
+            {{ $socialURL = printf "https://bsky.app/profile/%s" (index site.Params .) }}
+        {{ else if eq . "linkedin" }}
+            {{ $socialURL = printf "https://linkedin.com/in/%s" (index site.Params .) }}
+        {{ else }}
+            {{ $socialURL = printf "https://%s.com/%s" . (index site.Params .) }}
+        {{ end }}
+
+        <a
+            href="{{ $socialURL }}"
+            class="social-link"
+            target="_blank"
+            rel="{{ if eq . `rss` }}alternate{{ else }}me noopener noreferrer{{ end }}"
+            aria-label="{{ $platform }}"
+        >
+            <img
+                class="social-logo"
+                src="{{ printf `%s.svg` . | relURL }}"
+                alt="{{ $platform }}"
+                width="16"
+                height="16"
+            />
+        </a>
+        {{ end }}
+    </div>
+    {{ end }}
+</div>

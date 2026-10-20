@@ -1,5 +1,10 @@
-{{ $wechat_code := site.Params.WechatPaymentCode }} {{ $ali_code :=
-site.Params.AlipayPaymentCode }}
+{{ $wechat_code := site.Params.WechatPaymentCode }}
+{{ $ali_code := site.Params.AlipayPaymentCode }}
+{{ $css := resources.Get "css/reward.css" | minify | fingerprint }}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}">
+
+{{ $js := resources.Get "js/reward.js" | minify | fingerprint }}
+<script src="{{ $js.RelPermalink }}" defer></script>
 
 <div class="reward-container">
     <button
@@ -13,127 +18,13 @@ site.Params.AlipayPaymentCode }}
         <p class="reward-text">感谢支持！🍻</p>
         <div class="qr-container">
             <div class="reward-qr">
-                <img
-                    src="{{$wechat_code}}"
-                    alt="微信支付二维码"
-                    loading="lazy"
-                />
+                <img src="{{ $wechat_code }}" alt="微信支付二维码" loading="lazy" />
                 <p>微信</p>
             </div>
             <div class="reward-qr">
-                <img src="{{$ali_code}}" alt="支付宝二维码" loading="lazy" />
+                <img src="{{ $ali_code }}" alt="支付宝二维码" loading="lazy" />
                 <p>支付宝</p>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    .reward-container {
-        text-align: center;
-        margin: 2rem 0;
-    }
-
-    .reward-button {
-        padding: 0.5rem 1.25rem;
-        background-color: #f44336;
-        color: white;
-        border: none;
-        border-radius: 1rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-size: 1rem;
-    }
-
-    .reward-button:hover {
-        background-color: red;
-        font-size: 1rem;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
-
-    .reward-button:active {
-        background-color: red;
-        font-weight: 700;
-        font-size: 0.9rem;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
-    .reward-popup {
-        margin-top: 1.5rem;
-        opacity: 0;
-        transform: translateY(-10px);
-        transition: all 0.3s ease;
-    }
-
-    .reward-popup.visible {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    .reward-text {
-        margin-bottom: 1rem;
-        color: #333;
-        font-size: 1.1rem;
-    }
-    .reward-text:is(.dark *) {
-        margin-bottom: 1rem;
-        color: #fff;
-        font-size: 1.1rem;
-    }
-
-    .qr-container {
-        display: flex;
-        justify-content: center;
-        gap: 2rem;
-        flex-wrap: wrap;
-    }
-
-    .reward-qr {
-        text-align: center;
-    }
-
-    .reward-qr img {
-        width: 200px;
-        padding: 1rem;
-        background-color: white;
-        border-radius: 0.5rem;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s ease;
-    }
-
-    .reward-qr img:hover {
-        transform: scale(1.02);
-    }
-
-    .reward-qr p {
-        margin: 0.5rem 0 0;
-        color: #666;
-        font-size: 0.95rem;
-    }
-
-    .reward-qr p:is(.dark *) {
-        margin: 0.5rem 0 0;
-        color: #fff;
-        font-size: 0.95rem;
-    }
-
-    .hidden {
-        display: none;
-    }
-</style>
-
-<script>
-    const button = document.querySelector(".reward-button");
-    const popup = document.getElementById("reward-pop");
-
-    button.addEventListener("click", () => {
-        const isExpanded = button.getAttribute("aria-expanded") === "true";
-        button.setAttribute("aria-expanded", !isExpanded);
-
-        popup.classList.toggle("hidden");
-        setTimeout(() => {
-            popup.classList.toggle("visible");
-        }, 10);
-    });
-</script>

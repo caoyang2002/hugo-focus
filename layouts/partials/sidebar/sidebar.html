@@ -1,0 +1,21 @@
+<aside class="sticky w-64">
+    <div class="sidebar-card">
+        {{ partial "sidebar/profile.html" . }}
+        <div class="content-section">
+            {{ partial "sidebar/stats.html" . }}
+            {{ partial "sidebar/categories.html" . }}
+            {{ partial "sidebar/tags.html" . }}
+            {{ partial "sidebar/popular-posts.html" . }}
+            {{ partial "sidebar/archives.html" . }}
+        </div>
+    </div>
+</aside>
+
+{{ $css := resources.Get "css/sidebar.css" | minify | fingerprint }}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}">
+
+{{ $js := resources.Get "js/sidebar.js" | minify | fingerprint }}
+<script src="{{ $js.RelPermalink }}" defer></script>
+
+{{ $jsMobile := resources.Get "js/sidebar-mobile.js" | minify | fingerprint }}
+<script src="{{ $jsMobile.RelPermalink }}" defer></script>

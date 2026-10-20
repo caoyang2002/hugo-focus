@@ -1,0 +1,88 @@
+.reward-container {
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.reward-button {
+    padding: 0.5rem 1.25rem;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+}
+
+.reward-button:hover {
+    background-color: red;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.reward-button:active {
+    background-color: red;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.reward-popup {
+    margin-top: 1.5rem;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+}
+
+.reward-popup.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.reward-text {
+    margin-bottom: 1rem;
+    color: #333;
+    font-size: 1.1rem;
+}
+
+.reward-text:is(.dark *) {
+    color: #fff;
+}
+
+.qr-container {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.reward-qr {
+    text-align: center;
+}
+
+.reward-qr img {
+    width: 200px;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.reward-qr img:hover {
+    transform: scale(1.02);
+}
+
+.reward-qr p {
+    margin: 0.5rem 0 0;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.reward-qr p:is(.dark *) {
+    color: #fff;
+}
+
+.hidden {
+    display: none;
+}

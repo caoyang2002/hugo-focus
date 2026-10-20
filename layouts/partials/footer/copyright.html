@@ -1,0 +1,8 @@
+<div class="mr-auto opacity-60">
+    {{ if site.Copyright }}
+        {{ site.Copyright }}
+    {{ else }}
+        &copy; {{ now.Year }}
+        <a class="link" href="{{ `` | absURL }}">{{ site.Title }}</a>
+    {{ end }}
+</div>

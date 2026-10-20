@@ -1,0 +1,36 @@
+<div class="stats-grid">
+    <div class="stat-item">
+        <a href="{{ `posts` | relLangURL }}">
+            <p class="stat-tag">{{ i18n "total_article_count" }}</p>
+            <p class="stat-value">
+                {{ len (where .Site.RegularPages "Section" "posts") }}
+            </p>
+        </a>
+    </div>
+
+    <div class="stat-item">
+        <a href="{{ `wordcloud` | relLangURL }}">
+            <p class="stat-tag">{{ i18n "total_word_count" }}</p>
+            <p class="stat-value">
+                {{ $wordCount := 0 }}
+                {{ range .Site.RegularPages }}{{ $wordCount = add $wordCount .WordCount }}{{ end }}
+                {{ $wordCount }}
+            </p>
+        </a>
+    </div>
+
+    <div class="stat-item">
+        <a href="{{ `categories` | relLangURL }}">
+            <p class="stat-tag">{{ i18n "total_class_count" }}</p>
+            <p class="stat-value">{{ len .Site.Taxonomies.categories }}</p>
+        </a>
+    </div>
+
+    <div class="stat-item">
+        <a href="{{ `tags` | relLangURL }}">
+            <p class="stat-tag">{{ i18n "total_tag_count" }}</p>
+            <p class="stat-value">{{ len .Site.Taxonomies.tags }}</p>
+        </a>
+    </div>
+
+</div>

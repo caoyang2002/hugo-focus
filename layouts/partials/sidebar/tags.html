@@ -1,0 +1,20 @@
+<div class="tag-cloud">
+    <div class="section-header" data-toggle="tags" style="cursor: pointer">
+        <h3 class="section-title">
+            {{ i18n "all_tags" }}
+            <span class="toggle-icon" id="tags-icon">▼</span>
+        </h3>
+    </div>
+    <div class="tag-list" id="tags-content" style="display: block">
+        {{ range $name, $taxonomy := .Site.Taxonomies.tags }}
+        {{ $count := .Count }}
+        <a
+            href="{{ printf `tags/%s` ($name | urlize) | relLangURL }}"
+            class="tag-link"
+            style="font-size: {{ add 0.8 (mul 0.1 (len $taxonomy)) }}rem"
+        >
+            {{ $name }} ({{ $count }})
+        </a>
+        {{ end }}
+    </div>
+</div>

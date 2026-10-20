@@ -1,0 +1,12 @@
+<footer class="flex items-center text-xs uppercase h-8">
+    {{ partial "footer/copyright.html" . }}
+    {{ partial "footer/stats.html" . }}
+    {{ partial "footer/credits.html" . }}
+</footer>
+
+{{ $css := resources.Get "css/footer.css" | minify | fingerprint }}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}">
+
+    {{ if site.Params.busuanzi | default true }}
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    {{ end }}
