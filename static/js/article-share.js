@@ -52,7 +52,7 @@
     // 避免与站点已有的 QRCode 全局变量冲突（"Identifier 'QRCode' has already been declared"）
     var QR_SRCS = [
         data.vendor && data.vendor + "qrcode.min.js",
-        "https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js",
+        "https://cdn.jsdelivr.net/npm/qrcode@1.5.4/lib/browser.min.js",
         "https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js",
     ];
 
