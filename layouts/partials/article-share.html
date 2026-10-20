@@ -292,15 +292,12 @@
                                     <span>{{ $wordCount }} 字</span>
                                 </p>
                                 <h4 class="sp-ccard-title">{{ $title }}</h4>
+                            </div>
+                            <div class="sp-ccard-cover">
                                 {{ if $cover }}
-
-                                    <img class="sp-ccard-cover" data-fit="cover" src="{{ $cover | relURL }}" alt="{{ $title }}" />
-
-
+                                    <img class="" data-fit="cover" src="{{ $cover | relURL }}" alt="{{ $title }}" />
                                 {{ end }}
                             </div>
-
-
                         </div>
                         <div class="sp-ccard-body" id="spContentBody"></div>
                         <p class="sp-ccard-more" id="spContentMore" hidden>— 节选，扫码阅读全文</p>
