@@ -44,9 +44,15 @@
 {{ else if $page.Params.images }}{{ $cover = index $page.Params.images 0 }}{{ end }}
 
 {{/* 正文节选（内容卡片使用，最多 2400 字） */}}
-{{ $plain := $page.Plain }}
 {{ $body := "" }}
-{{ if $plain }}{{ $body = substr $plain 0 2400 }}{{ end }}
+{{ with $page.Content }}
+  {{/* 先移除 style / script，避免其内容被当成正文 */}}
+  {{ $html := . | replaceRE `(?is)<style\b[^>]*>[\s\S]*?</style>` "" }}
+  {{ $html = $html | replaceRE `(?is)<script\b[^>]*>[\s\S]*?</script>` "" }}
+  {{/* 只保留标题和段落 */}}
+  {{ $chunks := findRE `<h[1-6]\b[^>]*>[\s\S]*?</h[1-6]>|<p\b[^>]*>[\s\S]*?</p>` $html }}
+  {{ $body = delimit $chunks "" | safeHTML }}
+{{ end }}
 
 {{/* 文章总数 + 按日期统计 */}}
 {{ $posts := where $site.RegularPages "Section" "posts" }}
@@ -160,20 +166,28 @@
                     {{ end }}
 
                     <div class="sp-card-main">
-                        <p class="sp-card-meta">
-                            <span>{{ $date }}</span>
-                            <span>{{ $readingTime }} 分钟阅读</span>
-                            <span>{{ $wordCount }} 字</span>
-                        </p>
-                        <h4 class="sp-card-title">{{ $title }}</h4>
-                        <p class="sp-card-desc">{{ $description }}</p>
+                        <div class="sp-card-article-info">
+                            <div class="sp-card-article-descript">
+                                <p class="sp-card-meta">
+                                    <span>{{ $date }}</span>
+                                    <span>{{ $readingTime }} 分钟阅读</span>
+                                    <span>{{ $wordCount }} 字</span>
+                                </p>
+                                <h4 class="sp-card-title">{{ $title }}</h4>
+                                <p class="sp-card-desc">{{ $description }}</p>
+                                {{ if $tags }}
+                                <div class="sp-card-tags">
+                                    {{ range first 3 $tags }}<span class="sp-tag">{{ . }}</span>{{ end }}
+                                    {{ if gt (len $tags) 3 }}<span class="sp-tag sp-tag--more">+{{ sub (len $tags) 3 }}</span>{{ end }}
+                                </div>
+                                {{ end }}
+                            </div>
 
-                        {{ if $tags }}
-                        <div class="sp-card-tags">
-                            {{ range first 3 $tags }}<span class="sp-tag">{{ . }}</span>{{ end }}
-                            {{ if gt (len $tags) 3 }}<span class="sp-tag sp-tag--more">+{{ sub (len $tags) 3 }}</span>{{ end }}
+                             <div class="sp-qr" data-sp-qr></div>
                         </div>
-                        {{ end }}
+
+
+
 
                         <div class="sp-author">
                             {{ if $avatar }}
@@ -265,16 +279,23 @@
                         <span>{{ $date }}</span>
                     </div>
                     <div class="sp-ccard-main">
-                        <p class="sp-card-meta">
-                            <span>{{ $author }}</span>
-                            <span>{{ $readingTime }} 分钟阅读</span>
-                            <span>{{ $wordCount }} 字</span>
-                        </p>
-                        <h4 class="sp-ccard-title">{{ $title }}</h4>
+
+                        <div class="sp-card-article-info">
+                            <div class="sp-card-article-descript">
+                                <p class="sp-card-meta">
+                                    <span>{{ $author }}</span>
+                                    <span>{{ $readingTime }} 分钟阅读</span>
+                                    <span>{{ $wordCount }} 字</span>
+                                </p>
+                                <h4 class="sp-ccard-title">{{ $title }}</h4>
+
+                            </div>
+
+                             <div class="sp-qr" data-sp-qr></div>
+                        </div>
                         <div class="sp-ccard-body" id="spContentBody"></div>
                         <p class="sp-ccard-more" id="spContentMore" hidden>— 节选，扫码阅读全文</p>
                     </div>
-
                 </article>
 
                 <div class="sp-actions">

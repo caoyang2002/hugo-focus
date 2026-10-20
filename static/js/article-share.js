@@ -359,59 +359,81 @@
     /* ==========================================================
        内容卡片：从 <template id="spContentSrc"> 读取正文节选
        ========================================================== */
-    var LENS = { short: 300, mid: 800, long: 1600 };
-    var lenKey = "mid";
-    var srcEl = document.getElementById("spContentSrc");
-    var fullText = srcEl ? (srcEl.content || srcEl).textContent || "" : "";
-    var paragraphs = fullText
-        .split(/\r?\n+/)
-        .map(function (s) {
-            return s.replace(/\s+/g, " ").trim();
-        })
-        .filter(Boolean);
 
-    function renderContent() {
-        var body = $("#spContentBody");
-        var more = $("#spContentMore");
-        if (!body) return;
-        body.textContent = "";
+       var LENS = { short: 300, mid: 800, long: 1600 };
+       var lenKey = "mid";
+       var srcEl = document.getElementById("spContentSrc");
 
-        if (!paragraphs.length) {
-            var p0 = document.createElement("p");
-            p0.textContent = data.desc || data.title;
-            body.appendChild(p0);
-            more.hidden = true;
-            return;
-        }
+       // 读取结构：把模板里的标题/段落转成 { type, text } 数组
+       var blocks = [];
+       (function () {
+           var frag = srcEl && (srcEl.content || srcEl);
+           if (!frag) return;
+           var nodes = frag.querySelectorAll
+               ? frag.querySelectorAll("h1,h2,h3,h4,h5,h6,p")
+               : [];
+           Array.from(nodes).forEach(function (node) {
+               var text = node.textContent.replace(/\s+/g, " ").trim();
+               if (!text) return;
+               var isHead = /^h[1-6]$/.test(node.tagName.toLowerCase());
+               blocks.push({ type: isHead ? "h" : "p", text: text });
+           });
+       })();
 
-        var limit = LENS[lenKey];
-        var used = 0;
-        var truncated = false;
+       function renderContent() {
+           var body = $("#spContentBody");
+           var more = $("#spContentMore");
+           if (!body) return;
+           body.textContent = "";
 
-        for (var i = 0; i < paragraphs.length; i++) {
-            var para = paragraphs[i];
-            if (used >= limit) {
-                truncated = true;
-                break;
-            }
-            var text = para;
-            if (used + para.length > limit) {
-                text = para.slice(0, limit - used).replace(/[，,、；;：:\s]+$/, "") + "…";
-                truncated = true;
-            }
-            var isHead = para.length <= 24 && !/[。！？.!?：:；;，,]$/.test(para);
-            var el = document.createElement(isHead ? "h5" : "p");
-            el.textContent = text;
-            body.appendChild(el);
-            used += para.length;
-            if (truncated) break;
-        }
-        // 避免孤立小标题落在末尾
-        while (body.lastElementChild && body.lastElementChild.tagName === "H5") {
-            body.lastElementChild.remove();
-        }
-        more.hidden = !truncated;
-    }
+           if (!blocks.length) {
+               var p0 = document.createElement("p");
+               p0.textContent = data.desc || data.title;
+               body.appendChild(p0);
+               more.hidden = true;
+               return;
+           }
+
+           var limit = LENS[lenKey];
+           var used = 0;
+           var truncated = false;
+
+           for (var i = 0; i < blocks.length; i++) {
+               var b = blocks[i];
+               if (used >= limit) { truncated = true; break; }
+
+               var remain = limit - used;
+               var el;
+
+               if (b.text.length > remain) {
+                   var cut = b.text.slice(0, Math.max(1, remain)).replace(/[，,、；;：:\s]+$/, "");
+                   if (cut) {
+                       el = document.createElement(b.type === "h" ? "h5" : "p");
+                       el.textContent = cut + "…";
+                       body.appendChild(el);
+                   }
+                   truncated = true;
+                   break;
+               }
+
+               el = document.createElement(b.type === "h" ? "h5" : "p");
+               el.textContent = b.text;
+               body.appendChild(el);
+               used += b.text.length;
+           }
+
+           // 避免孤立小标题落在末尾；删空时兜底
+           while (body.lastElementChild && body.lastElementChild.tagName === "H5") {
+               body.lastElementChild.remove();
+           }
+           if (!body.firstElementChild) {
+               var fallback = document.createElement("p");
+               fallback.textContent = data.desc || data.title;
+               body.appendChild(fallback);
+           }
+
+           more.hidden = !truncated;
+       }
 
     function setLen(key) {
         if (!LENS[key]) return;

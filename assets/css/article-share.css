@@ -558,7 +558,7 @@ html.sp-lock {
     padding: 16px;
     background: #0042da;
 }
-.sp-card-cover--plain::before {
+/*.sp-card-cover--plain::before {
     content: "";
     position: absolute;
     top: 16px;
@@ -567,8 +567,8 @@ html.sp-lock {
     height: 56px;
     border-radius: 50%;
     background: #f2f2ef;
-}
-.sp-card-cover--plain::after {
+}*/
+/*.sp-card-cover--plain::after {
     content: "";
     position: absolute;
     right: 0;
@@ -576,7 +576,14 @@ html.sp-lock {
     width: 96px;
     height: 96px;
     background: #111;
+}*/
+.sp-card-article-info{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
 }
+
 .sp-card-cover-site {
     position: relative;
     z-index: 1;
@@ -849,8 +856,8 @@ html.sp-lock {
 }
 .sp-ccard-head span:first-child::before {
     content: "";
-    width: 10px;
-    height: 10px;
+    width: 1rem;
+    height: 1rem;
     background: #0042da;
 }
 .sp-ccard-main {
@@ -874,6 +881,9 @@ html.sp-lock {
 }
 .sp-ccard-body p {
     margin: 0 0 0.9em;
+}
+.sp-ccard-body h1 {
+    color: #0042da;
 }
 .sp-ccard-body h5 {
     margin: 1.4em 0 0.6em;
@@ -959,6 +969,7 @@ html.sp-lock {
 .sp-stage .sp-ccard-title {
     font-size: 2.1rem;
 }
+
 
 /* ---------- Toast ---------- */
 .sp-toast {
