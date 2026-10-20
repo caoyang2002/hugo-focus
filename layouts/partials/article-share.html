@@ -65,7 +65,7 @@
     data-desc="{{ $description }}"
     data-url="{{ $url }}"
     data-site="{{ $site.Title }}"
-    data-vendor="{{ `js/about/main.js` | relURL }}"
+    data-vendor="{{ `/js/vendor/` | relURL }}"
 >
     <!-- <script type="module" src="{{ `js/about/main.js` | relURL }}"></script>-->
     <button
@@ -222,7 +222,7 @@
                         {{ end }}
                     </div>
 
-                    <footer class="sp-card-foot">
+                    <!--<footer class="sp-card-foot">
                         <div class="sp-foot-brand">
                             {{ if $logo }}<img class="sp-foot-logo" src="{{ $logo | relURL }}" alt="{{ $site.Title }}" />{{ end }}
                             <div style="min-width: 0">
@@ -231,7 +231,7 @@
                             </div>
                         </div>
                         <div class="sp-qr" data-sp-qr></div>
-                    </footer>
+                    </footer>-->
                 </article>
 
                 <div class="sp-actions">
@@ -274,16 +274,7 @@
                         <div class="sp-ccard-body" id="spContentBody"></div>
                         <p class="sp-ccard-more" id="spContentMore" hidden>— 节选，扫码阅读全文</p>
                     </div>
-                    <footer class="sp-card-foot">
-                        <div class="sp-foot-brand">
-                            <div style="min-width: 0">
-                                <span class="sp-foot-name">{{ $site.Title }}</span>
-                                <span class="sp-foot-tip">扫码阅读全文</span>
-                                <span class="sp-foot-url">{{ $url }}</span>
-                            </div>
-                        </div>
-                        <div class="sp-qr" data-sp-qr></div>
-                    </footer>
+
                 </article>
 
                 <div class="sp-actions">
@@ -304,5 +295,16 @@
             </div>
             <div class="sp-preview-body"><img alt="分享图片预览" /></div>
         </div>
+
+        <!--<footer class="sp-card-foot">
+            <div class="sp-foot-brand">
+                <div style="min-width: 0">
+                    <span class="sp-foot-name">{{ $site.Title }}</span>
+                    <span class="sp-foot-tip">扫码阅读全文</span>
+                    <span class="sp-foot-url">{{ $url }}</span>
+                </div>
+            </div>
+            <div class="sp-qr" data-sp-qr></div>
+        </footer>-->
     </div>
 </div>
