@@ -29,6 +29,7 @@
 {{ $wordCount := $page.WordCount }}
 {{ $tags := $page.Params.tags }}
 
+
 {{/* 描述 */}}
 {{ $description := "" }}
 {{ if $page.Description }}{{ $description = $page.Description }}
@@ -275,8 +276,11 @@
 
                 <article class="sp-card" id="spContentCard">
                     <div class="sp-ccard-head">
-                        <span>{{ $site.Title }}</span>
-                        <span>{{ $date }}</span>
+                        <span class="sp-ccard-brand">
+                          {{ $site.Title }}
+                        </span>
+
+                        <span class="sp-ccard-date">{{ $date }}</span>
                     </div>
                     <div class="sp-ccard-main">
 
@@ -288,13 +292,30 @@
                                     <span>{{ $wordCount }} 字</span>
                                 </p>
                                 <h4 class="sp-ccard-title">{{ $title }}</h4>
+                                {{ if $cover }}
 
+                                    <img class="sp-ccard-cover" data-fit="cover" src="{{ $cover | relURL }}" alt="{{ $title }}" />
+
+
+                                {{ end }}
                             </div>
 
-                             <div class="sp-qr" data-sp-qr></div>
+
                         </div>
                         <div class="sp-ccard-body" id="spContentBody"></div>
                         <p class="sp-ccard-more" id="spContentMore" hidden>— 节选，扫码阅读全文</p>
+                        <div class="sp-ccard-auther-article">
+                            <div class="sp-author">
+                                {{ if $avatar }}
+                                <img class="sp-avatar" data-fit="cover" src="{{ $avatar | relURL }}" alt="{{ $author }}" />
+                                {{ end }}
+                                <div>
+                                    <p class="sp-author-name">{{ $author }}</p>
+                                    <p class="sp-author-stats">已发布 <b>{{ $totalPosts }}</b> 篇文章</p>
+                                </div>
+                            </div>
+                            <div class="sp-qr" data-sp-qr></div>
+                        </div>
                     </div>
                 </article>
 

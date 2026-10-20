@@ -841,25 +841,22 @@ html.sp-lock {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 12px 16px;
+    padding: 8px 16px;
     border-bottom: 2px solid #111;
-    font-size: 0.68rem;
-    font-weight: 700;
+
+
     letter-spacing: 0.14em;
     text-transform: uppercase;
     font-variant-numeric: tabular-nums;
+    background-color: #0042da;
 }
-.sp-ccard-head span:first-child {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+.sp-ccard-date,
+.sp-ccard-brand {
+    color: white;
+      font-weight: 700;
+    font-size: 0.8rem;
 }
-.sp-ccard-head span:first-child::before {
-    content: "";
-    width: 1rem;
-    height: 1rem;
-    background: #0042da;
-}
+
 .sp-ccard-main {
     padding: 24px 16px 8px;
 }
@@ -906,6 +903,32 @@ html.sp-lock {
     color: #0042da;
 }
 
+.sp-ccard-auther-article {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;     /* 头像/文字与二维码垂直居中 */
+    gap: 16px;               /* 两端之间留最小间距，防挤压 */
+}
+
+
+
+
+
+
+sp-ccard-cover{
+    flex: none;
+    width: 88px;
+    height: 88px;
+    padding: 6px;
+    background: #fff;
+    line-height: 0;
+}
+.sp-ccard-cover canvas,
+.sp-ccard-cover img {
+    display: block;
+    width: 76px !important;
+    height: 76px !important;
+}
 /* ---------- 预览层（微信 / iOS 等不支持下载时长按保存） ---------- */
 .sp-preview {
     position: absolute;
@@ -970,7 +993,46 @@ html.sp-lock {
     font-size: 2.1rem;
 }
 
+.sp-stage .sp-ccard-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
 
+/*.sp-stage .sp-ccard-dot {
+    display: block;
+    flex: none;
+    width: 16px;
+    height: 16px;
+    background: #0042da;
+}*/
+.sp-stage .sp-ccard-brand{
+    top:100px;
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+}
+
+/* 导出舞台：h5 不用 border，蓝线用绝对定位色块（html2canvas 更稳） */
+.sp-stage .sp-ccard-body h5 {
+    position: relative;
+    margin: 18px 0 8px;          /* em 改 px，避免字体基准漂移 */
+    padding-left: 14px;
+    border-left: 0;
+    font-size: 15px;             /* 0.95rem ≈ 15.2，取整 */
+    font-weight: 800;
+    line-height: 22px;           /* 15 × 1.5 ≈ 22.5，取整 */
+    color: #111;
+}
+.sp-stage .sp-ccard-body h5::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;                    /* px 定位，不靠 em */
+    height: 18px;                /* 22 - 2×2，线略短于行高 */
+    width: 4px;
+    background: #0042da;
+}
 /* ---------- Toast ---------- */
 .sp-toast {
     position: fixed;
