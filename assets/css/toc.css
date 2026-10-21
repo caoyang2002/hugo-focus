@@ -4,7 +4,7 @@
     top: 6rem;
     bottom: 4rem;
     right: 0;
-    width: 16rem;
+    width: 12rem;
     z-index: 100;
     transition: transform 0.3s ease;
 }
@@ -13,7 +13,8 @@
 .toc-container {
     background: white;
     height: 100%;
-    border-radius: 0.5rem;
+    /*border-radius: 0.5rem;*/
+    border: thick double var(--palette-ink);
     box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
@@ -23,10 +24,10 @@
 .toc-header {
     position: sticky;
     top: 0;
-    background: white;
-    padding: 1rem;
-    border-radius: 0.5rem 0.5rem 0 0;
-    border-bottom: 1px solid #e5e7eb;
+    background: var(--color-fg);
+    padding: 0.4rem 0.2rem;
+    /*border-radius: 0.5rem 0.5rem 0 0;*/
+    border-bottom: 1px solid var(--color-bg);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -36,6 +37,7 @@
 .toc-title {
     margin: 0;
     font-size: 1rem;
+    color: var(--color-bg);
     font-weight: 600;
 }
 
@@ -65,29 +67,30 @@
 
 /* ===== 关闭按钮 ===== */
 .toc-close {
+
     padding: 0.5rem;
     background: none;
     border: none;
-    color: inherit; /* 修复: 原来是非法值 --bg */
+    color: var(--card-muted);
     cursor: pointer;
     transition: color 0.2s;
 }
 
 .toc-close:hover {
-    color: #111827;
+    color: var(--card-accent);
 }
 
 /* ===== 目录内容 ===== */
 .toc {
     flex: 1;
     overflow-y: auto;
-    padding: 1rem;
+    padding: 0.1rem;
     scrollbar-gutter: stable;
 }
 
 .toc ul {
     list-style: none;
-    padding-left: 1rem;
+    padding-left: 0.4rem;
     margin: 0;
 }
 
@@ -97,24 +100,30 @@
 
 .toc a {
     display: block;
-    padding: 0.25rem 0.5rem;
+    padding: 0.1rem 0.1rem;
     color: #4b5563;
+
     text-decoration: none;
-    border-radius: 0.25rem;
+    /*border-radius: 0.25rem;*/
     transition: all 0.2s;
 }
 
-.toc a:hover,
-.toc a.active {
-    background-color: #f3f4f6;
-    color: #111827;
+.toc a:hover {
+    background-color: var(--card-accent);
+    color: var(--card-bg);
+
+
 }
 
 /* 修复: 原文件缺少 active 样式, JS 加了类却无视觉反馈 */
 .toc a.active {
     font-weight: 500;
-    border-left: 3px solid #223d60;
+    /*border-left: 3px solid #223d60;*/
+    border-left: 0.2rem solid var(--card-accent);
+    /*border-bottom: 0.2rem solid var(--card-accent);*/
     padding-left: calc(0.5rem - 3px);
+
+
 }
 
 /* ===== 滚动条 ===== */
@@ -184,7 +193,7 @@
 }
 
 .dark .toc-close:hover {
-    color: #f3f4f6;
+    color: var(--card-accent);
 }
 
 .dark .toc a {

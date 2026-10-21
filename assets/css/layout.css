@@ -32,6 +32,7 @@ body {
 
 .layout-aside {
     display: none;
+   /*border: 0.1rem solid var(--palette-ink);*/
 }
 
 /* 覆盖 Tailwind prose 默认的 max-width: 65ch，让 main 铺满 */
@@ -46,13 +47,14 @@ body {
         display: block;
         grid-column: 40 / span 8;   /* 第 1~8 列 */
         grid-row: 1;
-        min-width: 0;
+        /*min-width: 0;*/
         overflow: hidden;          /* 不允许左右滚动 */
-        padding: 0 1rem 0 2rem;
+        /*padding: 0 1rem 0 2rem;*/
+        /*padding: 0 0.1rem 0 0.4rem;*/
     }
 
     .layout-main {
-        grid-column: 1 / span 40;  /* 第 9~48 列 */
+        grid-column: 1 / span 39;  /* 第 9~48 列 */
         grid-row: 1;
         padding: 3rem 2rem;
     }
@@ -61,7 +63,8 @@ body {
 /* ===== aside sticky 容器（固定在左侧） ===== */
 .layout-aside-sticky {
     position: sticky;
-    top: 6rem;
+    /*top: 6rem;*/
+    border: 0.1rem solid var(--palette-ink);
     max-height: calc(100vh - 8rem);
     overflow-x: hidden;            /* 禁止横向滚动 */
     overflow-y: auto;              /* 仅允许纵向滚动 */
@@ -78,7 +81,7 @@ body {
 }
 .layout-aside-sticky::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.15);
-    border-radius: 4px;
+    /*border-radius: 4px;*/
 }
 .dark .layout-aside-sticky::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.15);

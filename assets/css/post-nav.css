@@ -1,0 +1,73 @@
+.post-nav {
+    display: flex;
+    align-items: stretch;
+    border: 0.1rem solid #000;
+}
+
+/* ---------- 左右按钮 ---------- */
+.post-nav__link {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;           /* 不被压缩 */
+    padding: 0.5rem 0.75rem;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.post-nav__prev {
+    border-right: 0.1rem solid #000 !important;
+    color: var(--color-accent);
+}
+
+.post-nav__next {
+    border-left: 0.1rem solid #000 !important;
+    color:var(--color-accent);
+
+}
+
+.post-nav__prev:hover,
+.post-nav__next:hover {
+    background-color: var(--color-accent);
+    color: #fff;
+}
+
+.post-nav__icon-start { margin-inline-end: 0.375rem; }
+.post-nav__icon-end   { margin-inline-start: 0.375rem; }
+
+/* ---------- 中间跑马灯 ---------- */
+.post-nav__marquee {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.post-nav__marquee-track {
+  display: inline-flex;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  animation: post-nav-marquee var(--marquee-duration, 20s) linear infinite;
+  will-change: transform;
+}
+
+.post-nav__marquee-group {
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.post-nav__marquee-group > span {
+  padding-inline-end: 4rem;
+}
+
+@keyframes post-nav-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ---------- 窄屏：只留箭头，避免挤压中间 ---------- */
+@media (max-width: 480px) {
+    .post-nav__label { display: none; }
+    .post-nav__icon-start { margin-inline-end: 0; }
+    .post-nav__icon-end   { margin-inline-start: 0; }
+}

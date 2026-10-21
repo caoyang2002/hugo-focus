@@ -34,7 +34,7 @@
 
     {{/* 按加载顺序声明：color 必须第一，layout 并入统一合并 */}}
     {{ $cssFiles := slice }}
-    {{ range slice "color" "main" "custom" "syntax" "code-handler" "prose" "layout" }}
+    {{ range slice "color" "main" "custom" "syntax" "code-handler" "prose" "layout" "pagination" "post-nav" "feedback" "comments" }}
         {{ with resources.Get (printf "css/%s.css" .) }}
             {{ $cssFiles = $cssFiles | append . }}
         {{ end }}

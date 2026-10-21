@@ -2386,13 +2386,6 @@ article code {
     display: block;
 }
 
-.pagination-nav {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 3.5rem;
-    gap: 1rem; /* 添加这一行 */
-}
-
 /* 目录容器样式 */
 .toc-container:is(.dark *),
 .toc-header:is(.dark *) {

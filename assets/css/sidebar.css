@@ -6,12 +6,12 @@
 /* ===== 侧栏整体 ===== */
 aside {
     position: fixed;
-    top: 6rem;
+    /*top: 6rem;*/
     bottom: 4rem;
     right: 1rem;
-    width: 14rem;
-    height: auto;
-    overflow-y: auto;
+    /*width: 14rem;*/
+    /*height: auto;*/
+    /*overflow-y: auto;*/
     z-index: 10;
 }
 
@@ -39,7 +39,8 @@ details[open] > div {
 /* ===== 卡片 ===== */
 .sidebar-card {
     background: #fff;
-    border-radius: 12px;
+    /*border-radius: 12px;*/
+    /*border: 0.1rem solid var(--palette-ink);*/
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 }
@@ -49,9 +50,10 @@ details[open] > div {
     position: sticky;
     top: 0;
     padding: 0.5rem;
+    border-bottom: 0.1rem solid var(--palette-ink);
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(8px);
-    border-bottom: 1px solid #eee;
+    /*border-bottom: 1px solid #eee;*/
     z-index: 10;
 }
 .avatar-container { margin: 0.1rem; text-align: center; }

@@ -1,0 +1,33 @@
+ <!-- giscus comment -->
+ {{ if and site.Params.giscus.repo (not (eq .Params.comments false)) }}
+ <section class="comments" aria-label="评论">
+   <div class="giscus-wrap">
+     <div class="giscus"></div>
+     <script
+       src="https://giscus.app/client.js"
+       data-repo="{{ site.Params.giscus.repo }}"
+       data-repo-id="{{ site.Params.giscus.repoId }}"
+       data-category="{{ site.Params.giscus.category }}"
+       data-category-id="{{ site.Params.giscus.categoryId }}"
+       data-mapping="{{ site.Params.giscus.mapping | default `pathname` }}"
+       data-strict="{{ site.Params.giscus.strict | default `1` }}"
+       data-reactions-enabled="{{ site.Params.giscus.reactionsEnabled | default `0` }}"
+       data-emit-metadata="{{ site.Params.giscus.emitMetadata | default `0` }}"
+       data-input-position="{{ site.Params.giscus.inputPosition | default `top` }}"
+       data-theme="preferred_color_scheme"
+       data-lang="{{ site.Params.giscus.lang | default `zh-CN` }}"
+       data-loading="lazy"
+       crossorigin="anonymous"
+       async
+     ></script>
+   </div>
+ </section>
+
+ {{- with resources.Get "js/comments.js" -}}
+   {{- $js := . | minify | fingerprint -}}
+   <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
+ {{- else -}}
+   {{- warnf "comments.html: assets/js/comments.js 未找到，主题同步脚本未加载" -}}
+ {{- end -}}
+
+ {{ end }}
