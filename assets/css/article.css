@@ -1,0 +1,87 @@
+/* ==========================================================================
+   article.css — 只负责颜色/视觉细节，布局交给 Tailwind
+   颜色全部取自 color.css 的语义变量，无任何 hex / rgb
+   ========================================================================== */
+
+/* ---------- 元数据 ---------- */
+.article__title {
+    color: var(--color-fg);
+}
+
+.article__byline {
+    /* 原 opacity-60 用 fg-muted 表达，比 opacity 更可控 */
+    color: var(--color-fg-muted);
+}
+
+.article__byline .post-date {
+    /* 保持和原文一致的次级层级 */
+    color: var(--color-fg-muted);
+}
+
+/* ---------- 标签 ---------- */
+.article__tag {
+    display: inline-block;
+    margin-bottom: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    background: var(--color-bg-soft);          /* ≈ black/3% */
+    color: var(--color-fg-soft);
+    text-decoration: none;
+    transition: background-color .15s ease, color .15s ease;
+}
+
+.article__tag:hover {
+    background: var(--color-bg-elevated);      /* ≈ black/6% */
+    color: var(--color-accent-ink);
+}
+
+/* ltr / rtl 间距（原 ltr:mr-1.5 rtl:ml-1.5） */
+.article__tag { margin-inline-end: 0.375rem; }
+[dir="rtl"] .article__tag { margin-inline-end: 0; margin-inline-start: 0.375rem; }
+
+/* ---------- 上下篇 ---------- */
+.article__pager {
+    border-radius: 0.75rem;
+    background: var(--color-bg-soft);          /* ≈ black/3% */
+    color: var(--color-fg);
+    font-size: 1.125rem;
+}
+
+/* 暗色下原模板是 white/8%，--color-bg-soft 在暗色下≈paper 7%，可接受；
+   若想更贴近，可显式覆盖： */
+:root[data-theme="dark"] .article__pager,
+:root.dark .article__pager {
+    background: var(--color-bg-elevated);      /* ≈ paper 7% */
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]):not(.light) .article__pager {
+        background: var(--color-bg-elevated);
+    }
+}
+
+.article__pager-link {
+    color: inherit;
+    text-decoration: none;
+    transition: background-color .15s ease;
+}
+
+.article__pager-link:hover {
+    /* 原 hover:bg-black/[2%] dark:hover:bg-white/[3%]
+       在父级已有底色上叠加更淡一层 → 用半透明 hair */
+    background: var(--color-hair-soft);
+}
+
+/* ---------- 反馈区 ---------- */
+.article__feedback {
+    text-align: center;
+}
+
+/* ---------- 评论容器 ---------- */
+.article__comments {
+    width: 100%;
+}
+
+/* ---------- 正文：prose 已由 --tw-prose-* 接管，无需额外上色 ---------- */
+.article__content {
+    color: var(--color-fg-soft);
+}

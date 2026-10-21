@@ -1,0 +1,239 @@
+/* ==========================================================================
+   color.css — 全站色彩唯一来源（瑞士国际主义 · 70 / 25 / 5）
+
+   配色比例
+     主色   70%  #F2F2EF  背景、最大形体、主要材质
+     辅助色 25%  #161616  层级、支撑主体、规则线、反色面
+     强调色  5%  #0042da  标题、焦点、交互状态、关键细节（面积越小越有效）
+
+   规则
+     1. 所有颜色只在此文件定义，其它 CSS 只允许 `var(--xxx)`，不得出现 hex / rgb / 颜色关键字。
+     2. 其余一切颜色均由三个基色经 color-mix() 派生，不引入第四种色相。
+     3. 明 / 暗模式用 light-dark() 一处定义，由 color-scheme 切换。优先级：
+          手动 [data-theme] / .dark / .light  >  系统 prefers-color-scheme  >  默认亮色
+     4. 深色模式下 #0042da 在 #161616 上对比度仅约 2:1，不适合做文字。
+        因此强调色拆为两个角色：
+          --color-accent      填充色（按钮、色块、规则线），明暗一致，恒为 #0042da
+          --color-accent-ink  文字 / 描边色，深色模式提亮为同色相的 #4a7bff
+   ========================================================================== */
+
+
+/* ---------- 0. 基色（常量，不随主题变化） ---------- */
+:root {
+    --palette-paper: #f2f2ef;   /* 主色   70% */
+    --palette-ink:   #161616;   /* 辅助色 25% */
+    --palette-blue:  #0042da;   /* 强调色  5% */
+    --palette-blue-lift: #4a7bff; /* 强调色在深底上的可读版本 */
+}
+
+
+/* ---------- 1. 主题切换（color-scheme 决定 light-dark() 取值） ---------- */
+:root {
+    color-scheme: light dark;                 /* 跟随系统 */
+}
+:root[data-theme="light"],
+:root.light {
+    color-scheme: light;                      /* 手动：普通模式 */
+}
+:root[data-theme="dark"],
+:root.dark {
+    color-scheme: dark;                       /* 手动：暗夜模式 */
+}
+
+
+/* ---------- 2. 语义色 ---------- */
+:root {
+    /* 背景 / 前景 */
+    --color-bg:          light-dark(var(--palette-paper), var(--palette-ink));
+    --color-fg:          light-dark(var(--palette-ink), var(--palette-paper));
+    --color-bg-soft:     color-mix(in srgb, var(--color-fg) 4%, var(--color-bg));
+    --color-bg-elevated: color-mix(in srgb, var(--color-fg) 7%, var(--color-bg));
+    --color-fg-soft:     color-mix(in srgb, var(--color-fg) 78%, var(--color-bg));
+    --color-fg-muted:    color-mix(in srgb, var(--color-fg) 58%, var(--color-bg));
+    --color-fg-faint:    color-mix(in srgb, var(--color-fg) 40%, var(--color-bg));
+
+    /* 规则线 / 边框 */
+    --color-border:        color-mix(in srgb, var(--color-fg) 16%, var(--color-bg));
+    --color-border-strong: color-mix(in srgb, var(--color-fg) 38%, var(--color-bg));
+    --color-rule:          var(--color-fg);
+    --color-hair:          color-mix(in srgb, var(--color-fg) 18%, transparent);
+    --color-hair-soft:     color-mix(in srgb, var(--color-fg) 12%, transparent);
+    --color-hair-strong:   color-mix(in srgb, var(--color-fg) 30%, transparent);
+
+    /* 强调色 */
+    --color-accent:       var(--palette-blue);
+    --color-accent-ink:   light-dark(var(--palette-blue), var(--palette-blue-lift));
+    --color-accent-hover: light-dark(
+        color-mix(in srgb, var(--palette-blue) 78%, var(--palette-ink)),
+        color-mix(in srgb, var(--palette-blue-lift) 78%, var(--palette-paper)));
+    --color-accent-soft:  color-mix(in srgb, var(--color-accent-ink) 8%, transparent);
+    --color-on-accent:    var(--palette-paper);   /* 蓝色填充上的文字 */
+    --color-on-accent-soft:  color-mix(in srgb, var(--palette-paper) 78%, transparent);
+    --color-on-accent-muted: color-mix(in srgb, var(--palette-paper) 60%, transparent);
+    --color-on-accent-hair:  color-mix(in srgb, var(--palette-paper) 16%, transparent);
+    --color-on-accent-fill:  color-mix(in srgb, var(--palette-paper) 4.5%, transparent);
+
+    /* 反色面（亮色模式 = 墨黑面；暗夜模式 = 纸白面，保持“整块反转”的节奏） */
+    --color-inverse-bg:    var(--color-fg);
+    --color-inverse-fg:    var(--color-bg);
+    --color-inverse-soft:  color-mix(in srgb, var(--color-inverse-fg) 72%, transparent);
+    --color-inverse-muted: color-mix(in srgb, var(--color-inverse-fg) 60%, transparent);
+    --color-inverse-rule:  color-mix(in srgb, var(--color-inverse-fg) 45%, transparent);
+    --color-inverse-hair:  color-mix(in srgb, var(--color-inverse-fg) 16%, transparent);
+    --color-inverse-fill:  color-mix(in srgb, var(--color-inverse-fg) 4.5%, transparent);
+
+    /* 模数网格 */
+    --color-grid-fill: color-mix(in srgb, var(--color-fg) 2.8%, transparent);
+    --color-grid-line: color-mix(in srgb, var(--color-fg) 7%, transparent);
+
+    /* 链接 */
+    --color-link:        var(--color-accent-ink);
+    --color-link-hover:  var(--color-accent-hover);
+
+    /* 选中文本 */
+    --color-selection-bg: var(--palette-blue);
+    --color-selection-fg: var(--palette-paper);
+
+    /* 遮罩 / 毛玻璃 */
+    --color-overlay:        color-mix(in srgb, var(--palette-ink) 72%, transparent);
+    --color-overlay-strong: color-mix(in srgb, var(--palette-ink) 96%, transparent);
+    --color-glass:          color-mix(in srgb, var(--color-bg) 86%, transparent);
+
+    --color-on-overlay-hair: color-mix(in srgb, var(--palette-paper) 25%, transparent);
+    --color-halftone:        color-mix(in srgb, var(--palette-ink) 35%, transparent);
+
+    --color-ring: color-mix(in srgb, var(--color-accent-ink) 50%, transparent);
+
+    /* 阴影 */
+    --color-shadow:       color-mix(in srgb, var(--palette-ink) 30%, transparent);
+    --color-shadow-soft:  color-mix(in srgb, var(--palette-ink) 12%, transparent);
+    --color-shadow-faint: color-mix(in srgb, var(--palette-ink) 5%, transparent);
+    --shadow-sm: 0 1px 2px var(--color-shadow-soft);
+    --shadow-md: 0 4px 12px var(--color-shadow-soft);
+
+    /* 二维码 / 需要“纸面”的位置：恒为纸白，保证扫码对比度 */
+    --color-qr-bg:       var(--palette-paper);
+    --color-qr-fg:       var(--palette-ink);
+    --color-qr-fg-muted: color-mix(in srgb, var(--palette-ink) 58%, var(--palette-paper));
+    --color-qr-hair:     color-mix(in srgb, var(--palette-ink) 12%, transparent);
+
+    /* 代码 */
+    --color-code-bg:        light-dark(
+        color-mix(in srgb, var(--palette-ink) 5%, var(--palette-paper)),
+        color-mix(in srgb, var(--palette-paper) 7%, var(--palette-ink)));
+    --color-code-fg:        var(--color-fg);
+    --color-code-border:    var(--color-border);
+    --color-code-block-bg:  var(--palette-ink);     /* 代码块恒为墨黑底 */
+    --color-code-block-fg:  var(--palette-paper);
+    --color-inline-code-bg:       color-mix(in srgb, var(--color-accent-ink) 12%, var(--color-bg));
+    --color-inline-code-bg-hover: color-mix(in srgb, var(--color-accent-ink) 22%, var(--color-bg));
+
+    /* 目录 */
+    --toc-line:        var(--color-fg);
+    --toc-line-active: var(--color-accent-ink);
+}
+
+
+/* ---------- 3. 导出卡片（html2canvas 导出为图片）固定亮色，使用实色 hex ----------
+   html2canvas 无法解析 color-mix() / light-dark()，因此这一组必须是字面量，不随主题变化。 */
+:root {
+    --card-bg:      #f2f2ef;
+    --card-ink:     #161616;
+    --card-ink-2:   #303030;
+    --card-soft:    #4d4d4c;
+    --card-muted:   #727271;
+    --card-accent:  #0042da;
+    --card-on-accent: #f2f2ef;
+    --card-avatar-bg: #d8d8d5;
+    --card-cell-0:  #d8d8d5;
+    --card-cell-1:  #acacaa;
+    --card-cell-2:  #6a6a68;
+    --card-foot-muted: #9e9e9d;
+    --card-foot-faint: #797978;
+}
+
+
+/* ---------- 4. 非“颜色类型”的明暗取值（filter 等，light-dark() 不支持） ---------- */
+:root {
+    --filter-icon: brightness(0);                       /* 图标 → 前景色剪影（亮色：墨黑） */
+}
+:root[data-theme="dark"],
+:root.dark {
+    --filter-icon: brightness(0) invert(1);             /* 暗夜：纸白 */
+}
+:root[data-theme="light"],
+:root.light {
+    --filter-icon: brightness(0);
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]):not(.light) {
+        --filter-icon: brightness(0) invert(1);
+    }
+}
+:root {
+    --filter-icon-on-accent: brightness(0) invert(1);   /* 蓝 / 反色面上：纸白 */
+}
+
+
+/* ---------- 5. 兼容别名（旧模板 / JS 里仍在用的变量名） ---------- */
+:root {
+    --bg:         var(--color-bg);
+    --paper:      var(--color-bg);
+    --ink:        var(--color-fg);
+    --text-gray:  var(--color-fg-soft);
+    --text-light: var(--color-fg-muted);
+    --primary:    var(--color-accent);
+    --rule:       var(--color-hair);
+
+    /* Tailwind Typography（.prose）。明暗已由语义色自适应，invert 与常规取值相同 */
+    --tw-prose-body:         var(--color-fg-soft);
+    --tw-prose-headings:     var(--color-fg);
+    --tw-prose-lead:         var(--color-fg-soft);
+    --tw-prose-links:        var(--color-accent-ink);
+    --tw-prose-bold:         var(--color-fg);
+    --tw-prose-counters:     var(--color-fg-muted);
+    --tw-prose-bullets:      var(--color-fg-faint);
+    --tw-prose-hr:           var(--color-border);
+    --tw-prose-quotes:       var(--color-fg);
+    --tw-prose-quote-borders: var(--color-border);
+    --tw-prose-captions:     var(--color-fg-muted);
+    --tw-prose-kbd:          var(--color-fg);
+    --tw-prose-code:         var(--color-fg);
+    --tw-prose-pre-code:     var(--color-code-block-fg);
+    --tw-prose-pre-bg:       var(--color-code-block-bg);
+    --tw-prose-th-borders:   var(--color-border-strong);
+    --tw-prose-td-borders:   var(--color-border);
+
+    --tw-prose-invert-body:         var(--tw-prose-body);
+    --tw-prose-invert-headings:     var(--tw-prose-headings);
+    --tw-prose-invert-lead:         var(--tw-prose-lead);
+    --tw-prose-invert-links:        var(--tw-prose-links);
+    --tw-prose-invert-bold:         var(--tw-prose-bold);
+    --tw-prose-invert-counters:     var(--tw-prose-counters);
+    --tw-prose-invert-bullets:      var(--tw-prose-bullets);
+    --tw-prose-invert-hr:           var(--tw-prose-hr);
+    --tw-prose-invert-quotes:       var(--tw-prose-quotes);
+    --tw-prose-invert-quote-borders: var(--tw-prose-quote-borders);
+    --tw-prose-invert-captions:     var(--tw-prose-captions);
+    --tw-prose-invert-kbd:          var(--tw-prose-kbd);
+    --tw-prose-invert-code:         var(--tw-prose-code);
+    --tw-prose-invert-pre-code:     var(--tw-prose-pre-code);
+    --tw-prose-invert-pre-bg:       var(--tw-prose-pre-bg);
+    --tw-prose-invert-th-borders:   var(--tw-prose-th-borders);
+    --tw-prose-invert-td-borders:   var(--tw-prose-td-borders);
+}
+
+
+/* ---------- 6. 打印：强制白底黑字（不跟随暗夜模式；强调色保持 #0042da） ---------- */
+@media print {
+    :root,
+    :root[data-theme="dark"],
+    :root.dark {
+        color-scheme: light;
+        --color-bg: #ffffff;
+        --color-fg: var(--palette-ink);
+        --color-accent-ink: var(--palette-blue);
+        --color-accent-hover: var(--palette-blue);
+        --filter-icon: brightness(0);
+    }
+}

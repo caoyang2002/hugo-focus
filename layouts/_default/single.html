@@ -7,31 +7,8 @@
         <h1 class="!my-0 pb-2.5">{{ .Title }}</h1>
         {{ if ne .Type "page" }}
         <div class="text-xs antialiased opacity-60">
-            <!-- <div>
-                <p>
-                    作者：{{ .Params.author | default
-                    .Site.Params.defaults.author }}
-                </p>
-                <p>
-                    日期：{{ .Date | default .Site.Params.defaults.date |
-                    time.Format ":date_medium"}}
-                </p>
-                <p>
-                    描述：{{ .Description | default
-                    .Site.Params.defaults.description }}
-                </p>
-                <p>
-                    分类：{{ delimit (.Params.categories | default
-                    .Site.Params.defaults.categories) ", " }}
-                </p>
-                <p>
-                    标签：{{ delimit (.Params.tags | default
-                    .Site.Params.defaults.tags) ", " }}
-                </p>
-            </div> -->
 
             <!-- 日期 -->
-
             <time>
                 {{ .Date | default .Site.Params.defaults.date | time.Format
                 ":date_full"}}
@@ -82,20 +59,6 @@
         "article-share.html" . }} {{ end }}
     </div>
 
-    <!-- Post Tags -->
-    <!-- {{ if .Params.tags }}
-    <footer class="mt-12 flex flex-wrap">
-        {{ range .Params.tags }} {{ $href := print (absURL "tags/") (urlize .)
-        }}
-        <a
-            class="mb-1.5 ltr:mr-1.5 rtl:ml-1.5 rounded-lg bg-black/[3%] px-5 py-1 no-underline hover:bg-black/[6%] dark:bg-white/[8%] dark:hover:bg-white/[12%]"
-            href="{{ $href }}"
-            >{{ . }}</a
-        >
-        {{ end }}
-    </footer>
-    {{ end }} -->
-
     <!-- Post Nav -->
     {{ if not site.Params.disablePostNavigation }}<!---->
     {{ $pages := where site.RegularPages "Type" "in" site.Params.mainSections }}<!---->
@@ -121,7 +84,7 @@
     {{ end }}<!---->
     {{ end }}
 
-    <!--  -->
+    <!-- 反馈 -->
     <div class="mt-12 rounded-xl" style="text-align: center">
         {{ if site.Params.Feedback }} {{ partial "feedback.html" . }} {{end}}
     </div>
