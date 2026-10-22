@@ -1,0 +1,277 @@
+
+    /* =========================================================
+       site-header：整站顶栏
+       ========================================================= */
+    .site-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        width: 100vw;
+        margin-inline: auto;
+        display: flex;
+        height: 3rem;                   /* h-12 */
+        padding-inline: 2rem;           /* px-8 */
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        background: rgba(255, 255, 255, 0.5);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        border-bottom: 0.1rem solid #000;
+    }
+
+    @media (min-width: 1024px) {
+        .site-header {
+            justify-content: center;
+        }
+    }
+
+    /* =========================================================
+       site-header__brand-zone：品牌 + 主题切换所在区
+       ========================================================= */
+    .site-header__brand-zone {
+        position: relative;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        max-width: var(--w);
+        margin-inline-end: auto;        /* LTR: mr-auto / RTL: ml-auto */
+    }
+
+    /* 菜单项悬停色 */
+    .site-header-menu:hover {
+        color: #0042da;
+    }
+
+
+/* =========================================================
+1. 外层容器 header_nav-wrapper
+移动端：固定在 header 下方、全屏、纵向居中
+桌面端：静态、横向
+========================================================= */
+.header_nav-wrapper {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 100%;
+    z-index: 40;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+    padding-bottom: 4rem;          /* pb-16 */
+    user-select: none;
+    transition-duration: 200ms;
+    background: transparent;
+
+}
+
+.dark .header_nav-wrapper {
+    background: #000;              /* dark:bg-black */
+}
+
+/* =========================================================
+2. 导航列表 header_nav-menu
+========================================================= */
+.header_nav-menu {
+    margin-left: 0;
+}
+
+/* =========================================================
+3. 主按钮分组
+========================================================= */
+.header_nav-group {
+    position: relative;
+}
+
+/* 主按钮：移动端整行居中、大字号、5rem 行高 */
+.header_nav-toggle {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;                  /* gap-1 */
+    cursor: default;
+    text-align: center;
+    font-size: 1.25rem;            /* text-xl */
+    line-height: 5rem;             /* leading-[5rem] */
+    font-family: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+}
+
+/* 无子项兜底链接 */
+.header_nav-link {
+    display: block;
+    text-align: center;
+    font-size: 1.25rem;
+    line-height: 5rem;
+    color: inherit;
+    text-decoration: none;
+}
+
+/* 图标 */
+.header_nav-group svg {
+    flex-shrink: 0;
+}
+
+.header_nav-icon-search {
+    width: 1.25rem;                /* h-5 w-5 */
+    height: 1.25rem;
+}
+
+.header_nav-icon-chevron {
+    width: 1rem;                   /* h-4 w-4 */
+    height: 1rem;
+    transition: transform 200ms;
+}
+
+.header_nav-group:hover .header_nav-icon-chevron,
+.header_nav-group:focus-within .header_nav-icon-chevron {
+    transform: rotate(180deg);     /* group-hover:rotate-180 */
+}
+
+/* 屏幕阅读器专用文本 */
+.header_nav-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* =========================================================
+4. 子菜单
+移动端：平铺缩进；桌面端：绝对定位下拉
+========================================================= */
+.header_nav-submenu {
+    display: block;
+    padding-left: 1rem;            /* pl-4 */
+
+}
+
+.header_nav-submenu a {
+    display: block;
+    padding: 0.25rem;
+    text-align: center;
+    font-size: 1rem;               /* text-base */
+    line-height: 1.5;              /* leading-normal */
+    color: inherit;
+    text-decoration: none;
+    transition: background-color 150ms, color 150ms;
+}
+
+.header_nav-submenu a:hover {
+    background-color: #0042da;     /* neutral-100 */
+    color:#fff;
+
+}
+
+.dark .header_nav-submenu a:hover {
+    background-color: #262626;     /* neutral-800 */
+}
+
+/* =========================================================
+5. 语言选择器（保留 .language-selector 兼容 partial）
+========================================================= */
+.header_nav-language-selector {
+    position: relative;
+    display: inline-block;
+    z-index: 10;
+}
+
+/* partial 内部若未改动样式，这里维持原逻辑 */
+.language-selector .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 50;
+}
+
+.language-selector:hover .dropdown-menu {
+    display: block;
+}
+
+/* =========================================================
+6. 桌面端 lg（≥1024px）
+========================================================= */
+@media (min-width: 1024px) {
+    .header_nav-wrapper {
+        position: static;
+        height: auto;
+        flex-direction: row;
+        padding-bottom: 0;
+        background: transparent !important;
+        transition: none;
+    }
+
+    .header_nav-menu {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    /* lg:space-x-10 + rtl:space-x-reverse，用逻辑属性兼容 LTR/RTL */
+    .header_nav-menu > * + * {
+        margin-inline-start: 2.5rem; /* 10 = 2.5rem */
+    }
+
+    .header_nav-toggle {
+        width: auto;
+        font-size: 1rem;
+        font-weight: 400;
+    }
+
+    .header_nav-link {
+        font-size: 1rem;
+        font-weight: 400;
+    }
+
+    .header_nav-submenu {
+        position: absolute;
+        left: 0;
+        top: 100%;
+        z-index: 50;
+        min-width: 6rem;
+        padding-left: 0;
+
+        /*border-radius: 0.5rem;*/
+        border: 0.1rem solid #000; /* neutral-200 */
+        background: #fff;
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+        0 4px 6px -4px rgb(0 0 0 / 0.1);
+        visibility: hidden;
+        opacity: 0;
+        transform: translateY(0.25rem);
+        transition: opacity 200ms, transform 200ms, visibility 200ms;
+    }
+
+    .header_nav-group:hover > .header_nav-submenu,
+    .header_nav-group:focus-within > .header_nav-submenu {
+        visibility: visible;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .header_nav-submenu a {
+        text-align: left;
+        font-size: 0.875rem;       /* text-sm */
+        padding: 0.25rem;
+    }
+
+    .dark .header_nav-submenu {
+        border-color: #262626;     /* neutral-800 */
+        background: #171717;       /* neutral-900 */
+    }
+}

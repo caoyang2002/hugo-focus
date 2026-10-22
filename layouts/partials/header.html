@@ -1,8 +1,6 @@
-<header class="mx-auto flex h-12 px-8 lg:justify-center">
+<header class="site-header">
     <!-- 左侧：品牌 + 主题切换 -->
-    <div
-        class="relative z-50 ltr:mr-auto rtl:ml-auto flex items-center max-w-[--w]"
-    >
+    <div class="site-header__brand-zone">
         {{ partial "header/brand" . }} {{ partial "header/theme-toggle" . }}
     </div>
 
@@ -58,23 +56,3 @@
 
     themeManager.init();
 </script>
-
-<!-- 样式 -->
-<style>
-    header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 50;
-        width: 100vw;
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        background: rgba(255, 255, 255, 0.5);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    }
-
-    .header-menu:hover {
-        color: #0042da;
-    }
-</style>
