@@ -9,7 +9,7 @@
   /* 占位：防止 iframe 加载后高度突增导致的布局抖动 */
   min-height: 320px;
   /* 用比页面高一级的底色包住 iframe，暗色下 giscus 白底不会太突兀 */
-  background: var(--color-bg-soft);
+  /*background: var(--color-bg-soft);*/
   border: 1px solid var(--color-border);
   padding: clamp(12px, 2vw, 24px);
   /* 瑞士风格：保持直角，不加圆角 */
@@ -35,7 +35,4 @@
   color: var(--color-fg-faint);
   font-size: 14px;
   letter-spacing: 0.04em;
-}
-.gsc-comment-box:not(.gsc-comment-box-is-reply){
-    border-radius: 0;
 }

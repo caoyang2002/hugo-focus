@@ -4,14 +4,66 @@
     <nav
         class="lg:ml-0 lg:flex lg:flex-row lg:items-center lg:space-x-10 rtl:space-x-reverse"
     >
-        {{ with site.Menus.main }} {{ range . }}
-        <a
-            class="block text-center text-xl leading-[5rem] lg:text-base lg:font-normal header-menu"
-            href="{{ .URL }}"
-        >
-            {{ .Name }}
-        </a>
-        {{ end }} {{ end }}
+        {{ with site.Menus.main }}
+            {{ range . }}
+                {{ if .HasChildren }}
+                    {{/* 有子项的主按钮：不可点击跳转，仅展开下拉 */}}
+                    <div class="nav-group group relative">
+                        <button
+                            type="button"
+                            aria-haspopup="true"
+                            class="flex w-full cursor-default items-center justify-center gap-1 text-center text-xl leading-[5rem] lg:w-auto lg:text-base lg:font-normal header-menu"
+                        >
+                            {{ if eq .Params.icon "search" }}
+                                {{/* 放大镜图标 */}}
+                                <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24"
+                                     stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <circle cx="11" cy="11" r="7"></circle>
+                                    <path stroke-linecap="round" d="M20.5 20.5l-4.2-4.2"></path>
+                                </svg>
+                                <span class="sr-only">{{ .Name }}</span>
+                            {{ else }}
+                                {{ .Name }}
+                                <svg class="h-4 w-4 shrink-0 transition-transform duration-200 group-hover:rotate-180"
+                                     viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd"
+                                          d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                                          clip-rule="evenodd"/>
+                                </svg>
+                            {{ end }}
+                        </button>
+
+                        <div
+                            class="nav-submenu pl-4 lg:pl-0
+                                   lg:absolute lg:left-0 lg:top-full lg:z-50 lg:min-w-[12rem]
+                                   lg:invisible lg:translate-y-1 lg:opacity-0
+                                   lg:transition-all lg:duration-200
+                                   lg:group-hover:visible lg:group-hover:translate-y-0 lg:group-hover:opacity-100
+                                   lg:group-focus-within:visible lg:group-focus-within:translate-y-0 lg:group-focus-within:opacity-100
+                                   lg:rounded-lg lg:border lg:border-neutral-200 lg:bg-white lg:py-2 lg:shadow-lg
+                                   dark:lg:border-neutral-800 dark:lg:bg-neutral-900"
+                        >
+                            {{ range .Children }}
+                                <a
+                                    href="{{ .URL }}"
+                                    class="block px-4 py-2 text-center text-base leading-normal transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800 lg:text-left lg:text-sm"
+                                >
+                                    {{ .Name }}
+                                </a>
+                            {{ end }}
+                        </div>
+                    </div>
+                {{ else }}
+                    {{/* 无子项的主按钮（当前配置不会出现，保留兜底）*/}}
+                    <a
+                        href="{{ .URL }}"
+                        class="block text-center text-xl leading-[5rem] lg:text-base lg:font-normal header-menu"
+                    >
+                        {{ .Name }}
+                    </a>
+                {{ end }}
+            {{ end }}
+        {{ end }}
 
         <div class="language-selector">
             {{ partial "language-selector.html" . }}
