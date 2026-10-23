@@ -1,11 +1,18 @@
+<!-- 主页侧边栏 -->
 <aside class="sticky">
     <div class="sidebar-card">
+        <!-- 个人信息 -->
         {{ partial "sidebar/profile.html" . }}
         <div class="content-section">
+            <!-- 统计信息 -->
             {{ partial "sidebar/stats.html" . }}
+            <!-- 文章分类 -->
             {{ partial "sidebar/categories.html" . }}
+            <!-- 标签 -->
             {{ partial "sidebar/tags.html" . }}
+            <!-- 热门文章 -->
             {{ partial "sidebar/popular-posts.html" . }}
+            <!-- 归档 -->
             {{ partial "sidebar/archives.html" . }}
         </div>
     </div>

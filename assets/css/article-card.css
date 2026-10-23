@@ -1,0 +1,240 @@
+/* ============================================
+   Article Card Component
+   ============================================ */
+
+/* ---------- 颜色变量（亮色） ---------- */
+.article-card {
+    --ac-bg: rgba(255, 255, 255, 0.1);
+    --ac-border: #e5e7eb;          /* gray-200 */
+    --ac-border-hover: #93c5fd;    /* blue-300 */
+    --ac-title: #111827;           /* gray-900 */
+    --ac-title-hover: #3b82f6;     /* blue-500 */
+    --ac-text: #4b5563;            /* gray-600 */
+    --ac-muted: #6b7280;           /* gray-500 */
+    --ac-meta-border: #f3f4f6;     /* gray-100 */
+    --ac-media-bg: #f3f4f6;        /* gray-100 */
+    --ac-badge-featured-bg: #ffedd5;  /* orange-100 */
+    --ac-badge-featured-text: #c2410c;/* orange-700 */
+    --ac-badge-category-bg: #dbeafe;  /* blue-100 */
+    --ac-badge-category-text: #1d4ed8;/* blue-700 */
+    --ac-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --ac-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+                       0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+/* ---------- 暗色变量 ---------- */
+@media (prefers-color-scheme: dark) {
+    .article-card {
+        --ac-bg: rgba(17, 24, 39, 0.6);
+        --ac-border: #374151;          /* gray-700 */
+        --ac-border-hover: #2563eb;    /* blue-600 */
+        --ac-title: #f3f4f6;           /* gray-100 */
+        --ac-title-hover: #60a5fa;     /* blue-400 */
+        --ac-text: #9ca3af;            /* gray-400 */
+        --ac-muted: #9ca3af;           /* gray-400 */
+        --ac-meta-border: #1f2937;     /* gray-800 */
+        --ac-media-bg: #374151;        /* gray-700 */
+        --ac-badge-featured-bg: #7c2d12;  /* orange-900 */
+        --ac-badge-featured-text: #fdba74;/* orange-300 */
+        --ac-badge-category-bg: #1e3a8a;  /* blue-900 */
+        --ac-badge-category-text: #93c5fd;/* blue-300 */
+    }
+}
+
+/* 站点若使用 .dark 类切换，可同时支持 */
+.dark .article-card {
+    --ac-bg: rgba(17, 24, 39, 0.6);
+    --ac-border: #374151;
+    --ac-border-hover: #2563eb;
+    --ac-title: #f3f4f6;
+    --ac-title-hover: #60a5fa;
+    --ac-text: #9ca3af;
+    --ac-muted: #9ca3af;
+    --ac-meta-border: #1f2937;
+    --ac-media-bg: #374151;
+    --ac-badge-featured-bg: #7c2d12;
+    --ac-badge-featured-text: #fdba74;
+    --ac-badge-category-bg: #1e3a8a;
+    --ac-badge-category-text: #93c5fd;
+}
+
+/* ---------- 根节点 ---------- */
+.article-card {
+    height: 100%;
+    background: var(--ac-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    /*border-radius: 0.5rem;*/
+    box-shadow: var(--ac-shadow);
+}
+
+/* ---------- 链接卡片 ---------- */
+.article-card .article-card-link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    /*border: 2px solid var(--ac-border);*/
+    border-radius: 0.5rem;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+
+.article-card .article-card-link:hover {
+    box-shadow: var(--ac-shadow-hover);
+    border-color: var(--ac-border-hover);
+    transform: scale(1.01);
+}
+
+/* ---------- 图片 ---------- */
+.article-card .article-card-media {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--ac-media-bg);
+    flex-shrink: 0;
+}
+
+.article-card .article-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.article-card .article-card-link:hover .article-card-image {
+    transform: scale(1.05);
+}
+
+/* ---------- 内容 ---------- */
+.article-card .article-card-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 0.4rem;
+}
+
+/* ---------- 标签 ---------- */
+.article-card .article-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.article-card .article-card-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1;
+    /*border-radius: 0.25rem;*/
+}
+
+.article-card .article-card-badge-featured {
+    background: var(--ac-badge-featured-bg);
+    color: var(--ac-badge-featured-text);
+}
+
+.article-card .article-card-badge-category {
+    background: var(--ac-badge-category-bg);
+    color: var(--ac-badge-category-text);
+}
+
+.article-card .article-card-badge-icon {
+    width: 0.75rem;
+    height: 0.75rem;
+    margin-right: 0.25rem;
+    flex-shrink: 0;
+}
+
+/* ---------- 中部标题与描述 ---------- */
+.article-card .article-card-main {
+    flex: 1 1 0%;
+    min-height: 0;
+}
+
+.article-card .article-card-title {
+    margin: 0 0 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--ac-title);
+    transition: color 0.3s ease;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+}
+
+.article-card .article-card-link:hover .article-card-title {
+    color: var(--ac-title-hover);
+}
+
+.article-card .article-card-desc {
+    overflow: hidden;
+}
+
+.article-card .article-card-summary {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--ac-text);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+}
+
+/* ---------- 底部元信息 ---------- */
+.article-card .article-card-meta {
+    padding-top: 1rem;
+    margin-top: 1rem;
+    /*border-top: 1px solid var(--ac-meta-border);*/
+}
+
+.article-card .article-card-meta-inner {
+    display: flex;
+    align-items: center;
+    font-size: 0.75rem;
+    color: var(--ac-muted);
+}
+
+.article-card .article-card-date {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.article-card .article-card-meta-sep {
+    margin: 0 0.5rem;
+    flex-shrink: 0;
+}
+
+.article-card .article-card-reading {
+    white-space: nowrap;
+}
+
+.article-card .article-card-tags-text {
+    flex: 1 1 0%;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 768px) {
+    .article-card .article-card-body {
+        padding: 1rem;
+    }
+
+    .article-card .article-card-title {
+        font-size: 1.125rem;
+    }
+}

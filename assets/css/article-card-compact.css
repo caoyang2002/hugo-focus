@@ -1,0 +1,251 @@
+/* ============================================
+   Article Card Compact Component
+   ============================================ */
+
+/* ---------- 颜色变量（亮色） ---------- */
+.article-compact {
+    --acc-inner-bg: rgba(255, 255, 255, 0.1);
+    --acc-inner-bg-hover: rgba(255, 255, 255, 0.8);
+    --acc-border: #e5e7eb;
+    --acc-border-hover: #93c5fd;
+    --acc-title: #111827;
+    --acc-title-hover: #3b82f6;
+    --acc-text: #4b5563;
+    --acc-muted: #6b7280;
+    --acc-media-bg: #f3f4f6;
+    --acc-star: #f97316;
+    --acc-decoration-from: rgba(239, 246, 255, 0.3);
+    --acc-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --acc-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+                        0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+/* ---------- 颜色变量（暗色） ---------- */
+@media (prefers-color-scheme: dark) {
+    .article-compact {
+        --acc-inner-bg: rgba(17, 24, 39, 0.6);
+        --acc-inner-bg-hover: rgba(17, 24, 39, 0.8);
+        --acc-border: #374151;
+        --acc-border-hover: #2563eb;
+        --acc-title: #f3f4f6;
+        --acc-title-hover: #60a5fa;
+        --acc-text: #9ca3af;
+        --acc-muted: #9ca3af;
+        --acc-media-bg: #374151;
+        --acc-star: #fb923c;
+        --acc-decoration-from: rgba(30, 58, 138, 0.2);
+    }
+}
+
+.dark .article-compact {
+    --acc-inner-bg: rgba(17, 24, 39, 0.6);
+    --acc-inner-bg-hover: rgba(17, 24, 39, 0.8);
+    --acc-border: #374151;
+    --acc-border-hover: #2563eb;
+    --acc-title: #f3f4f6;
+    --acc-title-hover: #60a5fa;
+    --acc-text: #9ca3af;
+    --acc-muted: #9ca3af;
+    --acc-media-bg: #374151;
+    --acc-star: #fb923c;
+    --acc-decoration-from: rgba(30, 58, 138, 0.2);
+}
+
+/* ---------- 根节点 ---------- */
+.article-compact {
+    position: relative;
+    margin: 0;
+}
+.article-compact:hover {
+   background-color: #0042da;
+}
+
+/* ---------- 卡片本体 ---------- */
+.article-compact .article-compact-inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;          /* 移动端：子项横向拉伸 */
+    gap: 1rem;
+    margin: 0;
+    border: 0.1rem solid #000;
+    background: var(--acc-inner-bg);
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+    box-shadow: var(--acc-shadow);
+    overflow: hidden;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease,
+                background-color 0.3s ease, transform 0.3s ease;
+}
+
+.article-compact .article-compact-inner:hover {
+    box-shadow: var(--acc-shadow-hover);
+    border-color: var(--acc-border-hover);
+    background: var(--acc-inner-bg-hover);
+    transform: scale(1.01);
+}
+
+/* ---------- 背景装饰 ---------- */
+.article-compact .article-compact-decoration {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(
+        to bottom right,
+        var(--acc-decoration-from),
+        transparent
+    );
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+}
+
+.article-compact .article-compact-inner:hover .article-compact-decoration {
+    opacity: 1;
+}
+
+/* ---------- 左侧图片容器 ---------- */
+.article-compact .article-compact-media {
+    position: relative;            /* 关键：为绝对定位的 img 提供上下文 */
+    flex-shrink: 0;
+    width: 100%;
+    height: 6rem;                  /* 移动端固定高度 */
+    overflow: hidden;
+    background: var(--acc-media-bg);
+    line-height: 0;                /* 消除行内元素基线缝隙 */
+}
+
+/* ---------- 图片本体 ---------- */
+.article-compact .article-compact-image {
+    position: absolute;            /* 关键：脱离文档流，不再依赖父级定高 */
+    inset: 0;                      /* top/right/bottom/left: 0 */
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    object-fit: cover;             /* 填满且等比裁剪，不变形 */
+    object-position: center;
+    padding: 0;
+    transition: transform 0.3s ease;
+}
+
+.article-compact .article-compact-inner:hover .article-compact-image {
+    transform: scale(1.05);
+}
+
+/* ---------- 右侧内容 ---------- */
+.article-compact .article-compact-body {
+    flex: 1 1 0%;
+    padding: 0.4rem;
+    min-width: 0;
+}
+
+/* ---------- 标题行 ---------- */
+.article-compact .article-compact-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin: 0 0 0.5rem;
+}
+
+.article-compact .article-compact-title {
+    flex: 1 1 0%;
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--acc-title);
+    transition: color 0.3s ease;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+}
+
+.article-compact .article-compact-inner:hover .article-compact-title {
+    color: var(--acc-title-hover);
+}
+
+/* ---------- 置顶星标 ---------- */
+.article-compact .article-compact-star {
+    flex-shrink: 0;
+    color: var(--acc-star);
+    display: inline-flex;
+    align-items: center;
+}
+
+.article-compact .article-compact-star-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+/* ---------- 描述 ---------- */
+.article-compact .article-compact-summary {
+    margin: 0 0 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--acc-text);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+}
+
+/* ---------- 元信息 ---------- */
+.article-compact .article-compact-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 1rem;
+    row-gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--acc-muted);
+}
+
+.article-compact .article-compact-meta-item {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.article-compact .article-compact-meta-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+    margin-right: 0.25rem;
+    flex-shrink: 0;
+}
+
+.article-compact .article-compact-meta-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+}
+
+/* ---------- 全区域链接 ---------- */
+.article-compact .article-compact-link {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    text-decoration: none;
+    color: transparent;
+}
+
+/* ---------- 中等屏幕及以上：横向布局 ---------- */
+@media (min-width: 768px) {
+    .article-compact .article-compact-inner {
+        flex-direction: row;
+        align-items: stretch;      /* 关键：media 高度跟随 body / 卡片实际高度 */
+    }
+
+    .article-compact .article-compact-media {
+        width: 8rem;
+        height: auto;              /* 覆盖移动端 6rem，交给 stretch 决定 */
+        align-self: stretch;       /* 双保险：垂直方向强制铺满 */
+    }
+}
