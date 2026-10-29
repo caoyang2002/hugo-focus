@@ -1,19 +1,4 @@
-/* ===== 响应式 ===== */
-@media (max-width: 768px) {
-    aside { display: none; }
-}
-
-/* ===== 侧栏整体 ===== */
-aside {
-    position: fixed;
-    /*top: 6rem;*/
-    top: 6rem;
-    right: 1rem;
-    /*width: 14rem;*/
-    /*height: auto;*/
-    /*overflow-y: auto;*/
-    z-index: 100;
-}
+/* ===== 侧栏整体（布局见 layout.css） ===== */
 
 /* ===== 折叠箭头 ===== */
 details > summary {
@@ -39,6 +24,7 @@ details[open] > div {
 /* ===== 卡片 ===== */
 .sidebar-card {
     background: #fff;
+    border: 0.1rem solid var(--palette-ink);
     /*border-radius: 12px;*/
     /*border: 0.1rem solid var(--palette-ink);*/
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);

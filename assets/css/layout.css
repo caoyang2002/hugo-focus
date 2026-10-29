@@ -60,11 +60,13 @@ body {
     }
 }
 
-/* ===== aside sticky 容器（固定在左侧） ===== */
+/* ===== aside 容器（固定在右侧中部） ===== */
 .layout-aside-sticky {
-    position: sticky;
-    /*top: 6rem;*/
-    border: 0.1rem solid var(--palette-ink);
+    position: fixed;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    width: calc(100vw / 6 - 1.5rem);
     max-height: calc(100vh - 8rem);
     overflow-x: hidden;            /* 禁止横向滚动 */
     overflow-y: auto;              /* 仅允许纵向滚动 */
@@ -80,7 +82,7 @@ body {
     width: 4px;
 }
 .layout-aside-sticky::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.15);
+    /*background: rgba(0, 0, 0, 0.15);*/
     /*border-radius: 4px;*/
 }
 .dark .layout-aside-sticky::-webkit-scrollbar-thumb {

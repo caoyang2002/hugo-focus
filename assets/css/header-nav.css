@@ -112,6 +112,9 @@
     text-decoration: none;
 }
 
+.header_nav-link:hover {
+    color: #0042da;
+}
 /* 图标 */
 .header_nav-group svg {
     flex-shrink: 0;
