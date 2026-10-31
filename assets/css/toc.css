@@ -1,10 +1,7 @@
 /* ===== 基础布局 ===== */
 .toc-aside {
-    position: fixed;
-    top: 6rem;
-    bottom: 4rem;
-    right: 0;
-    width: 12rem;
+    position: static;
+    width: 100%;
     z-index: 100;
     transition: transform 0.3s ease;
 }
