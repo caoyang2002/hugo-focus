@@ -57,8 +57,11 @@ background-color: #0042da;
 }
 
 .page-num {
-    /*padding: 0.5rem 1rem;*/
-    border: 1px solid #ddd;
+    padding: 0.2rem 0.4rem;
+    /*border: 1px solid #ddd;*/
+      border-right: 1px solid #000 !important;
+      border-left:  1px solid #000 !important;
+
     /*border-radius: 4px;*/
     text-decoration: none;
     color: #333;
@@ -67,6 +70,7 @@ background-color: #0042da;
 .page-num.active {
     background-color: #000;
     color: white;
+
     border-color: #007bff;
 }
 
