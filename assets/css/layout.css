@@ -92,6 +92,6 @@ body {
 /* ===== 移动端 footer 补偿 ===== */
 @media (max-width: 1023px) {
     .layout-grid {
-        padding-bottom: 4rem;
+        padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
     }
 }

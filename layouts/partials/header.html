@@ -18,12 +18,61 @@
 
     // 移动菜单功能
     const btnMenu = document.querySelector(".btn-menu");
+    const navWrapper = document.querySelector(".header_nav-wrapper");
+    const desktopQuery = window.matchMedia("(min-width: 1024px)");
+
+    function setMenu(open) {
+        htmlClass.toggle("open", open);
+        htmlClass.toggle("close", !open);
+        if (btnMenu) btnMenu.setAttribute("aria-expanded", String(open));
+
+        if (!open) {
+            document.querySelectorAll(".header_nav-group.is-open").forEach((group) => {
+                group.classList.remove("is-open");
+                const toggle = group.querySelector(".header_nav-toggle");
+                if (toggle) toggle.setAttribute("aria-expanded", "false");
+            });
+        }
+    }
+
     if (btnMenu) {
+        setMenu(false);
         btnMenu.addEventListener("click", () => {
-            htmlClass.toggle("open");
-            htmlClass.toggle("close");
+            setMenu(!htmlClass.contains("open"));
+        });
+        btnMenu.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                setMenu(!htmlClass.contains("open"));
+            }
         });
     }
+
+    if (navWrapper) {
+        navWrapper.addEventListener("click", (event) => {
+            const groupToggle = event.target.closest(".header_nav-toggle");
+            if (groupToggle && !desktopQuery.matches) {
+                const group = groupToggle.closest(".header_nav-group");
+                if (group) {
+                    const isOpen = group.classList.toggle("is-open");
+                    groupToggle.setAttribute("aria-expanded", String(isOpen));
+                }
+                return;
+            }
+
+            if (event.target.closest("a")) {
+                setMenu(false);
+            }
+        });
+    }
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") setMenu(false);
+    });
+
+    desktopQuery.addEventListener("change", (event) => {
+        if (event.matches) setMenu(false);
+    });
 
     // 主题管理
     const themeManager = {

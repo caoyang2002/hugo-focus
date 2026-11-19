@@ -1,4 +1,4 @@
-<div class="header_nav-wrapper">
+<div class="header_nav-wrapper" id="site-navigation">
     <nav class="header_nav-menu">
         {{ with site.Menus.main }}
             {{ range . }}
@@ -8,6 +8,7 @@
                         <button
                             type="button"
                             aria-haspopup="true"
+                            aria-expanded="false"
                             class="header_nav-toggle header_nav-menu-item"
                         >
                             {{ if eq .Params.icon "search" }}

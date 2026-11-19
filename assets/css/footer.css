@@ -13,14 +13,26 @@ footer {
     padding-right: max(0.5rem, var(--safe-padding-right, env(safe-area-inset-right, 0px)));
 
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
+    gap: 0.25rem 1rem;
 
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(12px);
     background: rgba(255, 255, 255, 0.85);
     border-top: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+}
+
+footer.h-8 {
+    height: auto;
+    min-height: 2rem;
+    line-height: 1.5;
+}
+
+footer > * {
+    min-width: 0;
 }
 
 /* ===== 深色模式 ===== */
@@ -30,9 +42,35 @@ footer {
 }
 
 /* ===== 响应式 ===== */
-@media (max-width: 768px) {
-    footer {
-        padding-top: 0.5rem;
-        padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
+@media (max-width: 1023px) {
+    footer.h-8 {
+        justify-content: center;
+        text-align: center;
+        font-size: 0.6875rem;
+        gap: 0.15rem 0.75rem;
+        padding-top: 0.4rem;
+        padding-bottom: calc(0.4rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    footer.h-8 > .mr-auto {
+        width: 100%;
+        margin-right: 0;
+        text-align: center;
+    }
+
+    footer.h-8 > .mx-6,
+    footer.h-8 > div > .mx-6 {
+        margin-inline: 0.35rem;
+    }
+}
+
+@media (max-width: 420px) {
+    footer.h-8 {
+        font-size: 0.625rem;
+    }
+
+    footer.h-8 > .mx-6,
+    footer.h-8 > div > .mx-6 {
+        margin-inline: 0.2rem;
     }
 }
