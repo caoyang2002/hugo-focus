@@ -89,8 +89,8 @@
     width: 40px;
     height: 40px;
     padding: 0;
-    background: #ffffff;
-    border: 1px solid #e5e7eb; /* gray-200 */
+    background: var(--color-bg-elevated, #ffffff);
+    border: 1px solid var(--color-border, #e5e7eb);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -100,12 +100,12 @@
     transition: all 0.3s ease;
     z-index: 10;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    color: #374151; /* gray-700 */
+    color: var(--color-fg, #374151);
 }
 
 .featured-scroll-component .scroll-btn:hover {
     opacity: 1;
-    background: #f9fafb; /* gray-50 */
+    background: var(--color-bg-soft, #f9fafb);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 
@@ -147,26 +147,53 @@
 }
 
 /* ---------- 暗色模式 ---------- */
+.dark .featured-scroll-component .featured-scroll-title,
+:root[data-theme="dark"] .featured-scroll-component .featured-scroll-title {
+    color: #f3f4f6; /* gray-100 */
+}
+
+.dark .featured-scroll-component .featured-scroll-count,
+:root[data-theme="dark"] .featured-scroll-component .featured-scroll-count {
+    color: #9ca3af; /* gray-400 */
+}
+
+.dark .featured-scroll-component .scroll-item,
+:root[data-theme="dark"] .featured-scroll-component .scroll-item {
+    border-color: #1e40af; /* blue-800 */
+}
+
+.dark .featured-scroll-component .scroll-btn,
+:root[data-theme="dark"] .featured-scroll-component .scroll-btn {
+    background: #374151; /* gray-700 */
+    border-color: #4b5563; /* gray-600 */
+    color: #d1d5db; /* gray-300 */
+}
+
+.dark .featured-scroll-component .scroll-btn:hover,
+:root[data-theme="dark"] .featured-scroll-component .scroll-btn:hover {
+    background: #4b5563;
+}
+
 @media (prefers-color-scheme: dark) {
-    .featured-scroll-component .featured-scroll-title {
+    :root:not(.light):not([data-theme="light"]) .featured-scroll-component .featured-scroll-title {
         color: #f3f4f6; /* gray-100 */
     }
 
-    .featured-scroll-component .featured-scroll-count {
+    :root:not(.light):not([data-theme="light"]) .featured-scroll-component .featured-scroll-count {
         color: #9ca3af; /* gray-400 */
     }
 
-    .featured-scroll-component .scroll-item {
+    :root:not(.light):not([data-theme="light"]) .featured-scroll-component .scroll-item {
         border-color: #1e40af; /* blue-800 */
     }
 
-    .featured-scroll-component .scroll-btn {
+    :root:not(.light):not([data-theme="light"]) .featured-scroll-component .scroll-btn {
         background: #374151; /* gray-700 */
         border-color: #4b5563; /* gray-600 */
         color: #d1d5db; /* gray-300 */
     }
 
-    .featured-scroll-component .scroll-btn:hover {
+    :root:not(.light):not([data-theme="light"]) .featured-scroll-component .scroll-btn:hover {
         background: #4b5563;
     }
 }

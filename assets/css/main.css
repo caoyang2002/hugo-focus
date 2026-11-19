@@ -128,12 +128,12 @@ hr {
 }
 
 li::marker {
-    color: #05001b !important;
+    color: var(--color-fg-muted, #05001b) !important;
     font-size: 1.2em;
 }
 
 li {
-    color: black; /* 保持文字颜色 */
+    color: inherit;
 }
 /*
 Add the correct text decoration in Chrome, Edge, and Safari.
@@ -508,13 +508,6 @@ video {
     --safe-padding-right: env(safe-area-inset-right, 0rem);
 }
 
-body:is(.dark *)::before {
-    position: fixed;
-    inset: 0px;
-    content: var(--tw-content);
-    background-color: rgb(0 0 0 / 0.85);
-}
-
 h1,
 h2,
 h3 {
@@ -805,9 +798,9 @@ pre {
     margin-top: 1.6em;
     margin-bottom: 1.6em;
     padding-inline-start: 1em;
-    border-left: 4px solid #dfe2e5;
+    border-left: 4px solid var(--color-border, #dfe2e5);
     padding: 0 15px;
-    color: #777777;
+    color: var(--color-fg-muted, #777777);
 }
 
 /* .prose

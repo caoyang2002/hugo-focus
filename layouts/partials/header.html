@@ -93,9 +93,12 @@
         },
 
         setTheme(isDark) {
-            this.metaTheme?.setAttribute("content", isDark ? "#000" : this.lightBg);
-            htmlClass[isDark ? "add" : "remove"]("dark");
-            localStorage.setItem("dark", isDark);
+            this.metaTheme?.setAttribute("content", isDark ? "#161616" : this.lightBg);
+            htmlClass.toggle("dark", isDark);
+            htmlClass.toggle("light", !isDark);
+            document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+            document.documentElement.style.colorScheme = isDark ? "dark" : "light";
+            localStorage.setItem("dark", String(isDark));
         },
 
         toggleTheme() {

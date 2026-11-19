@@ -195,9 +195,9 @@
 
 blockquote {
     width: 100%;
-    border-left: 4px solid #dfe2e5;
+    border-left: 4px solid var(--color-border, #dfe2e5);
     padding: 0 15px;
-    color: #777777;
+    color: var(--color-fg-muted, #777777);
 }
 
 blockquote blockquote {
@@ -274,9 +274,9 @@ table {
 
 /* ---========================侧边栏、菜单栏、专注模式的样式====================------ */
 blockquote {
-    border-left: 4px solid #dfe2e5;
+    border-left: 4px solid var(--color-border, #dfe2e5);
     padding: 0 15px;
-    color: #777777;
+    color: var(--color-fg-muted, #777777);
 }
 
 blockquote blockquote {
@@ -289,7 +289,7 @@ table {
 }
 
 table tr {
-    border: 1px solid #dfe2e5;
+    border: 1px solid var(--color-border, #dfe2e5);
     margin: 0;
     padding: 0;
 }
@@ -648,7 +648,7 @@ details {
     padding: 16px;
     margin: 1em 0;
     border-radius: 4px;
-    background: var(--bg-color);
+    background: var(--color-bg-soft, var(--bg-color, transparent));
     font-size: 14px;
     -webkit-transition: all 0.28s ease;
     -moz-transition: all 0.28s ease;
@@ -658,7 +658,7 @@ details {
     -moz-transition: all 0.28s ease;
     -webkit-transition: all 0.28s ease;
     -o-transition: all 0.28s ease;
-    border: 1px solid var(--bg-color);
+    border: 1px solid var(--color-border, var(--bg-color, transparent));
 }
 
 summary {
@@ -670,7 +670,7 @@ details summary {
     padding: 16px;
     margin: -16px;
     border-radius: 4px;
-    color: var(--detailstxt-color);
+    color: var(--color-fg, var(--detailstxt-color, black));
     font-size: 0.875rem !important;
     font-weight: 700;
     position: relative;
@@ -678,20 +678,20 @@ details summary {
 }
 
 details > summary {
-    background: var(--detailsbg-color);
+    background: var(--color-bg-elevated, var(--detailsbg-color, #fbffe7));
 }
 
 details[open] {
-    border-color: var(--detailsborder-color);
+    border-color: var(--color-border-strong, var(--detailsborder-color, #5fa7e4));
 }
 
 details[open] > summary {
-    color: #444;
+    color: var(--color-fg, #444);
     margin-bottom: 0;
 }
 
 details[open] > summary {
-    border-bottom: 1px solid var(--detailsborder-color);
+    border-bottom: 1px solid var(--color-border-strong, var(--detailsborder-color, #5fa7e4));
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
 }
@@ -812,26 +812,26 @@ table {
 }
 
 table tr {
-    border: 1px solid #dfe2e5;
+    border: 1px solid var(--color-border, #dfe2e5);
     margin: 0;
     padding: 0;
 }
 
 table tr:nth-child(2n),
 thead {
-    background-color: #f8f8f8;
+    background-color: var(--color-bg-soft, #f8f8f8);
 }
 
 table th {
     font-weight: bold;
-    border: 1px solid #dfe2e5;
+    border: 1px solid var(--color-border, #dfe2e5);
     border-bottom: 0;
     margin: 0;
     padding: 6px 13px;
 }
 
 table td {
-    border: 1px solid #dfe2e5;
+    border: 1px solid var(--color-border, #dfe2e5);
     margin: 0;
     padding: 6px 13px;
 }

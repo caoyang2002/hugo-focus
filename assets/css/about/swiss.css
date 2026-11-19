@@ -525,3 +525,27 @@ button {
         transition: none;
     }
 }
+
+/* ---------- 暗夜主题 ---------- */
+:root.dark,
+:root[data-theme="dark"] {
+    --bg: #161616;
+    --paper: #161616;
+    --ink: #f2f2ef;
+    --text-gray: #b5b5b0;
+    --text-light: #8a8a85;
+    --primary: #4a7bff;
+    --rule: rgba(242, 242, 239, 0.22);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not(.light):not([data-theme="light"]) {
+        --bg: #161616;
+        --paper: #161616;
+        --ink: #f2f2ef;
+        --text-gray: #b5b5b0;
+        --text-light: #8a8a85;
+        --primary: #4a7bff;
+        --rule: rgba(242, 242, 239, 0.22);
+    }
+}

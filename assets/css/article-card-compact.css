@@ -22,7 +22,7 @@
 
 /* ---------- 颜色变量（暗色） ---------- */
 @media (prefers-color-scheme: dark) {
-    .article-compact {
+    :root:not(.light):not([data-theme="light"]) .article-compact {
         --acc-inner-bg: rgba(17, 24, 39, 0.6);
         --acc-inner-bg-hover: rgba(17, 24, 39, 0.8);
         --acc-border: #374151;

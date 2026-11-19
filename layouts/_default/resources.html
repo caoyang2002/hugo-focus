@@ -8,6 +8,21 @@
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
         />
+        <script>
+            (function () {
+                try {
+                    var saved = localStorage.getItem("dark");
+                    var isDark = saved === null
+                        ? window.matchMedia("(prefers-color-scheme: dark)").matches
+                        : saved === "true";
+                    var root = document.documentElement;
+                    root.classList.toggle("dark", isDark);
+                    root.classList.toggle("light", !isDark);
+                    root.setAttribute("data-theme", isDark ? "dark" : "light");
+                    root.style.colorScheme = isDark ? "dark" : "light";
+                } catch (e) {}
+            })();
+        </script>
         <style>
             /* 现代化设计变量 - 简约时尚 */
             :root {
@@ -42,8 +57,29 @@
             }
 
             /* 暗色主题 */
+            :root.dark,
+            :root[data-theme="dark"] {
+                --primary: #60a5fa;
+                --primary-dark: #3b82f6;
+                --surface: #1f2937;
+                --surface-elevated: #374151;
+                --background: #111827;
+                --text-primary: #f9fafb;
+                --text-secondary: #d1d5db;
+                --text-tertiary: #9ca3af;
+                --border: #374151;
+                --border-light: #4b5563;
+                --hover: #2d3748;
+                --card-shadow:
+                    0 1px 3px 0 rgba(0, 0, 0, 0.2),
+                    0 1px 2px 0 rgba(0, 0, 0, 0.15);
+                --card-shadow-hover:
+                    0 10px 25px -5px rgba(0, 0, 0, 0.3),
+                    0 8px 10px -6px rgba(0, 0, 0, 0.2);
+            }
+
             @media (prefers-color-scheme: dark) {
-                :root {
+                :root:not(.light):not([data-theme="light"]) {
                     --primary: #60a5fa;
                     --primary-dark: #3b82f6;
                     --surface: #1f2937;
@@ -582,7 +618,7 @@
                         .sidebar-title {
                             font-size: 1.4rem;
                             font-weight: 600;
-                            color: #333;
+                            color: var(--text-primary);
                             margin: 0 0 0.3rem 0;
                             display: flex;
                             align-items: center;
@@ -590,12 +626,12 @@
                         }
 
                         .sidebar-title i {
-                            color: #667eea;
+                            color: var(--primary);
                         }
 
                         .sidebar-subtitle {
                             font-size: 0.9rem;
-                            color: #666;
+                            color: var(--text-secondary);
                             margin: 0;
                             line-height: 1.4;
                         }

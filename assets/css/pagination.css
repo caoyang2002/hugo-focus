@@ -11,7 +11,7 @@
     color: rgb(255 255 255 / var(--tw-text-opacity));
     text-decoration-line: none;
     transition-duration: 100ms;
-    border-left: 0.1rem solid #000;
+    border-left: 0.1rem solid var(--color-border-strong, #000);
 }
 
 .pagination-btn:active {
@@ -38,7 +38,7 @@ background-color: #0042da;
 .pagination-nav {
     /*margin: 2rem 0;*/
     margin-top: 2rem;
-    border: 0.1rem solid #000;
+    border: 0.1rem solid var(--color-border-strong, #000);
 }
 
 .pagination-container {
@@ -59,24 +59,28 @@ background-color: #0042da;
 .page-num {
     padding: 0.2rem 0.4rem;
     /*border: 1px solid #ddd;*/
-      border-right: 1px solid #000 !important;
-      border-left:  1px solid #000 !important;
+      border-right: 1px solid var(--color-border, #000) !important;
+      border-left:  1px solid var(--color-border, #000) !important;
 
     /*border-radius: 4px;*/
     text-decoration: none;
-    color: #333;
+    color: var(--color-fg, #333);
+}
+
+.page-num:hover {
+    color: var(--color-accent-ink, #0042da);
 }
 
 .page-num.active {
-    background-color: #000;
-    color: white;
+    background-color: var(--color-accent, #000);
+    color: var(--color-on-accent, white);
 
-    border-color: #007bff;
+    border-color: var(--color-accent, #007bff);
 }
 
 .ellipsis {
     /*padding: 0.5rem;*/
-    color: #666;
+    color: var(--color-fg-muted, #666);
 }
 
 .quick-jump {
@@ -89,8 +93,10 @@ background-color: #0042da;
 .jump-input {
     width: 4rem;
     padding: 0.25rem 0.5rem;
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-border, #ddd);
     border-radius: 4px;
+    color: var(--color-fg, inherit);
+    background-color: var(--color-bg-elevated, #fff);
 }
 
 .jump-btn {

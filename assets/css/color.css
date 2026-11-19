@@ -156,6 +156,23 @@
 /* ---------- 4. 非“颜色类型”的明暗取值（filter 等，light-dark() 不支持） ---------- */
 :root {
     --filter-icon: brightness(0);                       /* 图标 → 前景色剪影（亮色：墨黑） */
+    --bg-image-overlay: rgba(0, 0, 0, 0);               /* 背景图上的明暗遮罩 */
+}
+
+:root[data-theme="dark"],
+:root.dark {
+    --bg-image-overlay: rgba(22, 22, 22, 0.92);
+}
+
+:root[data-theme="light"],
+:root.light {
+    --bg-image-overlay: rgba(0, 0, 0, 0);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]):not(.light) {
+        --bg-image-overlay: rgba(22, 22, 22, 0.92);
+    }
 }
 :root[data-theme="dark"],
 :root.dark {

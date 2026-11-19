@@ -31,7 +31,7 @@
 
 <html
     class="not-ready lg:text-base close"
-    style="--bg: {{ $bg_color }}"
+    style="--palette-paper: {{ $bg_color }}"
     lang="{{ or site.LanguageCode site.Language.Lang }}"
     dir="{{ if site.Params.direction }}{{ site.Params.direction }}{{ else }}ltr{{ end }}"
 >
@@ -39,14 +39,33 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <script>
+        (function () {
+            try {
+                var saved = localStorage.getItem("dark");
+                var isDark = saved === null
+                    ? window.matchMedia("(prefers-color-scheme: dark)").matches
+                    : saved === "true";
+                var root = document.documentElement;
+                root.classList.toggle("dark", isDark);
+                root.classList.toggle("light", !isDark);
+                root.setAttribute("data-theme", isDark ? "dark" : "light");
+                root.style.colorScheme = isDark ? "dark" : "light";
+            } catch (e) {}
+        })();
+    </script>
+
     {{ if .Site.Params.backgroundImage }}
     <style>
         body {
-            background-image: url("{{ .Site.Params.backgroundImage }}");
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-attachment: fixed;
-            background-size: cover;
+            background-color: var(--bg);
+            background-image:
+                linear-gradient(var(--bg-image-overlay, transparent), var(--bg-image-overlay, transparent)),
+                url("{{ .Site.Params.backgroundImage }}");
+            background-repeat: no-repeat, no-repeat;
+            background-position: center center, center center;
+            background-attachment: fixed, fixed;
+            background-size: cover, cover;
             min-height: 100vh;
         }
         html, body { min-height: 100vh; }
@@ -64,6 +83,11 @@
     {{ end }}
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class"
+        };
+    </script>
 
     {{ partial "head.html" . }}
 </head>

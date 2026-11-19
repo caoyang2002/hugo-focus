@@ -30,8 +30,20 @@
     -webkit-text-size-adjust: 100%;
 }
 
+.dark .sp-scope,
+:root[data-theme="dark"] .sp-scope {
+    --sp-bg: #161616;
+    --sp-text: #f2f2ef;
+    --sp-text-2: #b5b5b0;
+    --sp-text-3: #77776f;
+    --sp-rule: #f2f2ef;
+    --sp-hair: rgba(242, 242, 239, 0.22);
+    --sp-tab-bg: #202020;
+    --sp-accent: #4a7bff; /* 深底上的可读蓝 */
+}
+
 @media (prefers-color-scheme: dark) {
-    .sp-scope {
+    :root:not(.light):not([data-theme="light"]) .sp-scope {
         --sp-bg: #161616;
         --sp-text: #f2f2ef;
         --sp-text-2: #b5b5b0;

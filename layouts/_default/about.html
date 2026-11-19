@@ -7,6 +7,22 @@
     <meta name="description" content="{{ with .Params.bio }}{{ . }}{{ else }}{{ .Site.Params.subtitle | default .Site.Title }}{{ end }}" />
     <title>{{ .Title }} | {{ .Site.Title }}</title>
 
+    <script>
+        (function () {
+            try {
+                var saved = localStorage.getItem("dark");
+                var isDark = saved === null
+                    ? window.matchMedia("(prefers-color-scheme: dark)").matches
+                    : saved === "true";
+                var root = document.documentElement;
+                root.classList.toggle("dark", isDark);
+                root.classList.toggle("light", !isDark);
+                root.setAttribute("data-theme", isDark ? "dark" : "light");
+                root.style.colorScheme = isDark ? "dark" : "light";
+            } catch (e) {}
+        })();
+    </script>
+
     {{ with .Site.Params.favicon }}
     <link rel="icon" href="{{ . | relURL }}" />
     {{ end }}

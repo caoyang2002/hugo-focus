@@ -24,7 +24,7 @@
 
 /* ---------- 暗色变量 ---------- */
 @media (prefers-color-scheme: dark) {
-    .article-card {
+    :root:not(.light):not([data-theme="light"]) .article-card {
         --ac-bg: rgba(17, 24, 39, 0.6);
         --ac-border: #374151;          /* gray-700 */
         --ac-border-hover: #2563eb;    /* blue-600 */
