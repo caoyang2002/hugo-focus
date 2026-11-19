@@ -884,9 +884,12 @@ html.sp-lock {
     margin-top: 16px;
     padding-top: 16px;
     border-top: 1px solid #111;
-    font-size: 0.9rem;
-    line-height: 1.95;
+    max-width: 25em;
+    font-size: 1.25rem;
+    line-height: 1.9;
     color: #222;
+    overflow-wrap: anywhere;
+    text-wrap: pretty;
 }
 .sp-ccard-body p {
     margin: 0 0 0.9em;

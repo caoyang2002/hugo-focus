@@ -40,11 +40,6 @@
         return Array.from((el || overlay).querySelectorAll(sel));
     };
 
-    var UA_NO_DOWNLOAD =
-        /MicroMessenger|iPhone|iPad|iPod|QQBrowser|MQQBrowser|Weibo|UCBrowser|Quark/i.test(
-            navigator.userAgent,
-        );
-
     /* ==========================================================
        第三方库：本地 → 多个 CDN 依次回退
        ========================================================== */
@@ -550,22 +545,26 @@
         return String(s).replace(/[\\/:*?"<>|\s]+/g, "-").slice(0, 60) || "share";
     }
 
-    async function deliver(canvas, filename) {
-        if (UA_NO_DOWNLOAD) {
-            showPreview(canvas.toDataURL("image/png"));
-            return;
-        }
-        var blob = await toBlob(canvas);
-        var url = URL.createObjectURL(blob);
+    function triggerDownload(url, filename, revoke) {
         var a = document.createElement("a");
         a.href = url;
         a.download = filename;
+        a.rel = "noopener";
+        a.style.display = "none";
         document.body.appendChild(a);
         a.click();
         a.remove();
-        setTimeout(function () {
-            URL.revokeObjectURL(url);
-        }, 5000);
+        if (revoke) {
+            setTimeout(function () {
+                URL.revokeObjectURL(url);
+            }, 5000);
+        }
+    }
+
+    async function deliver(canvas, filename) {
+        var blob = await toBlob(canvas);
+        var url = URL.createObjectURL(blob);
+        triggerDownload(url, filename, true);
     }
 
     async function exportCard(cardId, filename, btn) {
@@ -604,10 +603,8 @@
             await deliver(canvas, filename);
             toast(
                 degraded
-                    ? "已生成（部分图片因跨域无法导出，已使用默认样式）"
-                    : UA_NO_DOWNLOAD
-                      ? "请长按图片保存"
-                      : "图片已下载",
+                    ? "已下载（部分图片因跨域无法导出，已使用默认样式）"
+                    : "图片已下载",
             );
             bumpStats();
         } catch (err) {
@@ -624,23 +621,14 @@
     }
 
     function deliverURL(url, filename) {
-        if (UA_NO_DOWNLOAD) {
-            showPreview(url);
-            return;
-        }
-        var a = document.createElement("a");
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
+        triggerDownload(url, filename, false);
     }
 
     async function downloadQR() {
         try {
             var url = await qrDataURL(data.url, 512, 2);
             deliverURL(url, "qrcode-" + safeName(data.title) + ".png");
-            toast(UA_NO_DOWNLOAD ? "请长按二维码保存" : "二维码已下载");
+            toast("二维码已下载");
         } catch (e) {
             toast("二维码生成失败，请检查网络后重试");
         }
