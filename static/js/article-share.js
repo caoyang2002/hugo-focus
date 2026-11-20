@@ -538,6 +538,24 @@
         });
     }
 
+    function withTimeout(promise, ms, message) {
+        return new Promise(function (resolve, reject) {
+            var timer = setTimeout(function () {
+                reject(new Error(message || "timeout"));
+            }, ms);
+            promise.then(
+                function (value) {
+                    clearTimeout(timer);
+                    resolve(value);
+                },
+                function (error) {
+                    clearTimeout(timer);
+                    reject(error);
+                },
+            );
+        });
+    }
+
     function safeName(s) {
         return String(s).replace(/[\\/:*?"<>|\s]+/g, "-").slice(0, 60) || "share";
     }
@@ -550,11 +568,13 @@
         a.style.display = "none";
         document.body.appendChild(a);
         a.click();
-        a.remove();
+        setTimeout(function () {
+            a.remove();
+        }, 1000);
         if (revoke) {
             setTimeout(function () {
                 URL.revokeObjectURL(url);
-            }, 5000);
+            }, 60000);
         }
     }
 
@@ -567,7 +587,13 @@
     async function exportCard(cardId, filename, btn) {
         var card = document.getElementById(cardId);
         if (!card || (btn && btn.disabled)) return;
-        if (btn) btn.disabled = true;
+        var label = btn ? btn.querySelector("span") : null;
+        var labelText = label ? label.textContent : "";
+        if (btn) {
+            btn.disabled = true;
+            btn.setAttribute("aria-busy", "true");
+        }
+        if (label) label.textContent = "正在生成…";
         toast("正在生成图片…");
         var stage = null;
         try {
@@ -586,16 +612,27 @@
 
             freezeCanvases(card, clone);
             var degraded = await inlineImages(clone);
-            if (document.fonts && document.fonts.ready) await document.fonts.ready;
+            if (document.fonts && document.fonts.ready) {
+                await Promise.race([
+                    document.fonts.ready,
+                    new Promise(function (resolve) {
+                        setTimeout(resolve, 1500);
+                    }),
+                ]);
+            }
             await nextFrames();
 
-            var canvas = await window.html2canvas(clone, {
-                backgroundColor: "#f2f2ef",
-                scale: Math.min(3, Math.max(2, window.devicePixelRatio || 1)),
-                useCORS: true,
-                allowTaint: false,
-                logging: false,
-            });
+            var canvas = await withTimeout(
+                window.html2canvas(clone, {
+                    backgroundColor: "#f2f2ef",
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: false,
+                    logging: false,
+                }),
+                30000,
+                "generate timeout",
+            );
 
             await deliver(canvas, filename);
             toast(
@@ -606,14 +643,21 @@
             bumpStats();
         } catch (err) {
             console.error("[article-share]", err);
+            var message = String(err && err.message);
             toast(
-                /lib failed/.test(String(err && err.message))
+                /lib failed/.test(message)
                     ? "组件加载失败，请检查网络后重试"
-                    : "生成失败，请重试",
+                    : /timeout/.test(message)
+                      ? "生成超时，请重试"
+                      : "生成失败，请重试",
             );
         } finally {
             if (stage) stage.remove();
-            if (btn) btn.disabled = false;
+            if (btn) {
+                btn.disabled = false;
+                btn.removeAttribute("aria-busy");
+            }
+            if (label) label.textContent = labelText;
         }
     }
 
