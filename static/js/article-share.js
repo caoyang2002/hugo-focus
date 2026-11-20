@@ -578,10 +578,44 @@
         }
     }
 
-    async function deliver(canvas, filename) {
-        var blob = await toBlob(canvas);
+    function isMobileDevice() {
+        return /Android|iPhone|iPad|iPod|HarmonyOS|Mobile/i.test(
+            navigator.userAgent,
+        );
+    }
+
+    async function deliverBlob(blob, filename) {
+        if (isMobileDevice() && typeof File === "function") {
+            var file = new File([blob], filename, {
+                type: blob.type || "image/png",
+            });
+            if (
+                navigator.canShare &&
+                navigator.share &&
+                navigator.canShare({ files: [file] })
+            ) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: data.title,
+                        text: data.title,
+                    });
+                    return "shared";
+                } catch (err) {
+                    if (err && err.name === "AbortError") {
+                        return "cancelled";
+                    }
+                }
+            }
+        }
         var url = URL.createObjectURL(blob);
         triggerDownload(url, filename, true);
+        return "downloaded";
+    }
+
+    async function deliver(canvas, filename) {
+        var blob = await toBlob(canvas);
+        return deliverBlob(blob, filename);
     }
 
     async function exportCard(cardId, filename, btn) {
@@ -600,7 +634,9 @@
             await loadLib("html2canvas");
             if (!qrOK) await renderQR();
 
-            var width = 640;
+            var width = Math.round(card.getBoundingClientRect().width);
+            if (!width || width < 280) width = 360;
+            width = Math.min(width, 640);
             stage = document.createElement("div");
             stage.className = "sp-scope sp-stage";
             stage.style.width = width + "px";
@@ -625,7 +661,7 @@
             var canvas = await withTimeout(
                 window.html2canvas(clone, {
                     backgroundColor: "#f2f2ef",
-                    scale: 2,
+                    scale: Math.min(3, Math.max(2, 1024 / width)),
                     useCORS: true,
                     allowTaint: false,
                     logging: false,
@@ -634,12 +670,22 @@
                 "generate timeout",
             );
 
-            await deliver(canvas, filename);
-            toast(
-                degraded
-                    ? "已下载（部分图片因跨域无法导出，已使用默认样式）"
-                    : "图片已下载",
-            );
+            var result = await deliver(canvas, filename);
+            if (result === "shared") {
+                toast(
+                    degraded
+                        ? "已打开保存菜单（部分图片因跨域无法导出）"
+                        : "已打开保存菜单，请选择“存储图像”保存到相册",
+                );
+            } else if (result === "cancelled") {
+                toast("已取消保存");
+            } else {
+                toast(
+                    degraded
+                        ? "已下载（部分图片因跨域无法导出，已使用默认样式）"
+                        : "图片已下载",
+                );
+            }
             bumpStats();
         } catch (err) {
             console.error("[article-share]", err);
