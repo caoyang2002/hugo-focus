@@ -29,7 +29,6 @@
 
     var dialog = overlay.querySelector(".sp-panel");
     var scrollBox = overlay.querySelector(".sp-scroll");
-    var preview = overlay.querySelector("#spPreview");
     var tabs = Array.from(overlay.querySelectorAll("[data-tab]"));
     var panes = Array.from(overlay.querySelectorAll("[data-pane]"));
 
@@ -236,7 +235,6 @@
     }
 
     function closePanel() {
-        hidePreview();
         overlay.classList.remove("is-open");
         overlay.setAttribute("aria-hidden", "true");
         lockScroll(false);
@@ -245,7 +243,7 @@
 
     function trapFocus(e) {
         if (e.key !== "Tab") return;
-        var scope = preview && !preview.hidden ? preview : dialog;
+        var scope = dialog;
         var list = $$(
             "button:not([disabled]), input, [href], [tabindex]:not([tabindex='-1'])",
             scope,
@@ -267,8 +265,7 @@
     document.addEventListener("keydown", function (e) {
         if (!overlay.classList.contains("is-open")) return;
         if (e.key === "Escape") {
-            if (preview && !preview.hidden) hidePreview();
-            else closePanel();
+            closePanel();
         } else {
             trapFocus(e);
         }
@@ -634,22 +631,6 @@
         }
     }
 
-    /* ---------- 预览层 ---------- */
-    function showPreview(dataURL) {
-        if (!preview) return;
-        var img = $(".sp-preview-body img", preview);
-        img.src = dataURL;
-        preview.hidden = false;
-        var b = $("[data-action='preview-close']", preview);
-        if (b) b.focus();
-    }
-    function hidePreview() {
-        if (!preview || preview.hidden) return;
-        preview.hidden = true;
-        var img = $(".sp-preview-body img", preview);
-        if (img) img.removeAttribute("src");
-    }
-
     /* ==========================================================
        分享渠道 / 复制链接 / 系统分享
        ========================================================== */
@@ -806,9 +787,6 @@
                 break;
             case "retry-qr":
                 renderQR();
-                break;
-            case "preview-close":
-                hidePreview();
                 break;
         }
     });

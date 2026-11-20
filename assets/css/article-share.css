@@ -884,12 +884,10 @@ html.sp-lock {
     margin-top: 16px;
     padding-top: 16px;
     border-top: 1px solid #111;
-    max-width: 25em;
-    font-size: 1.25rem;
-    line-height: 1.9;
+    font-size: 0.9rem;
+    line-height: 1.95;
     color: #222;
-    overflow-wrap: anywhere;
-    text-wrap: pretty;
+    overflow-wrap: break-word;
 }
 .sp-ccard-body p {
     margin: 0 0 0.9em;
@@ -944,50 +942,6 @@ sp-ccard-cover{
     width: 76px !important;
     height: 76px !important;
 }
-/* ---------- 预览层（微信 / iOS 等不支持下载时长按保存） ---------- */
-.sp-preview {
-    position: absolute;
-    inset: 0;
-    z-index: 20;
-    display: flex;
-    flex-direction: column;
-    background: rgba(17, 17, 17, 0.96);
-    color: #f2f2ef;
-}
-.sp-preview-bar {
-    flex: none;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 12px 16px;
-    border-bottom: 1px solid rgba(242, 242, 239, 0.25);
-    font-size: 0.8rem;
-    font-weight: 700;
-}
-.sp-preview-bar button {
-    padding: 6px 12px;
-    background: transparent;
-    color: #f2f2ef;
-    border: 2px solid #f2f2ef;
-    font-size: 0.78rem;
-    font-weight: 700;
-    cursor: pointer;
-}
-.sp-preview-body {
-    flex: 1;
-    min-height: 0;
-    overflow: auto;
-    padding: 16px;
-}
-.sp-preview-body img {
-    display: block;
-    width: 100%;
-    height: auto;
-    margin: 0 auto;
-    max-width: 480px;
-}
-
 /* ---------- 导出舞台（离屏，固定宽度，保证成图一致） ---------- */
 .sp-stage {
     position: absolute;

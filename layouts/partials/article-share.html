@@ -14,7 +14,7 @@
 {{ with resources.Get "js/article-share.js" }}
   {{ with . | fingerprint }}<script src="{{ .RelPermalink }}" defer></script>{{ end }}
 {{ else }}
-  <script src="{{ "js/article-share.js" | relURL }}" defer></script>
+  <script src="{{ "js/article-share.js" | relURL }}?v={{ now.Unix }}" defer></script>
 {{ end }}
 
 {{ $page := . }} {{ $site := .Site }}
@@ -326,14 +326,6 @@
             </section>
         </div>
 
-        <!-- 预览层：微信 / iOS 等不支持直接下载时，长按图片保存 -->
-        <div class="sp-preview" id="spPreview" hidden>
-            <div class="sp-preview-bar">
-                <span>长按图片保存到相册</span>
-                <button type="button" data-action="preview-close">关闭</button>
-            </div>
-            <div class="sp-preview-body"><img alt="分享图片预览" /></div>
-        </div>
         <!--<footer class="sp-card-foot">
             <div class="sp-foot-brand">
                 <div style="min-width: 0">
