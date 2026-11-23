@@ -870,19 +870,126 @@
         }
     }
 
-    // 没有系统分享能力时（如微信内置浏览器）：打开图片，让用户长按保存到相册
-    function openImageForSave(url, filename) {
-        var win = null;
-        try {
-            win = window.open(url, "_blank");
-        } catch (e) {
-            win = null;
+    /* ----------------------------------------------------------
+       移动端保存预览：
+       系统分享不可用或被拦截时，直接在页面内展示图片，
+       用户可以「长按保存到相册」，也可点按钮重新唤起系统保存（新的用户手势）。
+       ---------------------------------------------------------- */
+    var savePreviewEl = null;
+    var savePreviewURL = null;
+
+    function closeSavePreview() {
+        if (savePreviewEl) {
+            savePreviewEl.remove();
+            savePreviewEl = null;
         }
-        if (!win) {
-            triggerDownload(url, filename, false);
-            return false;
+        if (savePreviewURL) {
+            var u = savePreviewURL;
+            savePreviewURL = null;
+            setTimeout(function () {
+                URL.revokeObjectURL(u);
+            }, 800);
         }
-        return true;
+        document.documentElement.classList.remove("sp-lock");
+        // 分享面板若仍打开，恢复它的滚动锁定
+        if (overlay.classList.contains("is-open")) {
+            document.documentElement.classList.add("sp-lock");
+        }
+    }
+
+    function showSavePreview(blob, filename) {
+        closeSavePreview();
+        var url = URL.createObjectURL(blob);
+        savePreviewURL = url;
+
+        var file = null;
+        if (typeof File === "function") {
+            try {
+                file = new File([blob], filename, {
+                    type: blob.type || "image/png",
+                });
+            } catch (e) {
+                file = null;
+            }
+        }
+
+        var rootEl = document.createElement("div");
+        rootEl.className = "sp-scope sp-save-preview";
+        rootEl.setAttribute("role", "dialog");
+        rootEl.setAttribute("aria-modal", "true");
+        rootEl.setAttribute("aria-label", "保存图片到相册");
+
+        var panel = document.createElement("div");
+        panel.className = "sp-save-preview__panel";
+
+        var closeBtn = document.createElement("button");
+        closeBtn.type = "button";
+        closeBtn.className = "sp-save-preview__close";
+        closeBtn.setAttribute("aria-label", "关闭");
+        closeBtn.innerHTML = "&times;";
+        closeBtn.addEventListener("click", closeSavePreview);
+
+        var img = document.createElement("img");
+        img.className = "sp-save-preview__img";
+        img.src = url;
+        img.alt = data.title || "分享图片";
+
+        var hint = document.createElement("p");
+        hint.className = "sp-save-preview__hint";
+        hint.textContent = "长按图片选择「存储图像 / 保存到相册」";
+
+        var actions = document.createElement("div");
+        actions.className = "sp-save-preview__actions";
+
+        if (file && navigator.share) {
+            var shareBtn = document.createElement("button");
+            shareBtn.type = "button";
+            shareBtn.className = "sp-btn sp-btn--primary";
+            shareBtn.textContent = "保存到相册 / 分享";
+            shareBtn.addEventListener("click", function () {
+                // 用户新的一次点击 → 手势有效，移动端更容易唤起系统保存面板
+                navigator
+                    .share({
+                        files: [file],
+                        title: data.title,
+                        text: data.title,
+                    })
+                    .then(function () {
+                        logInfo("预览中调用系统分享成功");
+                        closeSavePreview();
+                        toast("请选择“存储图像”保存到相册");
+                    })
+                    .catch(function (err) {
+                        if (err && err.name === "AbortError") return;
+                        logWarn("预览中系统分享仍失败", err && err.name);
+                        toast("无法调用系统保存，请长按上方图片保存");
+                    });
+            });
+            actions.appendChild(shareBtn);
+        }
+
+        var dl = document.createElement("a");
+        dl.className = "sp-btn sp-btn--ghost";
+        dl.href = url;
+        dl.download = filename;
+        dl.rel = "noopener";
+        dl.textContent = "下载图片";
+        actions.appendChild(dl);
+
+        panel.appendChild(closeBtn);
+        panel.appendChild(img);
+        panel.appendChild(hint);
+        panel.appendChild(actions);
+        rootEl.appendChild(panel);
+
+        rootEl.addEventListener("click", function (e) {
+            if (e.target === rootEl) closeSavePreview();
+        });
+
+        document.body.appendChild(rootEl);
+        document.documentElement.classList.add("sp-lock");
+        savePreviewEl = rootEl;
+        return "preview";
     }
 
     async function deliverBlob(blob, filename) {
@@ -894,7 +1001,7 @@
                     type: blob.type || "image/png",
                 });
             } catch (e) {
-                logWarn("创建文件失败，改用下载", e && e.message);
+                logWarn("创建文件失败，改用预览/下载", e && e.message);
             }
         }
 
@@ -913,20 +1020,17 @@
                     logInfo("用户取消了系统分享");
                     return "cancelled";
                 }
-                logWarn("系统分享失败，尝试长按保存", err && err.name);
+                logWarn("系统分享失败，改用页内预览", err && err.name);
             }
         }
 
-        var url = URL.createObjectURL(blob);
+        // 手机端兜底：页内展示图片，支持长按保存；避免 window.open 被拦截
         if (mobile) {
-            var opened = openImageForSave(url, filename);
-            setTimeout(function () {
-                URL.revokeObjectURL(url);
-            }, 60000);
-            logInfo(opened ? "已打开图片供长按保存" : "已触发文件下载");
-            return opened ? "opened" : "downloaded";
+            logInfo("系统分享不可用，显示页内保存预览");
+            return showSavePreview(blob, filename);
         }
 
+        var url = URL.createObjectURL(blob);
         triggerDownload(url, filename, true);
         return "downloaded";
     }
@@ -1078,8 +1182,8 @@
                 );
             } else if (result === "cancelled") {
                 toast("已取消保存");
-            } else if (result === "opened") {
-                toast("已打开图片，长按选择“保存图片/存储到相册”");
+            } else if (result === "preview") {
+                toast("图片已生成，长按图片或点按钮保存到相册");
             } else {
                 toast(
                     degraded

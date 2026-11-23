@@ -1,22 +1,15 @@
 /* ==========================================================
    paper-texture.js
    程序化宣纸背景（移植自 papper_matrix.html）
-   不再请求任何背景图片，纹理由 Canvas 算法生成并无缝平铺。
+   纹理由 Canvas 算法生成成无缝平铺图，作为 body 背景，
+   随文章内容一起滚动，不再固定悬浮在视口。
    ========================================================== */
 (function () {
     "use strict";
 
-    var wrap = document.getElementById("paper-bg");
-    if (!wrap) return;
-    var canvas = wrap.querySelector("canvas");
-    if (!canvas) return;
-    var ctx = canvas.getContext("2d", { alpha: false });
-    if (!ctx) return;
-
     var root = document.documentElement;
     var TILE = 1024; // 纹理块分辨率（可无缝平铺）
     var CACHE_KEY = "paper-tile-v1";
-    var pattern = null;
     var running = false;
 
     /* =========================================================
@@ -353,48 +346,15 @@
     }
 
     /* =========================================================
-       4. 渲染到固定背景画布
+       4. 应用到 body 背景（随文档长度平铺、随内容滚动）
        ========================================================= */
-    function sizeCanvas() {
-        var dpr = Math.min(window.devicePixelRatio || 1, 2);
-        var w = Math.max(1, Math.floor(window.innerWidth * dpr));
-        var h = Math.max(1, Math.floor(window.innerHeight * dpr));
-        if (canvas.width !== w || canvas.height !== h) {
-            canvas.width = w;
-            canvas.height = h;
-        }
-    }
-
-    function paint() {
-        sizeCanvas();
-        if (!pattern) return;
-        ctx.fillStyle = pattern;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
-    function activate() {
+    function applyURL(url) {
+        if (!url || !document.body) return;
+        document.body.style.backgroundImage = 'url("' + url + '")';
+        document.body.style.backgroundRepeat = "repeat";
+        document.body.style.backgroundPosition = "top left";
+        document.body.style.backgroundSize = "auto";
         root.classList.add("has-paper");
-    }
-
-    function useImage(src) {
-        var img = new Image();
-        img.onload = function () {
-            try {
-                pattern = ctx.createPattern(img, "repeat");
-            } catch (e) {
-                pattern = null;
-            }
-            if (pattern) {
-                paint();
-                activate();
-            } else {
-                startGenerate();
-            }
-        };
-        img.onerror = function () {
-            startGenerate();
-        };
-        img.src = src;
     }
 
     function startGenerate() {
@@ -410,18 +370,33 @@
             running = false;
             return;
         }
-        pattern = ctx.createPattern(tile, "repeat");
-        paint();
-        activate();
-        var ms = Math.round(performance.now() - t0);
-        console.info("[paper] 宣纸纹理生成完成：" + ms + "ms");
+
+        var url = "";
         try {
-            var url = tile.toDataURL("image/webp", 0.9);
-            if (url.indexOf("data:image/webp") === 0) {
-                sessionStorage.setItem(CACHE_KEY, url);
+            url = tile.toDataURL("image/webp", 0.9);
+            if (url.indexOf("data:image/webp") !== 0) {
+                url = tile.toDataURL("image/png");
             }
         } catch (e) {
-            /* 缓存失败不影响显示 */
+            try {
+                url = tile.toDataURL("image/png");
+            } catch (e2) {
+                url = "";
+            }
+        }
+
+        if (url) {
+            applyURL(url);
+            try {
+                sessionStorage.setItem(CACHE_KEY, url);
+            } catch (e) {
+                /* 缓存失败不影响显示 */
+            }
+            console.info(
+                "[paper] 宣纸纹理生成完成：" +
+                    Math.round(performance.now() - t0) +
+                    "ms",
+            );
         }
         running = false;
     }
@@ -434,7 +409,7 @@
             cached = null;
         }
         if (cached) {
-            useImage(cached);
+            applyURL(cached);
             return;
         }
         // 避免阻塞首屏：空闲时再生成
@@ -445,12 +420,9 @@
         }
     }
 
-    window.addEventListener("resize", paint, { passive: true });
-
-    sizeCanvas();
-    if (document.readyState === "complete") {
-        start();
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", start, { once: true });
     } else {
-        window.addEventListener("load", start, { once: true });
+        start();
     }
 })();
