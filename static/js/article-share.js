@@ -773,36 +773,89 @@
     }
 
     function isMobileDevice() {
-        return /Android|iPhone|iPad|iPod|HarmonyOS|Mobile/i.test(
-            navigator.userAgent,
-        );
+        var ua = navigator.userAgent || "";
+        if (
+            navigator.userAgentData &&
+            typeof navigator.userAgentData.mobile === "boolean" &&
+            navigator.userAgentData.mobile
+        ) {
+            return true;
+        }
+        if (/Android|iPhone|iPad|iPod|HarmonyOS|Mobile|Mobi/i.test(ua)) {
+            return true;
+        }
+        // iPadOS 13+ 的 UA 伪装成 macOS，用触点数判断
+        if (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) return true;
+        return false;
+    }
+
+    function canShareFile(file) {
+        if (!navigator.share) return false;
+        if (typeof navigator.canShare !== "function") return true;
+        try {
+            return navigator.canShare({ files: [file] });
+        } catch (e) {
+            return false;
+        }
+    }
+
+    // 没有系统分享能力时（如微信内置浏览器）：打开图片，让用户长按保存到相册
+    function openImageForSave(url, filename) {
+        var win = null;
+        try {
+            win = window.open(url, "_blank");
+        } catch (e) {
+            win = null;
+        }
+        if (!win) {
+            triggerDownload(url, filename, false);
+            return false;
+        }
+        return true;
     }
 
     async function deliverBlob(blob, filename) {
-        if (isMobileDevice() && typeof File === "function") {
-            var file = new File([blob], filename, {
-                type: blob.type || "image/png",
-            });
-            if (
-                navigator.canShare &&
-                navigator.share &&
-                navigator.canShare({ files: [file] })
-            ) {
-                try {
-                    await navigator.share({
-                        files: [file],
-                        title: data.title,
-                        text: data.title,
-                    });
-                    return "shared";
-                } catch (err) {
-                    if (err && err.name === "AbortError") {
-                        return "cancelled";
-                    }
-                }
+        var mobile = isMobileDevice();
+        var file = null;
+        if (typeof File === "function") {
+            try {
+                file = new File([blob], filename, {
+                    type: blob.type || "image/png",
+                });
+            } catch (e) {
+                logWarn("创建文件失败，改用下载", e && e.message);
             }
         }
+
+        // 移动端优先走系统分享面板：用户可选择「存储图像 / 保存到相册」
+        if (mobile && file && canShareFile(file)) {
+            try {
+                await navigator.share({
+                    files: [file],
+                    title: data.title,
+                    text: data.title,
+                });
+                logInfo("已调用系统分享（可保存到相册）");
+                return "shared";
+            } catch (err) {
+                if (err && err.name === "AbortError") {
+                    logInfo("用户取消了系统分享");
+                    return "cancelled";
+                }
+                logWarn("系统分享失败，尝试长按保存", err && err.name);
+            }
+        }
+
         var url = URL.createObjectURL(blob);
+        if (mobile) {
+            var opened = openImageForSave(url, filename);
+            setTimeout(function () {
+                URL.revokeObjectURL(url);
+            }, 60000);
+            logInfo(opened ? "已打开图片供长按保存" : "已触发文件下载");
+            return opened ? "opened" : "downloaded";
+        }
+
         triggerDownload(url, filename, true);
         return "downloaded";
     }
@@ -930,11 +983,13 @@
             if (result === "shared") {
                 toast(
                     degraded
-                        ? "已打开保存菜单（部分图片因跨域无法导出）"
-                        : "已打开保存菜单，请选择“存储图像”保存到相册",
+                        ? "已调用系统保存（部分图片因跨域无法导出），请选择“存储图像”"
+                        : "已调用系统保存，请选择“存储图像”保存到相册",
                 );
             } else if (result === "cancelled") {
                 toast("已取消保存");
+            } else if (result === "opened") {
+                toast("已打开图片，长按选择“保存图片/存储到相册”");
             } else {
                 toast(
                     degraded
