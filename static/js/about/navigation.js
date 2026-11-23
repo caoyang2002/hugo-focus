@@ -60,7 +60,11 @@ function bindJump(el, id) {
  */
 export function initNavigation() {
     // 目录项
-    nav.items.forEach((item) => bindJump(item, item.dataset.section));
+    nav.items.forEach((item) => {
+        // 「返回主页」等非页内锚点项没有 data-section，保持默认跳转
+        if (!item.dataset.section) return;
+        bindJump(item, item.dataset.section);
+    });
 
     // 侧栏 Action：只拦截页内锚点，「返回主页」等外部链接保持默认跳转
     nav.actions.forEach((action) => {

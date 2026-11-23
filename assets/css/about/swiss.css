@@ -515,6 +515,12 @@ button {
         width: auto;
         height: 3px;
     }
+
+    .nav-mobile .nav-item--home .nav-icon {
+        width: 16px;
+        height: 16px;
+        margin-bottom: 1px;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
