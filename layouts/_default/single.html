@@ -101,6 +101,33 @@
         {{ if site.Params.Feedback }} {{ partial "feedback.html" . }} {{end}}
     </div>
 
+    <!-- 推荐阅读：优先取相同标签的文章，没有相同标签时回退到相同分类，最多 5 篇 -->
+    {{ $pool := where site.RegularPages "Type" "in" site.Params.mainSections }}
+    {{ $pool = where $pool "Permalink" "ne" .Permalink }}
+    {{ $tags := .Params.tags }}
+    {{ $cats := .Params.categories }}
+    {{ $related := slice }}
+    {{ if $tags }}
+        {{ $related = where $pool "Params.tags" "intersect" $tags }}
+    {{ end }}
+    {{ if eq (len $related) 0 }}
+        {{ if $cats }}
+            {{ $related = where $pool "Params.categories" "intersect" $cats }}
+        {{ end }}
+    {{ end }}
+    {{ if gt (len $related) 0 }}
+    {{ $related = sort $related "Date" "desc" }}
+    {{ $related = first 5 $related }}
+    <section class="recommended-posts" aria-labelledby="recommended-title">
+        <h2 class="recommended-posts__title" id="recommended-title">推荐阅读</h2>
+        <div class="recommended-posts__grid">
+            {{ range $related }}
+                {{ partial "list/article-card-compact.html" . }}
+            {{ end }}
+        </div>
+    </section>
+    {{ end }}
+
     <!-- Disqus -->
     {{ if and site.Config.Services.Disqus.Shortname (not (eq .Params.comments
     false)) }}

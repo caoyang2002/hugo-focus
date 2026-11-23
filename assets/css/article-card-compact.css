@@ -275,3 +275,25 @@
         align-self: stretch;       /* 双保险：垂直方向强制铺满 */
     }
 }
+
+/* ---------- 推荐文章区（文章内页，评论区上方） ---------- */
+.recommended-posts {
+    margin-top: 4rem;
+}
+
+.recommended-posts__title {
+    margin: 0 0 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.recommended-posts__grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.recommended-posts .article-compact {
+    width: 100%;
+}
