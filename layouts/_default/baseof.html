@@ -82,7 +82,42 @@
     </style>
     {{ end }}
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 程序化宣纸背景：Canvas 生成，无任何图片请求 */
+        html { background-color: var(--bg); }
+        #paper-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        #paper-bg canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        #paper-bg .paper-shade {
+            position: absolute;
+            inset: 0;
+            background: transparent;
+            transition: background-color 0.3s ease;
+        }
+        html.has-paper body {
+            background-color: transparent !important;
+        }
+        html.dark #paper-bg .paper-shade,
+        html[data-theme="dark"] #paper-bg .paper-shade {
+            background-color: rgba(16, 14, 11, 0.86);
+        }
+        @media (prefers-color-scheme: dark) {
+            html:not(.light):not([data-theme="light"]) #paper-bg .paper-shade {
+                background-color: rgba(16, 14, 11, 0.86);
+            }
+        }
+    </style>
+
+    <script src="{{ "js/vendor/tailwind-play.js" | relURL }}"></script>
     <script>
         tailwind.config = {
             darkMode: "class"
@@ -93,6 +128,11 @@
 </head>
 
 <body class="text-black duration-200 ease-out dark:text-white">
+    <div id="paper-bg" aria-hidden="true">
+        <canvas></canvas>
+        <div class="paper-shade"></div>
+    </div>
+
     {{ partial "header.html" . }}
 
     {{/* ===== 48 列 Grid 主布局：左侧 aside 8 列 + 右侧 main 40 列 ===== */}}
@@ -121,5 +161,7 @@
     {{ if .Params.codeRunners }}
         {{ partial "code_runners.html" . }}
     {{ end }}
+
+    <script src="{{ "js/paper-texture.js" | relURL }}" defer></script>
 </body>
 </html>

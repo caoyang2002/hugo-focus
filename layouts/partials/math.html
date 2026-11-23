@@ -1,29 +1,9 @@
 <!-- layouts/partials/math.html -->
-{{ if site.Params.localKatex }}
-<link rel="stylesheet" href="{{ "katex.min.css" | relURL }}"/>
-<script defer src="{{ "katex.min.js" | relURL }}"></script>
-<script defer src="{{ "auto-render.min.js" | relURL }}"></script>
-{{ else }}
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
-  integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV"
-  crossorigin="anonymous"
-/>
-<script
-  defer
-  src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
-  integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8"
-  crossorigin="anonymous"
-></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/mhchem.min.js"></script>
-<script
-  defer
-  src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-  integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05"
-  crossorigin="anonymous"
-></script>
-{{ end }}
+{{/* KaTeX 全部本地化，避免外网 CDN 在受限网络下加载失败 */}}
+<link rel="stylesheet" href="{{ "css/vendor/katex/katex.min.css" | relURL }}" />
+<script defer src="{{ "js/vendor/katex/katex.min.js" | relURL }}"></script>
+<script defer src="{{ "js/vendor/katex/mhchem.min.js" | relURL }}"></script>
+<script defer src="{{ "js/vendor/katex/auto-render.min.js" | relURL }}"></script>
 
 <style>
   /* ===== CSS 变量定义 ===== */

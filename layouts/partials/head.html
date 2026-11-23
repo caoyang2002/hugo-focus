@@ -73,42 +73,33 @@
 
     <!-- highlight js -->
     {{ if and .IsPage (not site.Params.disableHLJS) }}
-    <!-- 引入 highlight.js CSS -->
+    <!-- 引入 highlight.js CSS（本地） -->
     <link
         rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/monokai.min.css"
+        href="{{ "css/vendor/highlight/monokai.min.css" | relURL }}"
     />
 
+    <script defer src="{{ "js/vendor/alpine.min.js" | relURL }}"></script>
+    <!-- 引入 highlight.js JS（本地） -->
     <script
         defer
-        src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"
-    ></script>
-    <!-- 引入 highlight.js JS -->
-    <script
-        defer
-        src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"
+        src="{{ "js/vendor/highlight.min.js" | relURL }}"
         onload="hljs.highlightAll()"
     ></script>
 
 
-    <!-- 或者 KaTeX 方案 (二选一，推荐，更快) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <!-- KaTeX（本地） -->
+    <link rel="stylesheet" href="{{ "css/vendor/katex/katex.min.css" | relURL }}">
+    <script defer src="{{ "js/vendor/katex/katex.min.js" | relURL }}"></script>
+    <script defer src="{{ "js/vendor/katex/auto-render.min.js" | relURL }}"></script>
 
     <!-- 自定义样式和脚本 -->
     <!--<link rel="stylesheet" href="{{ "css/latex.css" | relURL }}">
     <script defer src="{{ "js/latex.js" | relURL }}"></script>-->
 
-    <!-- 额外的语言支持 -->
-    <script
-        defer
-        src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/lisp.min.js"
-    ></script>
-    <script
-        defer
-        src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"
-    ></script>
+    <!-- 额外的语言支持（本地） -->
+    <script defer src="{{ "js/vendor/highlight-lisp.min.js" | relURL }}"></script>
+    <script defer src="{{ "js/vendor/highlight-sql.min.js" | relURL }}"></script>
     {{ end }}
 
     <!-- math -->

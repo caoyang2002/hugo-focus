@@ -334,9 +334,15 @@
     // 提前预热：首次导出最常见的慢点就是依赖与图片，打开面板时先把它们准备好
     function prewarmCardImages(card) {
         if (!card) return;
+        var mobile = isMobileDevice();
+        var origin = location.origin;
         Array.from(card.querySelectorAll("img")).forEach(function (img) {
             var src = img.currentSrc || img.src;
             if (!src || src.indexOf("data:") === 0) return;
+            // 移动端不预取外部图片，避免不同网络环境下的失败与等待
+            if (mobile && src.indexOf("http") === 0 && src.indexOf(origin) !== 0) {
+                return;
+            }
             fetchDataURL(src, 1400).catch(function () {});
         });
     }
@@ -661,14 +667,45 @@
         }
     }
 
+    // 移动端极端兜底：去掉图片、二维码和热力图，降低 html2canvas 渲染难度
+    function simplifyClone(clone) {
+        var cover = clone.querySelector(".sp-card-cover");
+        if (cover) {
+            cover.classList.add("sp-card-cover--plain");
+            cover.textContent = "";
+            var s = document.createElement("span");
+            s.className = "sp-card-cover-site";
+            s.textContent = data.site || data.title;
+            cover.appendChild(s);
+        }
+        Array.from(clone.querySelectorAll("img")).forEach(function (img) {
+            img.remove();
+        });
+        Array.from(clone.querySelectorAll(".sp-heat")).forEach(function (h) {
+            h.remove();
+        });
+        Array.from(clone.querySelectorAll(".sp-qr")).forEach(function (q) {
+            q.textContent = "";
+        });
+    }
+
     // 将克隆体里的图片全部内联为 data URL，避免跨域污染 canvas；失败则降级
-    async function inlineImages(clone) {
+    // mobile 为 true 时不请求任何跨域图片，直接降级为纯色封面，彻底避免外部请求
+    async function inlineImages(clone, mobile) {
         var degraded = false;
         var imgs = Array.from(clone.querySelectorAll("img"));
         var maxSide = 1400;
+        var origin = location.origin;
         var tasks = imgs.map(async function (img) {
             var src = img.currentSrc || img.src;
             if (!src || src.indexOf("data:") === 0) return;
+            var isExternal = src.indexOf("http") === 0 && src.indexOf(origin) !== 0;
+            if (mobile && isExternal) {
+                logInfo("移动端跳过外部图片", src);
+                degraded = true;
+                onImageFail(img);
+                return;
+            }
             try {
                 var d = await fetchDataURL(src, maxSide);
                 if (img.dataset.fit === "cover") {
@@ -724,11 +761,45 @@
         });
     }
 
+    function dataURLToBlob(dataURL) {
+        var parts = String(dataURL).split(",");
+        var header = parts[0] || "";
+        var mime = (header.match(/data:([^;]+)/) || [])[1] || "image/png";
+        var binary = atob(parts[1] || "");
+        var len = binary.length;
+        var bytes = new Uint8Array(len);
+        for (var i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
+        return new Blob([bytes], { type: mime });
+    }
+
+    // 部分移动端 WebView 的 canvas.toBlob 会返回 null 或直接不可用，
+    // 这里统一回退到 toDataURL，避免导出在最后一步“生成失败”。
     function toBlob(canvas) {
         return new Promise(function (resolve, reject) {
-            canvas.toBlob(function (b) {
-                b ? resolve(b) : reject(new Error("blob"));
-            }, "image/png");
+            function fromDataURL() {
+                try {
+                    resolve(dataURLToBlob(canvas.toDataURL("image/png")));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            if (typeof canvas.toBlob !== "function") {
+                fromDataURL();
+                return;
+            }
+            try {
+                canvas.toBlob(function (b) {
+                    if (b) {
+                        resolve(b);
+                    } else {
+                        logWarn("canvas.toBlob 返回空，改用 toDataURL");
+                        fromDataURL();
+                    }
+                }, "image/png");
+            } catch (e) {
+                logWarn("canvas.toBlob 不可用，改用 toDataURL", e && e.message);
+                fromDataURL();
+            }
         });
     }
 
@@ -916,7 +987,7 @@
             });
 
             freezeCanvases(card, clone);
-            var degraded = await inlineImages(clone);
+            var degraded = await inlineImages(clone, isMobile);
             mark("图片处理完成", { degraded: degraded });
             if (document.fonts && document.fonts.ready) {
                 await Promise.race([
@@ -966,17 +1037,36 @@
                     height: canvas.height,
                 });
             } catch (renderErr) {
-                // 首次渲染超时：用更低倍率重试一次，牺牲清晰度换取成功率
-                if (!/timeout/.test(String(renderErr && renderErr.message))) {
-                    throw renderErr;
-                }
-                logWarn("首次渲染超时，降级重试", { scale: 1 });
-                await nextFrames();
-                canvas = await renderCanvas(1, 20000);
-                mark("降级重试完成", {
-                    width: canvas.width,
-                    height: canvas.height,
+                logWarn("渲染失败，尝试降级", {
+                    name: renderErr && renderErr.name,
+                    message: renderErr && renderErr.message,
                 });
+                if (!/timeout/.test(String(renderErr && renderErr.message))) {
+                    if (!isMobile) throw renderErr;
+                }
+                // 1) 先降倍率重试
+                try {
+                    await nextFrames();
+                    canvas = await renderCanvas(1, 20000);
+                    mark("降级重试完成", {
+                        width: canvas.width,
+                        height: canvas.height,
+                    });
+                } catch (retryErr) {
+                    if (!isMobile) throw retryErr;
+                    // 2) 移动端再失败：移除图片/热力图等重元素后重试
+                    logWarn("降级重试仍失败，使用简化卡片重试", {
+                        name: retryErr && retryErr.name,
+                        message: retryErr && retryErr.message,
+                    });
+                    simplifyClone(clone);
+                    await nextFrames();
+                    canvas = await renderCanvas(1.5, 15000);
+                    mark("简化重试完成", {
+                        width: canvas.width,
+                        height: canvas.height,
+                    });
+                }
             }
 
             var result = await deliver(canvas, filename);

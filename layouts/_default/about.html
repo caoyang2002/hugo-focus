@@ -27,9 +27,8 @@
     <link rel="icon" href="{{ . | relURL }}" />
     {{ end }}
 
-    <!-- Font Awesome（技能 / 联系方式图标仍由数据驱动） -->
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" />
+    <!-- Font Awesome（技能 / 联系方式图标仍由数据驱动，本地资源） -->
+    <link rel="stylesheet" href="{{ "css/vendor/fontawesome4/font-awesome.min.css" | relURL }}" />
 
     <!-- 模块化CSS：swiss.css（基础/主题/导航）→ swiss-scenes.css（场景）→ work-section.css（作品弹层） -->
     {{ $swiss := resources.Get "css/about/swiss.css" }}
