@@ -9,8 +9,9 @@
 
     var root = document.documentElement;
     var TILE = 1024; // 纹理块分辨率（可无缝平铺）
-    var CACHE_KEY = "paper-tile-v1";
+    var CACHE_KEY = "paper-tile-v2";
     var running = false;
+    var currentObjectURL = null;
 
     /* =========================================================
        1. 随机 / 噪声工具
@@ -346,14 +347,56 @@
     }
 
     /* =========================================================
-       4. 应用到 body 背景（随文档长度平铺、随内容滚动）
+       4. 应用到整页长度的背景层（绝对定位，随文档一起滚动）
+       说明：iOS Safari 对 body 背景的 background-attachment 支持有缺陷，
+       会导致背景像 fixed 一样不滚动；因此改用铺满文档高度的绝对定位层。
        ========================================================= */
-    function applyURL(url) {
-        if (!url || !document.body) return;
-        document.body.style.backgroundImage = 'url("' + url + '")';
-        document.body.style.backgroundRepeat = "repeat";
-        document.body.style.backgroundPosition = "top left";
-        document.body.style.backgroundSize = "auto";
+    var paperEl = null;
+
+    function ensurePaperEl() {
+        if (paperEl && paperEl.isConnected) return paperEl;
+        paperEl = document.getElementById("paper-bg");
+        if (!paperEl) {
+            paperEl = document.createElement("div");
+            paperEl.id = "paper-bg";
+            paperEl.setAttribute("aria-hidden", "true");
+            document.body.insertBefore(paperEl, document.body.firstChild);
+        }
+        return paperEl;
+    }
+
+    function dataURLToBlob(dataURL) {
+        var parts = String(dataURL).split(",");
+        var header = parts[0] || "";
+        var mime = (header.match(/data:([^;]+)/) || [])[1] || "image/png";
+        var binary = atob(parts[1] || "");
+        var len = binary.length;
+        var bytes = new Uint8Array(len);
+        for (var i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
+        return new Blob([bytes], { type: mime });
+    }
+
+    // 用 Blob URL 而不是超长 data URL 作为背景，兼容性更好（某些浏览器会丢弃超大 data URL）
+    function applyDataURL(dataURL) {
+        if (!dataURL || !document.body) return;
+        var el = ensurePaperEl();
+        var bg = "";
+        try {
+            if (currentObjectURL) {
+                try {
+                    URL.revokeObjectURL(currentObjectURL);
+                } catch (e) {}
+                currentObjectURL = null;
+            }
+            currentObjectURL = URL.createObjectURL(dataURLToBlob(dataURL));
+            bg = 'url("' + currentObjectURL + '")';
+        } catch (e) {
+            bg = 'url("' + dataURL + '")';
+        }
+        el.style.backgroundImage = bg;
+        el.style.backgroundRepeat = "repeat";
+        el.style.backgroundPosition = "top left";
+        el.style.backgroundSize = "auto";
         root.classList.add("has-paper");
     }
 
@@ -386,7 +429,7 @@
         }
 
         if (url) {
-            applyURL(url);
+            applyDataURL(url);
             try {
                 sessionStorage.setItem(CACHE_KEY, url);
             } catch (e) {
@@ -409,7 +452,7 @@
             cached = null;
         }
         if (cached) {
-            applyURL(cached);
+            applyDataURL(cached);
             return;
         }
         // 避免阻塞首屏：空闲时再生成

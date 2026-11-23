@@ -83,17 +83,31 @@
     {{ end }}
 
     <style>
-        /* 程序化宣纸背景：算法生成的纹理作为 body 背景，随正文一起滚动平铺 */
+        /* 程序化宣纸背景：铺满整页高度的绝对定位层，随文档一起滚动 */
         html { background-color: var(--bg); }
         html.has-paper body {
-            background-attachment: scroll;
+            position: relative;
+            background-color: transparent !important;
         }
-        html.dark.has-paper body,
-        html[data-theme="dark"].has-paper body {
+        #paper-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-color: var(--bg);
+            background-repeat: repeat;
+            background-position: top left;
+        }
+        .page-layer {
+            position: relative;
+            z-index: 1;
+        }
+        html.dark #paper-bg,
+        html[data-theme="dark"] #paper-bg {
             background-blend-mode: multiply;
         }
         @media (prefers-color-scheme: dark) {
-            html:not(.light):not([data-theme="light"]).has-paper body {
+            html:not(.light):not([data-theme="light"]) #paper-bg {
                 background-blend-mode: multiply;
             }
         }
@@ -110,6 +124,8 @@
 </head>
 
 <body class="text-black duration-200 ease-out dark:text-white">
+    <div id="paper-bg" aria-hidden="true"></div>
+    <div class="page-layer">
     {{ partial "header.html" . }}
 
     {{/* ===== 48 列 Grid 主布局：左侧 aside 8 列 + 右侧 main 40 列 ===== */}}
@@ -138,7 +154,11 @@
     {{ if .Params.codeRunners }}
         {{ partial "code_runners.html" . }}
     {{ end }}
+    </div>
 
-    <script src="{{ "js/paper-texture.js" | relURL }}" defer></script>
+    {{ with resources.Get "js/paper-texture.js" }}
+        {{ $paper := . | minify | fingerprint }}
+        <script src="{{ $paper.RelPermalink }}" integrity="{{ $paper.Data.Integrity }}" defer></script>
+    {{ end }}
 </body>
 </html>
