@@ -39,6 +39,18 @@
         return Array.from((el || overlay).querySelectorAll(sel));
     };
 
+    // 调试输出：默认开启，可在页面 URL 加 ?spdebug=0 关闭
+    var SP_DEBUG = !/[?&]spdebug=0/.test(location.search);
+    function logInfo(label, extra) {
+        if (!SP_DEBUG) return;
+        if (extra === undefined) console.info("[article-share] " + label);
+        else console.info("[article-share] " + label, extra);
+    }
+    function logWarn(label, extra) {
+        if (!SP_DEBUG) return;
+        console.warn("[article-share] " + label, extra === undefined ? "" : extra);
+    }
+
     /* ==========================================================
        第三方库：本地 → 多个 CDN 依次回退
        ========================================================== */
@@ -95,9 +107,21 @@
             for (var i = 0; i < lib.srcs.length; i++) {
                 if (!lib.srcs[i]) continue;
                 try {
+                    logInfo("加载依赖 " + name, lib.srcs[i]);
+                    var startedAt = performance.now();
                     await loadScript(lib.srcs[i], 12000);
-                    if (lib.test()) return;
+                    if (lib.test()) {
+                        logInfo(
+                            "依赖就绪 " + name +
+                                "（" +
+                                Math.round(performance.now() - startedAt) +
+                                "ms）",
+                        );
+                        return;
+                    }
+                    logWarn("依赖加载后未挂载 " + name, lib.srcs[i]);
                 } catch (e) {
+                    logWarn("依赖加载失败 " + name, lib.srcs[i]);
                     /* 换下一个源 */
                 }
             }
@@ -109,11 +133,66 @@
         return lib.pending;
     }
 
+    // html2canvas 首次渲染会做 JIT/样式解析/画布初始化，明显比后续慢。
+    // 先用一个极小的离屏元素预热一次，让真正导出不再“第一次特别久”。
+    var h2cWarmPromise = null;
+    var h2cWarmed = false;
+    function warmUpHtml2canvas() {
+        if (h2cWarmed) return Promise.resolve();
+        if (h2cWarmPromise) return h2cWarmPromise;
+        h2cWarmPromise = loadLib("html2canvas")
+            .then(function () {
+                var el = document.createElement("div");
+                el.className = "sp-scope";
+                el.style.cssText =
+                    "position:absolute;left:-10000px;top:0;width:32px;height:32px;" +
+                    "background:#f2f2ef;color:#111;font:12px/1 sans-serif;";
+                el.textContent = "warm";
+                document.body.appendChild(el);
+                var startedAt = performance.now();
+                return Promise.race([
+                    window.html2canvas(el, {
+                        scale: 1,
+                        logging: false,
+                        backgroundColor: "#f2f2ef",
+                    }).then(function (c) {
+                        try {
+                            c.toDataURL();
+                        } catch (e) {}
+                    }),
+                    new Promise(function (resolve) {
+                        setTimeout(function () {
+                            logWarn("html2canvas 预热超时，跳过");
+                            resolve();
+                        }, 8000);
+                    }),
+                ])
+                    .catch(function (e) {
+                        logWarn("html2canvas 预热失败", e && e.message);
+                    })
+                    .then(function () {
+                        el.remove();
+                        h2cWarmed = true;
+                        logInfo(
+                            "html2canvas 预热完成（" +
+                                Math.round(performance.now() - startedAt) +
+                                "ms）",
+                        );
+                    });
+            })
+            .catch(function () {
+                h2cWarmPromise = null;
+            });
+        return h2cWarmPromise;
+    }
+
     var qrWin = null;
     function loadQRLib() {
         if (qrWin) return Promise.resolve(qrWin);
         if (loadQRLib.pending) return loadQRLib.pending;
         loadQRLib.pending = (async function () {
+            var qrT0 = performance.now();
+            logInfo("加载二维码库…");
             var frame = document.createElement("iframe");
             frame.setAttribute("aria-hidden", "true");
             frame.tabIndex = -1;
@@ -160,6 +239,11 @@
                     });
                     if (win.QRCode && typeof win.QRCode.toDataURL === "function") {
                         qrWin = win;
+                        logInfo(
+                            "二维码库就绪（" +
+                                Math.round(performance.now() - qrT0) +
+                                "ms）",
+                        );
                         return win;
                     }
                 } catch (e) {
@@ -242,9 +326,30 @@
         lockScroll(true);
         initStats();
         renderContent();
-        if (!qrOK) renderQR();
+        warmUpShare();
         var close = $("[data-action='close']");
         if (close) close.focus({ preventScroll: true });
+    }
+
+    // 提前预热：首次导出最常见的慢点就是依赖与图片，打开面板时先把它们准备好
+    function prewarmCardImages(card) {
+        if (!card) return;
+        Array.from(card.querySelectorAll("img")).forEach(function (img) {
+            var src = img.currentSrc || img.src;
+            if (!src || src.indexOf("data:") === 0) return;
+            fetchDataURL(src, 1400).catch(function () {});
+        });
+    }
+
+    function preloadHtml2canvas() {
+        warmUpHtml2canvas().catch(function () {});
+    }
+
+    function warmUpShare() {
+        preloadHtml2canvas();
+        if (!qrOK) renderQR();
+        prewarmCardImages(document.getElementById("shareCard"));
+        prewarmCardImages(document.getElementById("spContentCard"));
     }
 
     function closePanel() {
@@ -495,41 +600,51 @@
 
     // 拉取图片并降采样后转为 data URL：
     // 移动端对大图解码/排版极慢，先缩到合适尺寸可显著降低 html2canvas 耗时与内存占用。
-    async function fetchDataURL(src, maxSide) {
+    // 缓存的是 Promise，预取与导出并发时只请求一次。
+    function fetchDataURL(src, maxSide) {
         var key = src + "|" + maxSide;
         if (dataCache[key]) return dataCache[key];
-        var objectURL = null;
-        try {
-            var r = await fetchWithTimeout(src, 6000, {
-                mode: "cors",
-                credentials: "omit",
-            });
-            if (!r.ok) throw new Error("http " + r.status);
-            var blob = await r.blob();
-            var type = blob.type || "";
-            objectURL = URL.createObjectURL(blob);
-            var im = await loadImageElement(objectURL, 8000);
-            var nw = im.naturalWidth || im.width;
-            var nh = im.naturalHeight || im.height;
-            if (!nw || !nh) throw new Error("bad image");
-            var ratio = Math.min(1, maxSide / Math.max(nw, nh));
-            var cw = Math.max(1, Math.round(nw * ratio));
-            var ch = Math.max(1, Math.round(nh * ratio));
-            var canvas = document.createElement("canvas");
-            canvas.width = cw;
-            canvas.height = ch;
-            var ctx = canvas.getContext("2d");
-            if (!ctx) throw new Error("no canvas context");
-            ctx.drawImage(im, 0, 0, cw, ch);
-            var isJpeg = /jpe?g/i.test(type);
-            var url = isJpeg
-                ? canvas.toDataURL("image/jpeg", 0.85)
-                : canvas.toDataURL("image/png");
-            dataCache[key] = url;
-            return url;
-        } finally {
-            if (objectURL) URL.revokeObjectURL(objectURL);
-        }
+        dataCache[key] = (async function () {
+            var objectURL = null;
+            try {
+                var r = await fetchWithTimeout(src, 6000, {
+                    mode: "cors",
+                    credentials: "omit",
+                });
+                if (!r.ok) throw new Error("http " + r.status);
+                var blob = await r.blob();
+                var type = blob.type || "";
+                objectURL = URL.createObjectURL(blob);
+                var im = await loadImageElement(objectURL, 8000);
+                var nw = im.naturalWidth || im.width;
+                var nh = im.naturalHeight || im.height;
+                if (!nw || !nh) throw new Error("bad image");
+                var ratio = Math.min(1, maxSide / Math.max(nw, nh));
+                var cw = Math.max(1, Math.round(nw * ratio));
+                var ch = Math.max(1, Math.round(nh * ratio));
+                var canvas = document.createElement("canvas");
+                canvas.width = cw;
+                canvas.height = ch;
+                var ctx = canvas.getContext("2d");
+                if (!ctx) throw new Error("no canvas context");
+                ctx.drawImage(im, 0, 0, cw, ch);
+                var isJpeg = /jpe?g/i.test(type);
+                var url = isJpeg
+                    ? canvas.toDataURL("image/jpeg", 0.85)
+                    : canvas.toDataURL("image/png");
+                logInfo("图片已内联", {
+                    src: src,
+                    size: nw + "x" + nh + " → " + cw + "x" + ch,
+                });
+                return url;
+            } finally {
+                if (objectURL) URL.revokeObjectURL(objectURL);
+            }
+        })();
+        dataCache[key].catch(function () {
+            delete dataCache[key];
+        });
+        return dataCache[key];
     }
 
     function onImageFail(img) {
@@ -709,17 +824,27 @@
         if (label) label.textContent = "正在生成…";
         toast("正在生成图片…");
         var stage = null;
+        var t0 = performance.now();
+        function mark(label, extra) {
+            if (!SP_DEBUG) return;
+            var ms = Math.round(performance.now() - t0);
+            console.info(
+                "[article-share] +" + ms + "ms " + label,
+                extra === undefined ? "" : extra,
+            );
+        }
+        var isMobile = isMobileDevice();
         try {
+            mark("开始导出", {
+                cardId: cardId,
+                width: Math.round(card.getBoundingClientRect().width),
+                mobile: isMobile,
+            });
             await loadLib("html2canvas");
-            // 二维码只是装饰：即使生成卡住也不能阻塞海报导出
-            if (!qrOK) {
-                await Promise.race([
-                    renderQR(),
-                    new Promise(function (resolve) {
-                        setTimeout(resolve, 6000);
-                    }),
-                ]);
-            }
+            warmUpHtml2canvas();
+            mark("html2canvas 就绪");
+            // 二维码只是装饰，不阻塞导出：没准备好就导出不含二维码的版本
+            if (!qrOK) renderQR();
 
             var width = Math.round(card.getBoundingClientRect().width);
             if (!width || width < 280) width = 360;
@@ -732,9 +857,14 @@
             clone.style.width = "100%";
             stage.appendChild(clone);
             document.body.appendChild(stage);
+            mark("离屏舞台就绪", {
+                width: width,
+                height: Math.round(clone.getBoundingClientRect().height),
+            });
 
             freezeCanvases(card, clone);
             var degraded = await inlineImages(clone);
+            mark("图片处理完成", { degraded: degraded });
             if (document.fonts && document.fonts.ready) {
                 await Promise.race([
                     document.fonts.ready,
@@ -743,9 +873,10 @@
                     }),
                 ]);
             }
+            mark("字体就绪");
             await nextFrames();
+            mark("渲染前帧就绪");
 
-            var isMobile = isMobileDevice();
             // 移动端降低像素倍率：html2canvas 在低端手机上会因大画布长时间卡住
             var targetWidth = isMobile ? 900 : 1024;
             var scale = Math.min(
@@ -769,16 +900,30 @@
                 );
             }
 
+            mark("开始 html2canvas", {
+                scale: scale,
+                width: Math.round(clone.getBoundingClientRect().width),
+                height: Math.round(clone.getBoundingClientRect().height),
+            });
             var canvas;
             try {
                 canvas = await renderCanvas(scale, 30000);
+                mark("html2canvas 完成", {
+                    width: canvas.width,
+                    height: canvas.height,
+                });
             } catch (renderErr) {
                 // 首次渲染超时：用更低倍率重试一次，牺牲清晰度换取成功率
                 if (!/timeout/.test(String(renderErr && renderErr.message))) {
                     throw renderErr;
                 }
+                logWarn("首次渲染超时，降级重试", { scale: 1 });
                 await nextFrames();
                 canvas = await renderCanvas(1, 20000);
+                mark("降级重试完成", {
+                    width: canvas.width,
+                    height: canvas.height,
+                });
             }
 
             var result = await deliver(canvas, filename);
@@ -798,8 +943,16 @@
                 );
             }
             bumpStats();
+            mark("交付完成", result);
         } catch (err) {
-            console.error("[article-share]", err);
+            console.error("[article-share] 导出失败", err);
+            if (SP_DEBUG) {
+                console.info(
+                    "[article-share] 失败耗时 " +
+                        Math.round(performance.now() - t0) +
+                        "ms",
+                );
+            }
             var message = String(err && err.message);
             toast(
                 /lib failed/.test(message)
@@ -949,6 +1102,17 @@
     /* ==========================================================
        事件委托：data-action
        ========================================================== */
+    // 触发按钮被悬停/触摸/聚焦时提前加载 html2canvas，避免首次导出等待
+    var openTrigger = root.querySelector("[data-action='open']");
+    if (openTrigger) {
+        ["pointerenter", "touchstart", "focus"].forEach(function (ev) {
+            openTrigger.addEventListener(ev, preloadHtml2canvas, {
+                once: true,
+                passive: true,
+            });
+        });
+    }
+
     root.addEventListener("click", function (e) {
         if (e.target.closest("[data-action='open']")) openPanel();
     });
