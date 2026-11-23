@@ -57,9 +57,10 @@
             },
             srcs: [
                 data.vendor && data.vendor + "html2canvas.min.js",
-                // "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js",
-                // "https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js",
-                // "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
+                // 本地文件异常时回退到 CDN，避免移动端一直卡在加载
+                "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js",
+                "https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js",
+                "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
             ],
         },
     };
@@ -94,7 +95,7 @@
             for (var i = 0; i < lib.srcs.length; i++) {
                 if (!lib.srcs[i]) continue;
                 try {
-                    await loadScript(lib.srcs[i], 8000);
+                    await loadScript(lib.srcs[i], 12000);
                     if (lib.test()) return;
                 } catch (e) {
                     /* 换下一个源 */
@@ -119,10 +120,22 @@
             frame.style.cssText =
                 "position:absolute;width:0;height:0;border:0;visibility:hidden;pointer-events:none";
             frame.srcdoc = "<!doctype html><html><head></head><body></body></html>";
-            await new Promise(function (resolve) {
-                frame.onload = resolve;
-                document.body.appendChild(frame);
-            });
+            // 部分移动端 WebView 的 srcdoc iframe 可能不触发 load，必须加超时兜底
+            try {
+                await new Promise(function (resolve, reject) {
+                    var timer = setTimeout(function () {
+                        reject(new Error("iframe timeout"));
+                    }, 6000);
+                    frame.onload = function () {
+                        clearTimeout(timer);
+                        resolve();
+                    };
+                    document.body.appendChild(frame);
+                });
+            } catch (e) {
+                frame.remove();
+                throw e;
+            }
             var win = frame.contentWindow;
             var doc = frame.contentDocument;
             for (var i = 0; i < QR_SRCS.length; i++) {
@@ -441,21 +454,82 @@
        ========================================================== */
     var dataCache = {};
 
-    async function fetchDataURL(src) {
-        if (dataCache[src]) return dataCache[src];
-        var r = await fetch(src, { mode: "cors", credentials: "omit" });
-        if (!r.ok) throw new Error("http " + r.status);
-        var blob = await r.blob();
-        var url = await new Promise(function (resolve, reject) {
-            var fr = new FileReader();
-            fr.onload = function () {
-                resolve(fr.result);
+    function fetchWithTimeout(url, ms, options) {
+        options = options || {};
+        if (typeof AbortController !== "function") return fetch(url, options);
+        var ctrl = new AbortController();
+        var timer = setTimeout(function () {
+            ctrl.abort();
+        }, ms);
+        var opts = Object.assign({}, options, { signal: ctrl.signal });
+        return fetch(url, opts).then(
+            function (res) {
+                clearTimeout(timer);
+                return res;
+            },
+            function (err) {
+                clearTimeout(timer);
+                throw err;
+            },
+        );
+    }
+
+    function loadImageElement(src, ms) {
+        return new Promise(function (resolve, reject) {
+            var im = new Image();
+            var timer = setTimeout(function () {
+                im.src = "";
+                reject(new Error("image timeout"));
+            }, ms);
+            im.onload = function () {
+                clearTimeout(timer);
+                resolve(im);
             };
-            fr.onerror = reject;
-            fr.readAsDataURL(blob);
+            im.onerror = function () {
+                clearTimeout(timer);
+                reject(new Error("image error"));
+            };
+            im.src = src;
         });
-        dataCache[src] = url;
-        return url;
+    }
+
+    // 拉取图片并降采样后转为 data URL：
+    // 移动端对大图解码/排版极慢，先缩到合适尺寸可显著降低 html2canvas 耗时与内存占用。
+    async function fetchDataURL(src, maxSide) {
+        var key = src + "|" + maxSide;
+        if (dataCache[key]) return dataCache[key];
+        var objectURL = null;
+        try {
+            var r = await fetchWithTimeout(src, 6000, {
+                mode: "cors",
+                credentials: "omit",
+            });
+            if (!r.ok) throw new Error("http " + r.status);
+            var blob = await r.blob();
+            var type = blob.type || "";
+            objectURL = URL.createObjectURL(blob);
+            var im = await loadImageElement(objectURL, 8000);
+            var nw = im.naturalWidth || im.width;
+            var nh = im.naturalHeight || im.height;
+            if (!nw || !nh) throw new Error("bad image");
+            var ratio = Math.min(1, maxSide / Math.max(nw, nh));
+            var cw = Math.max(1, Math.round(nw * ratio));
+            var ch = Math.max(1, Math.round(nh * ratio));
+            var canvas = document.createElement("canvas");
+            canvas.width = cw;
+            canvas.height = ch;
+            var ctx = canvas.getContext("2d");
+            if (!ctx) throw new Error("no canvas context");
+            ctx.drawImage(im, 0, 0, cw, ch);
+            var isJpeg = /jpe?g/i.test(type);
+            var url = isJpeg
+                ? canvas.toDataURL("image/jpeg", 0.85)
+                : canvas.toDataURL("image/png");
+            dataCache[key] = url;
+            return url;
+        } finally {
+            if (objectURL) URL.revokeObjectURL(objectURL);
+        }
     }
 
     function onImageFail(img) {
@@ -476,33 +550,38 @@
     async function inlineImages(clone) {
         var degraded = false;
         var imgs = Array.from(clone.querySelectorAll("img"));
-        await Promise.all(
-            imgs.map(async function (img) {
-                var src = img.currentSrc || img.src;
-                if (!src || src.indexOf("data:") === 0) return;
-                try {
-                    var d = await fetchDataURL(src);
-                    if (img.dataset.fit === "cover") {
-                        // html2canvas 对 object-fit 支持不稳定，改用背景图
-                        var box = document.createElement("div");
-                        box.className = img.className;
-                        box.setAttribute("role", "img");
-                        box.style.backgroundImage = 'url("' + d + '")';
-                        box.style.backgroundSize = "cover";
-                        box.style.backgroundPosition = "center";
-                        box.style.backgroundRepeat = "no-repeat";
-                        img.replaceWith(box);
-                    } else {
-                        img.removeAttribute("loading");
-                        img.src = d;
-                        if (img.decode) await img.decode().catch(function () {});
-                    }
-                } catch (e) {
-                    degraded = true;
-                    onImageFail(img);
+        var maxSide = 1400;
+        var tasks = imgs.map(async function (img) {
+            var src = img.currentSrc || img.src;
+            if (!src || src.indexOf("data:") === 0) return;
+            try {
+                var d = await fetchDataURL(src, maxSide);
+                if (img.dataset.fit === "cover") {
+                    // html2canvas 对 object-fit 支持不稳定，改用背景图
+                    var box = document.createElement("div");
+                    box.className = img.className;
+                    box.setAttribute("role", "img");
+                    box.style.backgroundImage = 'url("' + d + '")';
+                    box.style.backgroundSize = "cover";
+                    box.style.backgroundPosition = "center";
+                    box.style.backgroundRepeat = "no-repeat";
+                    img.replaceWith(box);
+                } else {
+                    img.removeAttribute("loading");
+                    img.src = d;
+                    if (img.decode) await img.decode().catch(function () {});
                 }
-            }),
-        );
+            } catch (e) {
+                degraded = true;
+                onImageFail(img);
+            }
+        });
+        // 整体兜底：即使外链图片一直不返回，也不能阻塞后续渲染
+        try {
+            await withTimeout(Promise.all(tasks), 15000, "inline timeout");
+        } catch (e) {
+            degraded = true;
+        }
         return degraded;
     }
 
@@ -632,7 +711,15 @@
         var stage = null;
         try {
             await loadLib("html2canvas");
-            if (!qrOK) await renderQR();
+            // 二维码只是装饰：即使生成卡住也不能阻塞海报导出
+            if (!qrOK) {
+                await Promise.race([
+                    renderQR(),
+                    new Promise(function (resolve) {
+                        setTimeout(resolve, 6000);
+                    }),
+                ]);
+            }
 
             var width = Math.round(card.getBoundingClientRect().width);
             if (!width || width < 280) width = 360;
@@ -658,17 +745,41 @@
             }
             await nextFrames();
 
-            var canvas = await withTimeout(
-                window.html2canvas(clone, {
-                    backgroundColor: "#f2f2ef",
-                    scale: Math.min(3, Math.max(2, 1024 / width)),
-                    useCORS: true,
-                    allowTaint: false,
-                    logging: false,
-                }),
-                30000,
-                "generate timeout",
+            var isMobile = isMobileDevice();
+            // 移动端降低像素倍率：html2canvas 在低端手机上会因大画布长时间卡住
+            var targetWidth = isMobile ? 900 : 1024;
+            var scale = Math.min(
+                isMobile ? 2 : 3,
+                Math.max(isMobile ? 1.5 : 2, targetWidth / width),
             );
+
+            function renderCanvas(scaleValue, timeoutMs) {
+                return withTimeout(
+                    window.html2canvas(clone, {
+                        backgroundColor: "#f2f2ef",
+                        scale: scaleValue,
+                        useCORS: true,
+                        allowTaint: false,
+                        logging: false,
+                        imageTimeout: 12000,
+                        removeContainer: true,
+                    }),
+                    timeoutMs,
+                    "generate timeout",
+                );
+            }
+
+            var canvas;
+            try {
+                canvas = await renderCanvas(scale, 30000);
+            } catch (renderErr) {
+                // 首次渲染超时：用更低倍率重试一次，牺牲清晰度换取成功率
+                if (!/timeout/.test(String(renderErr && renderErr.message))) {
+                    throw renderErr;
+                }
+                await nextFrames();
+                canvas = await renderCanvas(1, 20000);
+            }
 
             var result = await deliver(canvas, filename);
             if (result === "shared") {
