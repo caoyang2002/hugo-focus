@@ -9,7 +9,7 @@
 
     var root = document.documentElement;
     var TILE = 1024; // 纹理块分辨率（可无缝平铺）
-    var CACHE_KEY = "paper-tile-v2";
+    var CACHE_KEY = "paper-tile-v3";
     var running = false;
     var currentObjectURL = null;
 
@@ -104,7 +104,7 @@
 
         var Lx = -0.62,
             Ly = -0.62;
-        var K = 1.6;
+        var K = 1.0;
 
         for (var y2 = 0; y2 < size; y2++) {
             var yU = (y2 + size - 1) % size;
@@ -123,15 +123,15 @@
                 var dy = H[rD + x2] - H[rU + x2];
 
                 var shade = 1 - K * (dx * Lx + dy * Ly);
-                if (shade < 0.55) shade = 0.55;
-                else if (shade > 1.45) shade = 1.45;
+                if (shade < 0.72) shade = 0.72;
+                else if (shade > 1.26) shade = 1.26;
 
                 var low = vnoise((x2 / size) * 8, yn2 * 8, 8, sLow);
                 var ao = (0.88 + 0.24 * hc) * (0.96 + 0.08 * low);
 
                 var v = shade * ao;
-                if (v < 0.46) v = 0.46;
-                else if (v > 1.09) v = 1.09;
+                if (v < 0.64) v = 0.64;
+                else if (v > 1.04) v = 1.04;
 
                 var R = 236 * v;
                 var G = 230 * v;
@@ -139,9 +139,9 @@
 
                 if (v < 1) {
                     var d = (1 - v) * (1 - v);
-                    R -= d * 26;
-                    G -= d * 44;
-                    B -= d * 74;
+                    R -= d * 20;
+                    G -= d * 34;
+                    B -= d * 58;
                 }
 
                 data[p++] = R;
@@ -322,10 +322,10 @@
             darkStyles = [];
         for (var q2 = 0; q2 < 8; q2++) {
             brightStyles.push(
-                "rgba(255,255,250," + (0.1 + q2 * 0.038).toFixed(3) + ")",
+                "rgba(255,255,250," + (0.08 + q2 * 0.03).toFixed(3) + ")",
             );
             darkStyles.push(
-                "rgba(120,102,78," + (0.06 + q2 * 0.024).toFixed(3) + ")",
+                "rgba(120,102,78," + (0.04 + q2 * 0.018).toFixed(3) + ")",
             );
         }
         var SAND = 14000;
